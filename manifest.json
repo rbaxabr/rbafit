@@ -2,7 +2,7 @@
   "name": "16-Week Transformation Tracker",
   "short_name": "Workout Tracker",
   "description": "Track your 16-week fitness transformation",
-  "start_url": "/workout-tracker/",
+  "start_url": "/rbafit/",
   "display": "standalone",
   "background_color": "#0f172a",
   "theme_color": "#1e293b",
