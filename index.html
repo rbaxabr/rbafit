@@ -6,12 +6,25 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>16-Week Transformation</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1e293b">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E💪%3C/text%3E%3C/svg%3E">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gradient-to-br from-slate-900 to-slate-800 text-white min-h-screen">
     <div id="app"></div>
 
     <script>
+        // Calculate current week based on start date
+        function getCurrentWeek() {
+            const startDate = new Date('2024-10-11');
+            const today = new Date();
+            const diffTime = today - startDate;
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            const weekNum = Math.floor(diffDays / 7);
+            return Math.max(0, Math.min(16, weekNum));
+        }
+
         // State management
         const state = {
             currentWeek: parseInt(localStorage.getItem('lastWeek')) || getCurrentWeek(),
@@ -23,16 +36,6 @@
             editingSet: null,
             tempWeight: ''
         };
-
-        // Calculate current week based on start date
-        function getCurrentWeek() {
-            const startDate = new Date('2024-10-11'); // Program start
-            const today = new Date();
-            const diffTime = today - startDate;
-            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-            const weekNum = Math.floor(diffDays / 7);
-            return Math.max(0, Math.min(16, weekNum));
-        }
 
         function saveState() {
             localStorage.setItem('workoutProgress', JSON.stringify(state.completedExercises));
@@ -119,7 +122,6 @@
             return phases[phase];
         }
 
-        // Simplified workout data - Phase 1 structure (repeated for all phases with weight progression)
         const baseWorkouts = {
             monday: { 
                 name: 'Lower Body', 
@@ -275,8 +277,6 @@
             
             const phase = getPhase(week);
             const schedule = JSON.parse(JSON.stringify(baseWorkouts));
-            
-            // Progressive weight increases by phase
             const weightMultiplier = 1 + (phase - 1) * 0.15;
             
             Object.keys(schedule).forEach(day => {
@@ -423,6 +423,8 @@
             const workout = schedule[state.selectedDay];
             const phase = getPhase(state.currentWeek);
             const phaseInfo = getPhaseInfo(phase);
+            const dates = getWeekDates(state.currentWeek);
+            const dayDate = dates[state.selectedDay];
             
             let html = `
                 <div class="max-w-4xl mx-auto p-4">
@@ -434,6 +436,7 @@
                                 <div class="text-sm text-slate-400 space-x-2">
                                     <span>Week ${state.currentWeek}</span>
                                     ${state.currentWeek > 0 ? `<span>• ${phaseInfo.name}</span>` : ''}
+                                    <span>• ${formatDate(dayDate)}</span>
                                     <span>• ${workout.duration}</span>
                                     <span>• ${workout.location}</span>
                                 </div>
@@ -518,6 +521,7 @@
             const schedule = getWorkoutSchedule(state.currentWeek);
             const days = state.currentWeek === 0 ? ['saturday', 'sunday'] : ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
             const dayLabels = state.currentWeek === 0 ? ['Sat', 'Sun'] : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            const dates = getWeekDates(state.currentWeek);
             
             let html = `
                 <div class="max-w-6xl mx-auto p-4">
@@ -627,7 +631,6 @@
                 state.selectedDay = null;
             }
             render();
-            // Prevent default back behavior
             window.history.pushState({}, '');
         }
 
@@ -640,20 +643,8 @@
         function selectDay(day) {
             state.selectedDay = day;
             render();
-            // Push state to enable back button
             window.history.pushState({ view: 'workout', day: day }, '');
         }
-
-        // Handle browser back button
-        window.addEventListener('popstate', function(event) {
-            if (state.selectedDay) {
-                state.selectedDay = null;
-                render();
-            } else if (state.view === 'supplements') {
-                state.view = 'overview';
-                render();
-            }
-        });
 
         function toggleSupplement(time, idx) {
             const today = new Date().toDateString();
@@ -696,6 +687,17 @@
             state.tempWeight = '';
             render();
         }
+
+        // Handle browser back button
+        window.addEventListener('popstate', function(event) {
+            if (state.selectedDay) {
+                state.selectedDay = null;
+                render();
+            } else if (state.view === 'supplements') {
+                state.view = 'overview';
+                render();
+            }
+        });
 
         // Initial render
         render();
