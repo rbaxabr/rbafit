@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>16-Week Transformation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-slate-900 to-slate-800 text-white min-h-screen">
+    <div id="app"></div>
+
+    <script>
+        // State management
+        const state = {
+            currentWeek: 0,
+            selectedDay: null,
+            view: 'overview',
+            completedExercises: JSON.parse(localStorage.getItem('workoutProgress') || '{}'),
+            exerciseWeights: JSON.parse(localStorage.getItem('exerciseWeights') || '{}'),
+            supplementLog: JSON.parse(localStorage.getItem('supplementLog') || '{}'),
+            editingSet: null,
+            tempWeight: ''
+        };
+
+        function saveState() {
+            localStorage.setItem('workoutProgress', JSON.stringify(state.completedExercises));
+            localStorage.setItem('exerciseWeights', JSON.stringify(state.exerciseWeights));
+            localStorage.setItem('supplementLog', JSON.stringify(state.supplementLog));
+        }
+
+        const supplementSchedule = {
+            preworkout: {
+                time: '6:00 AM',
+                note: 'Before training',
+                supplements: [
+                    { name: 'Beta-Alanine', dose: '3.2g (4 caps)', icon: '⚡', conditional: true },
+                    { name: 'Collagen', dose: '1 scoop', icon: '🦴' }
+                ]
+            },
+            morning: {
+                time: '8:30 AM',
+                note: 'Post-workout',
+                supplements: [
+                    { name: 'Whey Protein', dose: '2 scoops (50g)', icon: '🥤' },
+                    { name: 'Creatine', dose: '5g', icon: '💪' },
+                    { name: 'Omega-3', dose: '1 cap', icon: '🐟' },
+                    { name: 'Vitamin D3+K2', dose: '4000IU+100mcg', icon: '☀️' },
+                    { name: 'B-Complex', dose: '1 cap', icon: '🔋' },
+                    { name: 'Vitamin C', dose: '500mg', icon: '🍊' }
+                ]
+            },
+            evening: {
+                time: '9:30 PM',
+                note: 'Before bed',
+                supplements: [
+                    { name: 'Magnesium', dose: '240mg', icon: '😴' },
+                    { name: 'Zinc', dose: '30mg', icon: '🛡️' },
+                    { name: 'Ashwagandha', dose: '500mg', icon: '🧘' }
+                ]
+            }
+        };
+
+        function getPhase(week) {
+            if (week === 0) return 0;
+            if (week <= 4) return 1;
+            if (week <= 8) return 2;
+            if (week <= 12) return 3;
+            return 4;
+        }
+
+        function getPhaseInfo(phase) {
+            const phases = {
+                0: { name: 'Prep Week', focus: 'Movement prep' },
+                1: { name: 'Foundation', focus: 'Work capacity' },
+                2: { name: 'Strength Building', focus: 'Progressive overload' },
+                3: { name: 'Power & Hypertrophy', focus: 'Peak building' },
+                4: { name: 'Peak Performance', focus: 'Max strength' }
+            };
+            return phases[phase];
+        }
+
+        // Simplified workout data - Phase 1 structure (repeated for all phases with weight progression)
+        const baseWorkouts = {
+            monday: { 
+                name: 'Lower Body', 
+                duration: '65 min',
+                location: 'home',
+                exercises: [
+                    { name: 'Dynamic Warm-up', sets: 1, reps: '8 min' },
+                    { name: 'Box Jumps', sets: 3, reps: 8, rest: '90s' },
+                    { name: 'Goblet Squats', sets: 4, reps: 15, rest: '90s', hasWeight: true, defaultWeight: 35 },
+                    { name: 'Single-Leg Step-ups', sets: 3, reps: '12/side', rest: '75s', hasWeight: true, defaultWeight: 20 },
+                    { name: 'KB Swings', sets: 4, reps: 20, rest: '75s', hasWeight: true, defaultWeight: 35 },
+                    { name: 'Walking Lunges', sets: 3, reps: '20 steps', rest: '75s', hasWeight: true, defaultWeight: 20 },
+                    { name: 'Slider Leg Curls', sets: 3, reps: 12, rest: '60s' },
+                    { name: 'Core: Med Ball Slams', sets: 3, reps: 15, rest: '45s' },
+                    { name: 'Core: Plank Hold', sets: 3, reps: '45s', rest: '30s' },
+                    { name: 'Mobility Cool-down', sets: 1, reps: '5 min' }
+                ]
+            },
+            tuesday: { 
+                name: 'Upper Body', 
+                duration: '70 min',
+                location: 'home',
+                exercises: [
+                    { name: 'Dynamic Warm-up', sets: 1, reps: '8 min' },
+                    { name: 'DB Floor Press', sets: 4, reps: 12, rest: '90s', hasWeight: true, defaultWeight: 35 },
+                    { name: 'KB Rows', sets: 4, reps: '15/side', rest: '90s', hasWeight: true, defaultWeight: 35 },
+                    { name: 'KB Shoulder Press', sets: 4, reps: 12, rest: '75s', hasWeight: true, defaultWeight: 25 },
+                    { name: 'Push-ups', sets: 3, reps: 15, rest: '75s' },
+                    { name: 'KB Upright Rows', sets: 3, reps: 15, rest: '60s', hasWeight: true, defaultWeight: 25 },
+                    { name: 'Hammer Curls', sets: 3, reps: 15, rest: '60s', hasWeight: true, defaultWeight: 20 },
+                    { name: 'Tricep Extensions', sets: 3, reps: 15, rest: '60s', hasWeight: true, defaultWeight: 25 },
+                    { name: 'Core: Med Ball Twists', sets: 3, reps: 20, rest: '45s' },
+                    { name: 'Core: Dead Bugs', sets: 3, reps: '12/side', rest: '30s' },
+                    { name: 'Stretch', sets: 1, reps: '5 min' }
+                ]
+            },
+            wednesday: { 
+                name: 'HIIT Conditioning', 
+                duration: '60 min',
+                location: 'track',
+                note: 'Bring: Jump rope, sliders, water',
+                exercises: [
+                    { name: 'Warm-up Jog', sets: 1, reps: '8 min' },
+                    { name: 'Sprint Intervals', sets: 8, reps: '200m @ 80%', rest: '90s' },
+                    { name: 'Stadium Stairs', sets: 6, reps: 'full climb', rest: '90s' },
+                    { name: 'Jump Rope HIIT', sets: 8, reps: '45s on/45s off' },
+                    { name: 'Slider Mt Climbers', sets: 3, reps: 20, rest: '45s' },
+                    { name: 'Core: Burpees', sets: 3, reps: 10, rest: '60s' },
+                    { name: 'Core: Plank to Dog', sets: 3, reps: 12, rest: '45s' },
+                    { name: 'Cool-down', sets: 1, reps: '8 min' }
+                ]
+            },
+            thursday: { 
+                name: 'Full Body Power', 
+                duration: '65 min',
+                location: 'home',
+                exercises: [
+                    { name: 'Dynamic Warm-up', sets: 1, reps: '8 min' },
+                    { name: 'Broad Jumps', sets: 4, reps: 5, rest: '2m' },
+                    { name: 'KB Clean & Press', sets: 4, reps: '8/side', rest: '2m', hasWeight: true, defaultWeight: 35 },
+                    { name: 'Single-Leg RDL', sets: 3, reps: '12/side', rest: '75s', hasWeight: true, defaultWeight: 25 },
+                    { name: 'Box Jumps', sets: 4, reps: 8, rest: '90s' },
+                    { name: 'KB Swings', sets: 4, reps: 25, rest: '90s', hasWeight: true, defaultWeight: 35 },
+                    { name: 'Lateral Bounds', sets: 3, reps: '10/side', rest: '60s' },
+                    { name: 'Weighted Carries', sets: 3, reps: '50 yds', rest: '75s', hasWeight: true, defaultWeight: 15 },
+                    { name: 'Core: Med Ball Slams', sets: 3, reps: 15, rest: '45s' },
+                    { name: 'Core: Ball Pikes', sets: 3, reps: 10, rest: '45s' },
+                    { name: 'Mobility', sets: 1, reps: '5 min' }
+                ]
+            },
+            friday: { 
+                name: 'Upper Volume', 
+                duration: '65 min',
+                location: 'home',
+                exercises: [
+                    { name: 'Dynamic Warm-up', sets: 1, reps: '8 min' },
+                    { name: 'DB Floor Press', sets: 4, reps: 12, rest: '90s', hasWeight: true, defaultWeight: 35 },
+                    { name: 'Bent-Over Rows', sets: 4, reps: 15, rest: '75s', hasWeight: true, defaultWeight: 35 },
+                    { name: 'Lateral Raises', sets: 3, reps: 15, rest: '60s', hasWeight: true, defaultWeight: 12 },
+                    { name: 'Pike Push-ups', sets: 3, reps: 12, rest: '75s' },
+                    { name: 'KB Curls', sets: 3, reps: 15, rest: '60s', hasWeight: true, defaultWeight: 20 },
+                    { name: 'Skull Crushers', sets: 3, reps: 15, rest: '60s', hasWeight: true, defaultWeight: 20 },
+                    { name: 'Face Pulls', sets: 3, reps: 20, rest: '60s', hasWeight: true, defaultWeight: 15 },
+                    { name: 'Core: Side Throws', sets: 3, reps: '12/side', rest: '45s' },
+                    { name: 'Core: Ball Rollouts', sets: 3, reps: 10, rest: '45s' },
+                    { name: 'Stretch', sets: 1, reps: '5 min' }
+                ]
+            },
+            saturday: { 
+                name: 'Athletic Power', 
+                duration: '70 min',
+                location: 'track',
+                note: 'Bring: Jump rope, weighted vest, sliders, water',
+                exercises: [
+                    { name: 'Dynamic Warm-up', sets: 1, reps: '12 min' },
+                    { name: 'Power Sprints', sets: 8, reps: '50m @ 90%', rest: '2m' },
+                    { name: 'Broad Jumps', sets: 4, reps: 5, rest: '90s' },
+                    { name: 'Agility T-Drill', sets: 6, reps: 1, rest: '90s' },
+                    { name: 'Lateral Bounds', sets: 3, reps: '10/side', rest: '60s' },
+                    { name: 'Jump Rope', sets: 5, reps: '1 min', rest: '60s' },
+                    { name: 'Weighted Stairs', sets: 5, reps: 'full climb', rest: '90s', hasWeight: true, defaultWeight: 15 },
+                    { name: 'Core: High Knees', sets: 3, reps: '30s', rest: '30s' },
+                    { name: 'Core: V-ups', sets: 3, reps: 15, rest: '45s' },
+                    { name: 'Core: Bicycle Crunches', sets: 3, reps: 20, rest: '30s' },
+                    { name: 'Cool-down', sets: 1, reps: '8 min' }
+                ]
+            },
+            sunday: { 
+                name: 'Active Recovery', 
+                duration: '40 min',
+                location: 'home',
+                exercises: [
+                    { name: 'Easy Jog/Peloton', sets: 1, reps: '20 min' },
+                    { name: 'Jump Rope Easy', sets: 1, reps: '5 min' },
+                    { name: 'Mobility Flow', sets: 1, reps: '10 min' },
+                    { name: 'Foam Rolling', sets: 1, reps: '5 min' }
+                ]
+            }
+        };
+
+        const prepWorkouts = {
+            saturday: { 
+                name: 'Prep Power', 
+                duration: '55 min',
+                location: 'track',
+                note: 'Bring: Jump rope, sliders, water - 75% intensity',
+                exercises: [
+                    { name: 'Dynamic Warm-up', sets: 1, reps: '12 min' },
+                    { name: 'Build-up Sprints', sets: 6, reps: '40m @ 75%', rest: '2m' },
+                    { name: 'Broad Jumps', sets: 3, reps: 5, rest: '90s' },
+                    { name: 'Agility Drills', sets: 1, reps: '8 min' },
+                    { name: 'Jump Rope', sets: 5, reps: '1 min on/off' },
+                    { name: 'Easy Stairs', sets: 4, reps: 'walk up/jog down', rest: '90s' },
+                    { name: 'Core: Plank', sets: 3, reps: '30s', rest: '30s' },
+                    { name: 'Mobility', sets: 1, reps: '8 min' }
+                ]
+            },
+            sunday: { 
+                name: 'Prep Recovery', 
+                duration: '40 min',
+                location: 'home',
+                exercises: [
+                    { name: 'Walk/Easy Jog', sets: 1, reps: '20 min' },
+                    { name: 'Jump Rope', sets: 1, reps: '8 min' },
+                    { name: 'Stretching', sets: 1, reps: '8 min' },
+                    { name: 'Foam Rolling', sets: 1, reps: '4 min' }
+                ]
+            }
+        };
+
+        function getWorkoutSchedule(week) {
+            if (week === 0) return prepWorkouts;
+            
+            const phase = getPhase(week);
+            const schedule = JSON.parse(JSON.stringify(baseWorkouts));
+            
+            // Progressive weight increases by phase
+            const weightMultiplier = 1 + (phase - 1) * 0.15;
+            
+            Object.keys(schedule).forEach(day => {
+                schedule[day].exercises.forEach(ex => {
+                    if (ex.hasWeight && ex.defaultWeight) {
+                        ex.defaultWeight = Math.round(ex.defaultWeight * weightMultiplier);
+                    }
+                });
+            });
+            
+            return schedule;
+        }
+
+        function getSuppCompletion() {
+            const today = new Date().toDateString();
+            const dayOfWeek = new Date().getDay();
+            const isRestDay = dayOfWeek === 0 || dayOfWeek === 3;
+            
+            let total = 0, completed = 0;
+            
+            Object.keys(supplementSchedule).forEach(time => {
+                supplementSchedule[time].supplements.forEach((supp, idx) => {
+                    if (supp.conditional && isRestDay) return;
+                    total++;
+                    if (state.supplementLog[`${today}-${time}-${idx}`]) completed++;
+                });
+            });
+            
+            return total > 0 ? Math.round((completed / total) * 100) : 0;
+        }
+
+        function getDayCompletion(day) {
+            const schedule = getWorkoutSchedule(state.currentWeek);
+            const workout = schedule[day];
+            if (!workout) return 0;
+            const completed = workout.exercises.filter((_, idx) => 
+                state.completedExercises[`week${state.currentWeek}-${day}-${idx}`]
+            ).length;
+            return Math.round((completed / workout.exercises.length) * 100);
+        }
+
+        function getWeekCompletion(week) {
+            const schedule = getWorkoutSchedule(week);
+            const days = week === 0 ? ['saturday', 'sunday'] : ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+            
+            let total = 0, completed = 0;
+            
+            days.forEach(day => {
+                const workout = schedule[day];
+                if (workout) {
+                    total += workout.exercises.length;
+                    workout.exercises.forEach((_, idx) => {
+                        if (state.completedExercises[`week${week}-${day}-${idx}`]) completed++;
+                    });
+                }
+            });
+            
+            return total > 0 ? Math.round((completed / total) * 100) : 0;
+        }
+
+        function getProgramCompletion() {
+            let total = 0, completed = 0;
+            
+            for (let week = 0; week <= 16; week++) {
+                const schedule = getWorkoutSchedule(week);
+                const days = week === 0 ? ['saturday', 'sunday'] : ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+                
+                days.forEach(day => {
+                    const workout = schedule[day];
+                    if (workout) {
+                        total += workout.exercises.length;
+                        workout.exercises.forEach((_, idx) => {
+                            if (state.completedExercises[`week${week}-${day}-${idx}`]) completed++;
+                        });
+                    }
+                });
+            }
+            
+            return total > 0 ? Math.round((completed / total) * 100) : 0;
+        }
+
+        function render() {
+            const app = document.getElementById('app');
+            if (state.view === 'supplements') {
+                app.innerHTML = renderSupplements();
+            } else if (state.selectedDay) {
+                app.innerHTML = renderWorkoutDetail();
+            } else {
+                app.innerHTML = renderOverview();
+            }
+        }
+
+        function renderSupplements() {
+            const today = new Date().toDateString();
+            const dayOfWeek = new Date().getDay();
+            const isRestDay = dayOfWeek === 0 || dayOfWeek === 3;
+            
+            let html = `
+                <div class="max-w-4xl mx-auto p-4">
+                    <button onclick="goBack()" class="text-blue-400 mb-6">← Back</button>
+                    <div class="bg-slate-800 rounded-lg p-6 mb-6 border border-slate-700">
+                        <h2 class="text-3xl font-bold mb-2">Daily Supplements</h2>
+                        <div class="text-4xl font-bold text-blue-400">${getSuppCompletion()}%</div>
+                        <p class="text-sm text-slate-400 mt-2">
+                            ${isRestDay ? '🧘 Rest day - No Beta-Alanine' : '💪 Training day'}
+                        </p>
+                    </div>
+            `;
+            
+            Object.entries(supplementSchedule).forEach(([timeKey, timeData]) => {
+                html += `
+                    <div class="bg-slate-800 rounded-lg p-6 mb-6 border border-slate-700">
+                        <div class="mb-4">
+                            <h3 class="text-xl font-bold capitalize">${timeKey}</h3>
+                            <p class="text-sm text-slate-400">${timeData.time} • ${timeData.note}</p>
+                        </div>
+                        <div class="space-y-3">
+                `;
+                
+                timeData.supplements.forEach((supp, idx) => {
+                    if (supp.conditional && isRestDay) return;
+                    const isChecked = state.supplementLog[`${today}-${timeKey}-${idx}`];
+                    html += `
+                        <div onclick="toggleSupplement('${timeKey}', ${idx})" 
+                            class="flex items-center gap-4 p-4 rounded-lg cursor-pointer ${isChecked ? 'bg-green-900/30 border border-green-600' : 'bg-slate-700/50 border border-slate-600'}">
+                            <div class="text-2xl">${isChecked ? '✓' : '○'}</div>
+                            <div class="text-3xl">${supp.icon}</div>
+                            <div class="flex-1">
+                                <div class="font-semibold">${supp.name}</div>
+                                <div class="text-sm text-slate-400">${supp.dose}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += `</div></div>`;
+            });
+            
+            return html + `</div>`;
+        }
+
+        function renderWorkoutDetail() {
+            const schedule = getWorkoutSchedule(state.currentWeek);
+            const workout = schedule[state.selectedDay];
+            const phase = getPhase(state.currentWeek);
+            const phaseInfo = getPhaseInfo(phase);
+            
+            let html = `
+                <div class="max-w-4xl mx-auto p-4">
+                    <button onclick="goBack()" class="text-blue-400 mb-6">← Back</button>
+                    <div class="bg-slate-800 rounded-lg p-6 mb-6 border border-slate-700">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h2 class="text-2xl font-bold mb-2">${workout.name}</h2>
+                                <div class="text-sm text-slate-400 space-x-2">
+                                    <span>Week ${state.currentWeek}</span>
+                                    ${state.currentWeek > 0 ? `<span>• ${phaseInfo.name}</span>` : ''}
+                                    <span>• ${workout.duration}</span>
+                                    <span>• ${workout.location}</span>
+                                </div>
+                                ${workout.note ? `<div class="text-xs text-blue-300 mt-2">💡 ${workout.note}</div>` : ''}
+                            </div>
+                            <div class="text-3xl font-bold text-blue-400">${getDayCompletion(state.selectedDay)}%</div>
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+            `;
+            
+            workout.exercises.forEach((exercise, idx) => {
+                const isCompleted = state.completedExercises[`week${state.currentWeek}-${state.selectedDay}-${idx}`];
+                html += `
+                    <div class="bg-slate-800 rounded-lg p-4 border ${isCompleted ? 'border-green-500 bg-green-900/20' : 'border-slate-700'}">
+                        <div class="flex items-start gap-3">
+                            <div onclick="toggleExercise('${state.selectedDay}', ${idx})" class="cursor-pointer mt-1 text-2xl">
+                                ${isCompleted ? '✓' : '○'}
+                            </div>
+                            <div class="flex-1">
+                                <div class="font-semibold text-lg mb-1">${exercise.name}</div>
+                                <div class="text-sm text-slate-400">
+                                    Sets: ${exercise.sets} • Reps: ${exercise.reps}
+                                    ${exercise.rest ? ` • Rest: ${exercise.rest}` : ''}
+                                </div>
+                                ${exercise.hasWeight ? renderWeightSets(exercise, idx) : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += `
+                    </div>
+                    <button onclick="goBack()" class="w-full mt-6 bg-green-600 py-4 rounded-lg font-bold text-lg">
+                        Complete Workout
+                    </button>
+                </div>
+            `;
+            return html;
+        }
+
+        function renderWeightSets(exercise, exerciseIdx) {
+            let html = '<div class="mt-3 space-y-2">';
+            for (let setNum = 1; setNum <= exercise.sets; setNum++) {
+                const weightKey = `week${state.currentWeek}-${state.selectedDay}-${exerciseIdx}-set${setNum}`;
+                const currentWeight = state.exerciseWeights[weightKey] || exercise.defaultWeight || 0;
+                const isEditing = state.editingSet === `${state.selectedDay}-${exerciseIdx}-${setNum}`;
+                
+                if (isEditing) {
+                    html += `
+                        <div class="bg-slate-700/50 rounded-lg p-3 flex gap-2">
+                            <span class="text-sm font-semibold min-w-[50px]">Set ${setNum}:</span>
+                            <input type="number" id="weightInput" value="${state.tempWeight}" 
+                                oninput="state.tempWeight = this.value"
+                                class="flex-1 bg-slate-900 border border-slate-600 rounded px-3 py-2 text-white text-sm">
+                            <button onclick="saveWeight('${state.selectedDay}', ${exerciseIdx}, ${setNum})" 
+                                class="bg-green-600 px-3 py-2 rounded">✓</button>
+                            <button onclick="cancelEdit()" 
+                                class="bg-slate-600 px-3 py-2 rounded">✕</button>
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div class="bg-slate-700/50 rounded-lg p-3 flex justify-between">
+                            <div>
+                                <span class="text-sm text-slate-400">Set ${setNum}:</span>
+                                <span class="text-lg font-bold text-blue-400 ml-2">${currentWeight} lbs</span>
+                            </div>
+                            <button onclick="editWeight('${state.selectedDay}', ${exerciseIdx}, ${setNum}, ${currentWeight})" 
+                                class="bg-blue-600 px-3 py-1 rounded text-sm">Edit</button>
+                        </div>
+                    `;
+                }
+            }
+            return html + '</div>';
+        }
+
+        function renderOverview() {
+            const phase = getPhase(state.currentWeek);
+            const phaseInfo = getPhaseInfo(phase);
+            const schedule = getWorkoutSchedule(state.currentWeek);
+            const days = state.currentWeek === 0 ? ['saturday', 'sunday'] : ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+            const dayLabels = state.currentWeek === 0 ? ['Sat', 'Sun'] : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            
+            let html = `
+                <div class="max-w-6xl mx-auto p-4">
+                    <h1 class="text-4xl font-bold mb-4 text-center bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                        16-Week Transformation
+                    </h1>
+                    ${state.currentWeek > 0 ? `
+                        <div class="text-center mb-6">
+                            <div class="inline-block bg-purple-600/20 border border-purple-500 rounded-lg px-6 py-2">
+                                <span class="text-purple-300 font-semibold">Phase ${phase}: ${phaseInfo.name}</span>
+                                <span class="text-slate-400 text-sm ml-3">• ${phaseInfo.focus}</span>
+                            </div>
+                        </div>
+                    ` : ''}
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <button onclick="state.view = 'supplements'; render()" 
+                            class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-6 text-left">
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="flex items-center gap-3">
+                                    <span class="text-3xl">💊</span>
+                                    <h3 class="text-2xl font-bold">Supplements</h3>
+                                </div>
+                                <div class="text-3xl font-bold">${getSuppCompletion()}%</div>
+                            </div>
+                            <p>Track daily supplements</p>
+                        </button>
+                        
+                        <div class="bg-slate-800 rounded-lg p-6 border border-slate-700">
+                            <div class="flex items-center gap-3 mb-4">
+                                <span class="text-3xl text-orange-400">💪</span>
+                                <h3 class="text-2xl font-bold">Progress</h3>
+                            </div>
+                            <div class="space-y-4">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm text-slate-400">Week ${state.currentWeek}</span>
+                                    <span class="text-2xl font-bold text-orange-400">${getWeekCompletion(state.currentWeek)}%</span>
+                                </div>
+                                <div class="pt-3 border-t border-slate-600">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm text-slate-400">Overall Program</span>
+                                        <span class="text-2xl font-bold text-green-400">${getProgramCompletion()}%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-800 rounded-lg p-6 mb-6 border border-slate-700">
+                        <div class="flex items-center justify-between">
+                            <button onclick="changeWeek(-1)" ${state.currentWeek === 0 ? 'disabled' : ''}
+                                class="p-3 rounded-lg text-2xl ${state.currentWeek === 0 ? 'bg-slate-700 opacity-50' : 'bg-slate-700'}">
+                                ←
+                            </button>
+                            <div class="text-center">
+                                <div class="text-3xl font-bold">Week ${state.currentWeek}</div>
+                                <div class="text-sm text-slate-400 mt-1">
+                                    ${state.currentWeek === 0 ? 'Prep Week' : `${state.currentWeek} of 16`}
+                                </div>
+                            </div>
+                            <button onclick="changeWeek(1)" ${state.currentWeek === 16 ? 'disabled' : ''}
+                                class="p-3 rounded-lg text-2xl ${state.currentWeek === 16 ? 'bg-slate-700 opacity-50' : 'bg-slate-700'}">
+                                →
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            `;
+            
+            days.forEach((day, idx) => {
+                const workout = schedule[day];
+                if (!workout) return;
+                const completion = getDayCompletion(day);
+                html += `
+                    <div onclick="selectDay('${day}')" 
+                        class="bg-slate-800 rounded-lg p-5 border border-slate-700 cursor-pointer">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <div class="text-sm text-slate-400 mb-1">${dayLabels[idx]}</div>
+                                <div class="font-bold text-lg">${workout.name}</div>
+                            </div>
+                            <div class="text-2xl font-bold ${completion === 100 ? 'text-green-400' : 'text-blue-400'}">
+                                ${completion}%
+                            </div>
+                        </div>
+                        <div class="text-sm text-slate-400 mb-3">
+                            💪 ${workout.duration} • ${workout.location}
+                        </div>
+                        <div class="w-full bg-slate-700 rounded-full h-2">
+                            <div class="h-2 rounded-full ${completion === 100 ? 'bg-green-500' : 'bg-blue-500'}" 
+                                style="width: ${completion}%"></div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            return html + `</div></div>`;
+        }
+
+        // Event handlers
+        function goBack() {
+            if (state.view === 'supplements') {
+                state.view = 'overview';
+            } else if (state.selectedDay) {
+                state.selectedDay = null;
+            }
+            render();
+        }
+
+        function changeWeek(delta) {
+            state.currentWeek = Math.max(0, Math.min(16, state.currentWeek + delta));
+            render();
+        }
+
+        function selectDay(day) {
+            state.selectedDay = day;
+            render();
+        }
+
+        function toggleSupplement(time, idx) {
+            const today = new Date().toDateString();
+            const key = `${today}-${time}-${idx}`;
+            state.supplementLog[key] = !state.supplementLog[key];
+            saveState();
+            render();
+        }
+
+        function toggleExercise(day, idx) {
+            const key = `week${state.currentWeek}-${day}-${idx}`;
+            state.completedExercises[key] = !state.completedExercises[key];
+            saveState();
+            render();
+        }
+
+        function editWeight(day, exerciseIdx, setNum, currentWeight) {
+            state.editingSet = `${day}-${exerciseIdx}-${setNum}`;
+            state.tempWeight = currentWeight.toString();
+            render();
+            setTimeout(() => {
+                const input = document.getElementById('weightInput');
+                if (input) input.focus();
+            }, 100);
+        }
+
+        function saveWeight(day, exerciseIdx, setNum) {
+            if (state.tempWeight) {
+                const weightKey = `week${state.currentWeek}-${day}-${exerciseIdx}-set${setNum}`;
+                state.exerciseWeights[weightKey] = parseInt(state.tempWeight);
+                state.editingSet = null;
+                state.tempWeight = '';
+                saveState();
+                render();
+            }
+        }
+
+        function cancelEdit() {
+            state.editingSet = null;
+            state.tempWeight = '';
+            render();
+        }
+
+        // Initial render
+        render();
+    </script>
+</body>
+</html>
