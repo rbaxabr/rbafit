@@ -6,9 +6,6 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>16-Week Transformation</title>
-    <link rel="manifest" href="manifest.json">
-   <meta name="theme-color" content="#1e293b">
-   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E💪%3C/text%3E%3C/svg%3E">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gradient-to-br from-slate-900 to-slate-800 text-white min-h-screen">
@@ -17,7 +14,7 @@
     <script>
         // State management
         const state = {
-            currentWeek: 0,
+            currentWeek: parseInt(localStorage.getItem('lastWeek')) || getCurrentWeek(),
             selectedDay: null,
             view: 'overview',
             completedExercises: JSON.parse(localStorage.getItem('workoutProgress') || '{}'),
@@ -27,10 +24,48 @@
             tempWeight: ''
         };
 
+        // Calculate current week based on start date
+        function getCurrentWeek() {
+            const startDate = new Date('2024-10-11'); // Program start
+            const today = new Date();
+            const diffTime = today - startDate;
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            const weekNum = Math.floor(diffDays / 7);
+            return Math.max(0, Math.min(16, weekNum));
+        }
+
         function saveState() {
             localStorage.setItem('workoutProgress', JSON.stringify(state.completedExercises));
             localStorage.setItem('exerciseWeights', JSON.stringify(state.exerciseWeights));
             localStorage.setItem('supplementLog', JSON.stringify(state.supplementLog));
+            localStorage.setItem('lastWeek', state.currentWeek.toString());
+        }
+
+        function getWeekDates(week) {
+            const startDate = new Date('2024-10-11');
+            const weekStart = new Date(startDate);
+            weekStart.setDate(startDate.getDate() + (week * 7) - 5);
+            
+            if (week === 0) {
+                return {
+                    saturday: new Date('2024-10-12'),
+                    sunday: new Date('2024-10-13')
+                };
+            }
+            
+            return {
+                monday: new Date(weekStart),
+                tuesday: new Date(weekStart.getTime() + 86400000),
+                wednesday: new Date(weekStart.getTime() + 172800000),
+                thursday: new Date(weekStart.getTime() + 259200000),
+                friday: new Date(weekStart.getTime() + 345600000),
+                saturday: new Date(weekStart.getTime() + 432000000),
+                sunday: new Date(weekStart.getTime() + 518400000)
+            };
+        }
+
+        function formatDate(date) {
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
         }
 
         const supplementSchedule = {
@@ -557,12 +592,13 @@
                 const workout = schedule[day];
                 if (!workout) return;
                 const completion = getDayCompletion(day);
+                const dayDate = dates[day];
                 html += `
                     <div onclick="selectDay('${day}')" 
                         class="bg-slate-800 rounded-lg p-5 border border-slate-700 cursor-pointer">
                         <div class="flex justify-between items-start mb-3">
                             <div>
-                                <div class="text-sm text-slate-400 mb-1">${dayLabels[idx]}</div>
+                                <div class="text-sm text-slate-400 mb-1">${dayLabels[idx]} - ${formatDate(dayDate)}</div>
                                 <div class="font-bold text-lg">${workout.name}</div>
                             </div>
                             <div class="text-2xl font-bold ${completion === 100 ? 'text-green-400' : 'text-blue-400'}">
@@ -591,17 +627,33 @@
                 state.selectedDay = null;
             }
             render();
+            // Prevent default back behavior
+            window.history.pushState({}, '');
         }
 
         function changeWeek(delta) {
             state.currentWeek = Math.max(0, Math.min(16, state.currentWeek + delta));
+            saveState();
             render();
         }
 
         function selectDay(day) {
             state.selectedDay = day;
             render();
+            // Push state to enable back button
+            window.history.pushState({ view: 'workout', day: day }, '');
         }
+
+        // Handle browser back button
+        window.addEventListener('popstate', function(event) {
+            if (state.selectedDay) {
+                state.selectedDay = null;
+                render();
+            } else if (state.view === 'supplements') {
+                state.view = 'overview';
+                render();
+            }
+        });
 
         function toggleSupplement(time, idx) {
             const today = new Date().toDateString();
