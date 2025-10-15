@@ -61,161 +61,6 @@
             localStorage.setItem('lastWeek', state.currentWeek.toString());
         }
 
-        // Equipment constraints
-        function getEquipmentType(exerciseName) {
-            const name = exerciseName.toLowerCase();
-            
-            // Weighted vest exercises
-            if (name.includes('weighted stairs') || name.includes('weighted vest')) {
-                return { type: 'vest', increment: 2.5, max: 40, min: 0 };
-            }
-            
-            // Medicine ball exercises
-            if (name.includes('med ball') || name.includes('medicine ball')) {
-                return { type: 'medball', options: [10, 15, 20, 30, 40] };
-            }
-            
-            // Box jumps
-            if (name.includes('box jump')) {
-                return { type: 'box', options: [6, 20, 24, 30] };
-            }
-            
-            // Dumbbells and kettlebells (5lb increments)
-            return { type: 'weight', increment: 5, min: 5 };
-        }
-
-        function constrainWeight(weight, exerciseName) {
-            const equipment = getEquipmentType(exerciseName);
-            
-            if (equipment.type === 'vest') {
-                const constrained = Math.round(weight / equipment.increment) * equipment.increment;
-                return Math.max(equipment.min, Math.min(equipment.max, constrained));
-            }
-            
-            if (equipment.type === 'medball' || equipment.type === 'box') {
-                // Find closest option
-                return equipment.options.reduce((prev, curr) => 
-                    Math.abs(curr - weight) < Math.abs(prev - weight) ? curr : prev
-                );
-            }
-            
-            // Regular weights - round to nearest 5lb increment
-            const constrained = Math.round(weight / equipment.increment) * equipment.increment;
-            return Math.max(equipment.min, constrained);
-        }
-
-        // Smart weight progression system
-        function getExerciseHistory(exerciseName) {
-            const history = [];
-            
-            // Search through all stored weights
-            Object.entries(state.exerciseWeights).forEach(([key, weight]) => {
-                const match = key.match(/week(\d+)-(\w+)-(\d+)-set(\d+)/);
-                if (match) {
-                    const week = parseInt(match[1]);
-                    const day = match[2];
-                    const exerciseIdx = parseInt(match[3]);
-                    
-                    // Get the actual exercise name from that workout
-                    const schedule = getWorkoutSchedule(week);
-                    const workout = schedule[day];
-                    if (workout && workout.exercises[exerciseIdx]) {
-                        const exercise = workout.exercises[exerciseIdx];
-                        if (exercise.name === exerciseName) {
-                            history.push({
-                                week: week,
-                                day: day,
-                                exerciseIdx: exerciseIdx,
-                                set: parseInt(match[4]),
-                                weight: weight
-                            });
-                        }
-                    }
-                }
-            });
-            
-            return history.sort((a, b) => a.week - b.week || a.set - b.set);
-        }
-
-        function calculateSmartWeight(exercise, currentWeek, day, exerciseIdx) {
-            // Map similar exercises for cross-reference
-            const exerciseGroups = {
-                'goblet-squats': ['Goblet Squats', 'Double KB Front Squats', 'Heavy Goblet Squats'],
-                'floor-press': ['DB Floor Press', 'Single-Arm Floor Press', 'DB Floor Press (tempo)', 'Heavy DB Press (floor)', 'Weighted Push-ups', 'Weighted Deficit Push-ups', 'Explosive Push-ups (clap)'],
-                'kb-rows': ['KB Rows', 'Bent-Over Rows'],
-                'kb-shoulder-press': ['KB Shoulder Press'],
-                'kb-swings': ['KB Swings'],
-                'step-ups': ['Single-Leg Step-ups', 'Bulgarian Split Squats'],
-                'kb-clean-press': ['KB Clean & Press', 'KB Snatches', 'Double KB Clean & Press'],
-                'single-leg-rdl': ['Single-Leg RDL'],
-                'lateral-raises': ['Lateral Raises'],
-                'hammer-curls': ['Hammer Curls', 'KB Curls'],
-                'tricep-extensions': ['Tricep Extensions', 'Skull Crushers'],
-                'weighted-carries': ['Weighted Carries'],
-                'face-pulls': ['Face Pulls'],
-                'kb-upright-rows': ['KB Upright Rows'],
-                'weighted-stairs': ['Weighted Stairs'],
-                'walking-lunges': ['Walking Lunges'],
-                'box-jumps': ['Box Jumps', 'Box Jumps (max height)', 'Depth Jumps']
-            };
-
-            // Find which group this exercise belongs to
-            let exerciseGroup = null;
-            for (const [group, exercises] of Object.entries(exerciseGroups)) {
-                if (exercises.includes(exercise.name)) {
-                    exerciseGroup = exercises;
-                    break;
-                }
-            }
-
-            if (!exerciseGroup) return constrainWeight(exercise.defaultWeight, exercise.name);
-
-            // Collect all historical weights for this exercise group
-            let allWeights = [];
-            exerciseGroup.forEach(exName => {
-                const history = getExerciseHistory(exName);
-                allWeights = allWeights.concat(history);
-            });
-
-            if (allWeights.length === 0) return constrainWeight(exercise.defaultWeight, exercise.name);
-
-            // Filter to recent history (last 4 weeks)
-            const recentWeights = allWeights.filter(w => w.week >= currentWeek - 4 && w.week < currentWeek);
-            
-            if (recentWeights.length === 0) {
-                // No recent history, use the most recent weight ever recorded
-                const sortedAll = allWeights.sort((a, b) => a.week - b.week);
-                const lastWeight = sortedAll[sortedAll.length - 1].weight;
-                return constrainWeight(lastWeight, exercise.name);
-            }
-
-            // Calculate average of recent weights
-            const avgWeight = recentWeights.reduce((sum, w) => sum + w.weight, 0) / recentWeights.length;
-            
-            // Calculate trend (are weights increasing or decreasing?)
-            const sortedRecent = [...recentWeights].sort((a, b) => a.week - b.week);
-            const midpoint = Math.floor(sortedRecent.length / 2);
-            const firstHalf = sortedRecent.slice(0, midpoint);
-            const secondHalf = sortedRecent.slice(midpoint);
-            
-            if (firstHalf.length > 0 && secondHalf.length > 0) {
-                const firstAvg = firstHalf.reduce((sum, w) => sum + w.weight, 0) / firstHalf.length;
-                const secondAvg = secondHalf.reduce((sum, w) => sum + w.weight, 0) / secondHalf.length;
-                
-                const equipment = getEquipmentType(exercise.name);
-                const progressionAmount = equipment.type === 'vest' ? 2.5 : 5;
-                
-                // If trending up significantly, suggest progression
-                if (secondAvg > firstAvg + 2) {
-                    return constrainWeight(avgWeight + progressionAmount, exercise.name);
-                }
-                // If stable or slight increase, maintain
-                return constrainWeight(avgWeight, exercise.name);
-            }
-
-            return constrainWeight(Math.round(avgWeight), exercise.name);
-        }
-
         function getWeekDates(week) {
             const startDate = new Date('2025-10-11');
             const weekStart = new Date(startDate);
@@ -309,13 +154,13 @@
                 location: 'home',
                 exercises: [
                     { name: 'Dynamic Warm-up', sets: 1, reps: '8 min' },
-                    { name: 'Box Jumps', sets: 3, reps: 8, rest: '90s' },
+                    { name: 'Box Jumps', sets: 3, reps: 8, rest: '90s', hasWeight: true, defaultWeight: 20 },
                     { name: 'Goblet Squats', sets: 4, reps: 15, rest: '90s', hasWeight: true, defaultWeight: 35 },
                     { name: 'Single-Leg Step-ups', sets: 3, reps: '12/side', rest: '75s', hasWeight: true, defaultWeight: 20 },
                     { name: 'KB Swings', sets: 4, reps: 20, rest: '75s', hasWeight: true, defaultWeight: 35 },
                     { name: 'Walking Lunges', sets: 3, reps: '20 steps', rest: '75s', hasWeight: true, defaultWeight: 20 },
                     { name: 'Slider Leg Curls', sets: 3, reps: 12, rest: '60s' },
-                    { name: 'Core: Med Ball Slams', sets: 3, reps: 15, rest: '45s' },
+                    { name: 'Core: Med Ball Slams', sets: 3, reps: 15, rest: '45s', hasWeight: true, defaultWeight: 15 },
                     { name: 'Core: Plank Hold', sets: 3, reps: '45s', rest: '30s' },
                     { name: 'Mobility Cool-down', sets: 1, reps: '5 min' }
                 ]
@@ -333,7 +178,7 @@
                     { name: 'KB Upright Rows', sets: 3, reps: 15, rest: '60s', hasWeight: true, defaultWeight: 25 },
                     { name: 'Hammer Curls', sets: 3, reps: 15, rest: '60s', hasWeight: true, defaultWeight: 20 },
                     { name: 'Tricep Extensions', sets: 3, reps: 15, rest: '60s', hasWeight: true, defaultWeight: 25 },
-                    { name: 'Core: Med Ball Twists', sets: 3, reps: 20, rest: '45s' },
+                    { name: 'Core: Med Ball Twists', sets: 3, reps: 20, rest: '45s', hasWeight: true, defaultWeight: 15 },
                     { name: 'Core: Dead Bugs', sets: 3, reps: '12/side', rest: '30s' },
                     { name: 'Stretch', sets: 1, reps: '5 min' }
                 ]
@@ -363,11 +208,11 @@
                     { name: 'Broad Jumps', sets: 4, reps: 5, rest: '2m' },
                     { name: 'KB Clean & Press', sets: 4, reps: '8/side', rest: '2m', hasWeight: true, defaultWeight: 35 },
                     { name: 'Single-Leg RDL', sets: 3, reps: '12/side', rest: '75s', hasWeight: true, defaultWeight: 25 },
-                    { name: 'Box Jumps', sets: 4, reps: 8, rest: '90s' },
+                    { name: 'Box Jumps', sets: 4, reps: 8, rest: '90s', hasWeight: true, defaultWeight: 20 },
                     { name: 'KB Swings', sets: 4, reps: 25, rest: '90s', hasWeight: true, defaultWeight: 35 },
                     { name: 'Lateral Bounds', sets: 3, reps: '10/side', rest: '60s' },
-                    { name: 'Weighted Carries', sets: 3, reps: '50 yds', rest: '75s', hasWeight: true, defaultWeight: 15 },
-                    { name: 'Core: Med Ball Slams', sets: 3, reps: 15, rest: '45s' },
+                    { name: 'Weighted Carries', sets: 3, reps: '50 yds', rest: '75s', hasWeight: true, defaultWeight: 35 },
+                    { name: 'Core: Med Ball Slams', sets: 3, reps: 15, rest: '45s', hasWeight: true, defaultWeight: 15 },
                     { name: 'Core: Ball Pikes', sets: 3, reps: 10, rest: '45s' },
                     { name: 'Mobility', sets: 1, reps: '5 min' }
                 ]
@@ -380,12 +225,12 @@
                     { name: 'Dynamic Warm-up', sets: 1, reps: '8 min' },
                     { name: 'DB Floor Press', sets: 4, reps: 12, rest: '90s', hasWeight: true, defaultWeight: 35 },
                     { name: 'Bent-Over Rows', sets: 4, reps: 15, rest: '75s', hasWeight: true, defaultWeight: 35 },
-                    { name: 'Lateral Raises', sets: 3, reps: 15, rest: '60s', hasWeight: true, defaultWeight: 12 },
+                    { name: 'Lateral Raises', sets: 3, reps: 15, rest: '60s', hasWeight: true, defaultWeight: 15 },
                     { name: 'Pike Push-ups', sets: 3, reps: 12, rest: '75s' },
                     { name: 'KB Curls', sets: 3, reps: 15, rest: '60s', hasWeight: true, defaultWeight: 20 },
                     { name: 'Skull Crushers', sets: 3, reps: 15, rest: '60s', hasWeight: true, defaultWeight: 20 },
                     { name: 'Face Pulls', sets: 3, reps: 20, rest: '60s', hasWeight: true, defaultWeight: 15 },
-                    { name: 'Core: Side Throws', sets: 3, reps: '12/side', rest: '45s' },
+                    { name: 'Core: Side Throws', sets: 3, reps: '12/side', rest: '45s', hasWeight: true, defaultWeight: 15 },
                     { name: 'Core: Ball Rollouts', sets: 3, reps: 10, rest: '45s' },
                     { name: 'Stretch', sets: 1, reps: '5 min' }
                 ]
@@ -477,22 +322,162 @@
             }
             
             if (phase === 3) {
-                schedule.monday.exercises[1] = { name: 'Depth Jumps', sets: 4, reps: 5, rest: '2m' };
+                schedule.monday.exercises[1] = { name: 'Depth Jumps', sets: 4, reps: 5, rest: '2m', hasWeight: true, defaultWeight: 20 };
                 schedule.monday.exercises[2] = { name: 'Double KB Front Squats', sets: 5, reps: 8, rest: '2m', hasWeight: true, defaultWeight: Math.round(45 * weightMultiplier) };
                 schedule.tuesday.exercises[1] = { name: 'Weighted Deficit Push-ups', sets: 4, reps: 8, rest: '2m', hasWeight: true, defaultWeight: Math.round(25 * weightMultiplier) };
                 schedule.thursday.exercises[2] = { name: 'Double KB Clean & Press', sets: 5, reps: 6, rest: '2m', hasWeight: true, defaultWeight: Math.round(40 * weightMultiplier) };
+                schedule.thursday.exercises[4] = { name: 'Box Jumps', sets: 4, reps: 8, rest: '90s', hasWeight: true, defaultWeight: 24 };
                 schedule.friday.exercises[1] = { name: 'DB Floor Press (tempo)', sets: 5, reps: 8, rest: '90s', hasWeight: true, defaultWeight: Math.round(45 * weightMultiplier) };
             }
             
             if (phase === 4) {
-                schedule.monday.exercises[1] = { name: 'Box Jumps (max height)', sets: 5, reps: 4, rest: '2m' };
+                schedule.monday.exercises[1] = { name: 'Box Jumps (max height)', sets: 5, reps: 4, rest: '2m', hasWeight: true, defaultWeight: 24 };
                 schedule.monday.exercises[2] = { name: 'Heavy Goblet Squats', sets: 5, reps: 6, rest: '2.5m', hasWeight: true, defaultWeight: Math.round(53 * weightMultiplier) };
                 schedule.tuesday.exercises[1] = { name: 'Explosive Push-ups (clap)', sets: 5, reps: 6, rest: '2m' };
                 schedule.thursday.exercises[1] = { name: 'Broad Jumps (max distance)', sets: 6, reps: 3, rest: '2.5m' };
+                schedule.thursday.exercises[4] = { name: 'Box Jumps', sets: 4, reps: 8, rest: '90s', hasWeight: true, defaultWeight: 30 };
                 schedule.friday.exercises[1] = { name: 'Heavy DB Press (floor)', sets: 5, reps: 6, rest: '2m', hasWeight: true, defaultWeight: Math.round(53 * weightMultiplier) };
             }
             
             return schedule;
+        }
+
+        // Equipment constraints
+        function getEquipmentType(exerciseName) {
+            const name = exerciseName.toLowerCase();
+            
+            if (name.includes('weighted stairs') || name.includes('weighted vest')) {
+                return { type: 'vest', increment: 2.5, max: 40, min: 0 };
+            }
+            
+            if (name.includes('med ball') || name.includes('medicine ball')) {
+                return { type: 'medball', options: [10, 15, 20, 30, 40] };
+            }
+            
+            if (name.includes('box jump')) {
+                return { type: 'box', options: [6, 20, 24, 30] };
+            }
+            
+            return { type: 'weight', increment: 5, min: 5 };
+        }
+
+        function constrainWeight(weight, exerciseName) {
+            const equipment = getEquipmentType(exerciseName);
+            
+            if (equipment.type === 'vest') {
+                const constrained = Math.round(weight / equipment.increment) * equipment.increment;
+                return Math.max(equipment.min, Math.min(equipment.max, constrained));
+            }
+            
+            if (equipment.type === 'medball' || equipment.type === 'box') {
+                return equipment.options.reduce((prev, curr) => 
+                    Math.abs(curr - weight) < Math.abs(prev - weight) ? curr : prev
+                );
+            }
+            
+            const constrained = Math.round(weight / equipment.increment) * equipment.increment;
+            return Math.max(equipment.min, constrained);
+        }
+
+        function getExerciseHistory(exerciseName) {
+            const history = [];
+            
+            Object.entries(state.exerciseWeights).forEach(([key, weight]) => {
+                const match = key.match(/week(\d+)-(\w+)-(\d+)-set(\d+)/);
+                if (match) {
+                    const week = parseInt(match[1]);
+                    const day = match[2];
+                    const exerciseIdx = parseInt(match[3]);
+                    
+                    const schedule = getWorkoutSchedule(week);
+                    const workout = schedule[day];
+                    if (workout && workout.exercises[exerciseIdx]) {
+                        const exercise = workout.exercises[exerciseIdx];
+                        if (exercise.name === exerciseName) {
+                            history.push({
+                                week: week,
+                                day: day,
+                                exerciseIdx: exerciseIdx,
+                                set: parseInt(match[4]),
+                                weight: weight
+                            });
+                        }
+                    }
+                }
+            });
+            
+            return history.sort((a, b) => a.week - b.week || a.set - b.set);
+        }
+
+        function calculateSmartWeight(exercise, currentWeek, day, exerciseIdx) {
+            const exerciseGroups = {
+                'goblet-squats': ['Goblet Squats', 'Double KB Front Squats', 'Heavy Goblet Squats'],
+                'floor-press': ['DB Floor Press', 'Single-Arm Floor Press', 'DB Floor Press (tempo)', 'Heavy DB Press (floor)', 'Weighted Push-ups', 'Weighted Deficit Push-ups', 'Explosive Push-ups (clap)'],
+                'kb-rows': ['KB Rows', 'Bent-Over Rows'],
+                'kb-shoulder-press': ['KB Shoulder Press'],
+                'kb-swings': ['KB Swings'],
+                'step-ups': ['Single-Leg Step-ups', 'Bulgarian Split Squats'],
+                'kb-clean-press': ['KB Clean & Press', 'KB Snatches', 'Double KB Clean & Press'],
+                'single-leg-rdl': ['Single-Leg RDL'],
+                'lateral-raises': ['Lateral Raises'],
+                'hammer-curls': ['Hammer Curls', 'KB Curls'],
+                'tricep-extensions': ['Tricep Extensions', 'Skull Crushers'],
+                'weighted-carries': ['Weighted Carries'],
+                'face-pulls': ['Face Pulls'],
+                'kb-upright-rows': ['KB Upright Rows'],
+                'weighted-stairs': ['Weighted Stairs'],
+                'walking-lunges': ['Walking Lunges'],
+                'box-jumps': ['Box Jumps', 'Box Jumps (max height)', 'Depth Jumps'],
+                'med-ball': ['Core: Med Ball Slams', 'Core: Med Ball Twists', 'Core: Side Throws']
+            };
+
+            let exerciseGroup = null;
+            for (const [group, exercises] of Object.entries(exerciseGroups)) {
+                if (exercises.includes(exercise.name)) {
+                    exerciseGroup = exercises;
+                    break;
+                }
+            }
+
+            if (!exerciseGroup) return constrainWeight(exercise.defaultWeight, exercise.name);
+
+            let allWeights = [];
+            exerciseGroup.forEach(exName => {
+                const history = getExerciseHistory(exName);
+                allWeights = allWeights.concat(history);
+            });
+
+            if (allWeights.length === 0) return constrainWeight(exercise.defaultWeight, exercise.name);
+
+            const recentWeights = allWeights.filter(w => w.week >= currentWeek - 4 && w.week < currentWeek);
+            
+            if (recentWeights.length === 0) {
+                const sortedAll = allWeights.sort((a, b) => a.week - b.week);
+                const lastWeight = sortedAll[sortedAll.length - 1].weight;
+                return constrainWeight(lastWeight, exercise.name);
+            }
+
+            const avgWeight = recentWeights.reduce((sum, w) => sum + w.weight, 0) / recentWeights.length;
+            
+            const sortedRecent = [...recentWeights].sort((a, b) => a.week - b.week);
+            const midpoint = Math.floor(sortedRecent.length / 2);
+            const firstHalf = sortedRecent.slice(0, midpoint);
+            const secondHalf = sortedRecent.slice(midpoint);
+            
+            if (firstHalf.length > 0 && secondHalf.length > 0) {
+                const firstAvg = firstHalf.reduce((sum, w) => sum + w.weight, 0) / firstHalf.length;
+                const secondAvg = secondHalf.reduce((sum, w) => sum + w.weight, 0) / secondHalf.length;
+                
+                const equipment = getEquipmentType(exercise.name);
+                const progressionAmount = equipment.type === 'vest' ? 2.5 : 5;
+                
+                if (secondAvg > firstAvg + 2) {
+                    return constrainWeight(avgWeight + progressionAmount, exercise.name);
+                }
+                return constrainWeight(avgWeight, exercise.name);
+            }
+
+            return constrainWeight(Math.round(avgWeight), exercise.name);
         }
 
         function getSuppCompletion() {
@@ -618,7 +603,6 @@
             const equipment = getEquipmentType(exercise.name);
             let html = '<div class="mt-3 space-y-2">';
             
-            // Add equipment info
             let equipmentInfo = '';
             if (equipment.type === 'vest') {
                 equipmentInfo = `<div class="text-xs text-slate-500 mb-2">Weighted vest: ${equipment.increment}lb increments, max ${equipment.max}lbs</div>`;
@@ -668,7 +652,7 @@
                 if (!workout) return;
                 const completion = getDayCompletion(day);
                 const dayDate = dates[day];
-                html += `<div onclick="selectDay('${day}')" class="bg-slate-800 rounded-lg p-5 border border-slate-700 cursor-pointer"><div class="flex justify-between items-start mb-3"><div><div class="text-sm text-slate-400 mb-1">${dayLabels[idx]} - ${formatDate(dayDate)}</div><div class="font-bold text-lg">${workout.name}</div></div><div class="text-2xl font-bold ${completion === 100 ? 'text-green-400' : 'text-blue-400'}">${completion}%</div></div><div class="text-sm text-slate-400 mb-3">💪 ${workout.duration} • ${workout.location}</div><div class="w-full bg-slate-700 rounded-full h-2"><div class="h-2 rounded-full ${completion === 100 ? 'bg-green-500' : 'bg-blue-500'}" style="width: ${completion}%"></div></div></div>`;
+                html += `<div onclick="selectDay('${day}')" class="bg-slate-800 rounded-lg p-5 border border-slate-700 cursor-pointer hover:border-slate-600 transition-colors"><div class="flex justify-between items-start mb-3"><div><div class="text-sm text-slate-400 mb-1">${dayLabels[idx]} - ${formatDate(dayDate)}</div><div class="font-bold text-lg">${workout.name}</div></div><div class="text-2xl font-bold ${completion === 100 ? 'text-green-400' : 'text-blue-400'}">${completion}%</div></div><div class="text-sm text-slate-400 mb-3">💪 ${workout.duration} • ${workout.location}</div><div class="w-full bg-slate-700 rounded-full h-2"><div class="h-2 rounded-full ${completion === 100 ? 'bg-green-500' : 'bg-blue-500'}" style="width: ${completion}%"></div></div></div>`;
             });
             
             return html + `</div></div>`;
