@@ -23,7 +23,6 @@
     <div id="app"></div>
 
     <script>
-        // Calculate current week based on start date
         function getCurrentWeek() {
             const startDate = new Date('2024-10-11');
             const today = new Date();
@@ -33,7 +32,6 @@
             return Math.max(0, Math.min(16, weekNum));
         }
 
-        // State management
         const state = {
             currentWeek: parseInt(localStorage.getItem('lastWeek')) || getCurrentWeek(),
             selectedDay: null,
@@ -292,6 +290,11 @@
             if (week === 0) return prepWorkouts;
             
             const phase = getPhase(week);
+            
+            if (phase === 1) {
+                return JSON.parse(JSON.stringify(baseWorkouts));
+            }
+            
             const schedule = JSON.parse(JSON.stringify(baseWorkouts));
             const weightMultiplier = 1 + (phase - 1) * 0.15;
             
@@ -302,6 +305,64 @@
                     }
                 });
             });
+            
+            if (phase === 2) {
+                schedule.monday.exercises[3] = { name: 'Bulgarian Split Squats', sets: 4, reps: '10/side', rest: '90s', hasWeight: true, defaultWeight: Math.round(30 * weightMultiplier) };
+                schedule.monday.exercises[6] = { name: 'Slider Reverse Lunges', sets: 3, reps: '12/side', rest: '60s' };
+                
+                schedule.tuesday.exercises[1] = { name: 'Weighted Push-ups', sets: 4, reps: 10, rest: '90s', hasWeight: true, defaultWeight: Math.round(20 * weightMultiplier) };
+                schedule.tuesday.exercises[2] = { name: 'Renegade Rows', sets: 4, reps: '10/side', rest: '90s', hasWeight: true, defaultWeight: Math.round(35 * weightMultiplier) };
+                schedule.tuesday.exercises[3] = { name: 'Half-Kneel KB Press', sets: 4, reps: '10/side', rest: '75s', hasWeight: true, defaultWeight: Math.round(35 * weightMultiplier) };
+                
+                schedule.thursday.exercises[2] = { name: 'KB Snatches', sets: 4, reps: '8/side', rest: '2m', hasWeight: true, defaultWeight: Math.round(35 * weightMultiplier) };
+                schedule.thursday.exercises[3] = { name: 'Single-Arm KB Rows', sets: 4, reps: '10/side', rest: '75s', hasWeight: true, defaultWeight: Math.round(45 * weightMultiplier) };
+                
+                schedule.friday.exercises[1] = { name: 'Single-Arm Floor Press', sets: 4, reps: '10/side', rest: '90s', hasWeight: true, defaultWeight: Math.round(35 * weightMultiplier) };
+                schedule.friday.exercises[2] = { name: 'Gorilla Rows', sets: 4, reps: '12/side', rest: '75s', hasWeight: true, defaultWeight: Math.round(40 * weightMultiplier) };
+                schedule.friday.exercises[3] = { name: 'Arnold Press', sets: 3, reps: 10, rest: '75s', hasWeight: true, defaultWeight: Math.round(30 * weightMultiplier) };
+            }
+            
+            if (phase === 3) {
+                schedule.monday.exercises[1] = { name: 'Depth Jumps', sets: 4, reps: 5, rest: '2m' };
+                schedule.monday.exercises[2] = { name: 'Double KB Front Squats', sets: 5, reps: 8, rest: '2m', hasWeight: true, defaultWeight: Math.round(45 * weightMultiplier) };
+                schedule.monday.exercises[3] = { name: 'Single-Leg Box Squats', sets: 4, reps: '8/side', rest: '90s', hasWeight: true, defaultWeight: Math.round(35 * weightMultiplier) };
+                schedule.monday.exercises[6] = { name: 'Slider Hamstring Curls', sets: 4, reps: 10, rest: '60s' };
+                
+                schedule.tuesday.exercises[1] = { name: 'Weighted Deficit Push-ups', sets: 4, reps: 8, rest: '2m', hasWeight: true, defaultWeight: Math.round(25 * weightMultiplier) };
+                schedule.tuesday.exercises[2] = { name: 'Pendlay Rows', sets: 4, reps: 10, rest: '90s', hasWeight: true, defaultWeight: Math.round(45 * weightMultiplier) };
+                schedule.tuesday.exercises[3] = { name: 'Military Press', sets: 4, reps: 8, rest: '2m', hasWeight: true, defaultWeight: Math.round(35 * weightMultiplier) };
+                schedule.tuesday.exercises[4] = { name: 'Pull-ups or Inverted Rows', sets: 4, reps: 'max', rest: '90s' };
+                
+                schedule.thursday.exercises[2] = { name: 'Double KB Clean & Press', sets: 5, reps: 6, rest: '2m', hasWeight: true, defaultWeight: Math.round(40 * weightMultiplier) };
+                schedule.thursday.exercises[3] = { name: 'Single-Leg RDL (heavy)', sets: 4, reps: '8/side', rest: '90s', hasWeight: true, defaultWeight: Math.round(40 * weightMultiplier) };
+                schedule.thursday.exercises[4] = { name: 'Explosive Push-ups', sets: 4, reps: 8, rest: '90s' };
+                
+                schedule.friday.exercises[1] = { name: 'DB Floor Press (tempo)', sets: 5, reps: 8, rest: '90s', hasWeight: true, defaultWeight: Math.round(45 * weightMultiplier) };
+                schedule.friday.exercises[2] = { name: 'Wide-Grip Rows', sets: 4, reps: 10, rest: '75s', hasWeight: true, defaultWeight: Math.round(45 * weightMultiplier) };
+                schedule.friday.exercises[3] = { name: 'Push Press', sets: 4, reps: 8, rest: '90s', hasWeight: true, defaultWeight: Math.round(40 * weightMultiplier) };
+            }
+            
+            if (phase === 4) {
+                schedule.monday.exercises[1] = { name: 'Box Jumps (max height)', sets: 5, reps: 4, rest: '2m' };
+                schedule.monday.exercises[2] = { name: 'Heavy Goblet Squats', sets: 5, reps: 6, rest: '2.5m', hasWeight: true, defaultWeight: Math.round(53 * weightMultiplier) };
+                schedule.monday.exercises[3] = { name: 'Pistol Squats', sets: 4, reps: '6/side', rest: '2m' };
+                schedule.monday.exercises[5] = { name: 'Bulgarian Jumps', sets: 4, reps: '8/side', rest: '90s' };
+                
+                schedule.tuesday.exercises[1] = { name: 'Explosive Push-ups (clap)', sets: 5, reps: 6, rest: '2m' };
+                schedule.tuesday.exercises[2] = { name: 'Heavy Single-Arm Rows', sets: 5, reps: '6/side', rest: '2m', hasWeight: true, defaultWeight: Math.round(53 * weightMultiplier) };
+                schedule.tuesday.exercises[3] = { name: 'Heavy KB Press', sets: 5, reps: 6, rest: '2m', hasWeight: true, defaultWeight: Math.round(45 * weightMultiplier) };
+                schedule.tuesday.exercises[4] = { name: 'Weighted Pull-ups', sets: 4, reps: 6, rest: '2m', hasWeight: true, defaultWeight: Math.round(25 * weightMultiplier) };
+                
+                schedule.thursday.exercises[1] = { name: 'Broad Jumps (max distance)', sets: 6, reps: 3, rest: '2.5m' };
+                schedule.thursday.exercises[2] = { name: 'Heavy KB Snatches', sets: 5, reps: '5/side', rest: '2m', hasWeight: true, defaultWeight: Math.round(45 * weightMultiplier) };
+                schedule.thursday.exercises[3] = { name: 'Weighted Pistol Squats', sets: 4, reps: '6/side', rest: '2m', hasWeight: true, defaultWeight: Math.round(25 * weightMultiplier) };
+                schedule.thursday.exercises[4] = { name: 'Plyo Push-ups', sets: 4, reps: 8, rest: '2m' };
+                
+                schedule.friday.exercises[1] = { name: 'Heavy DB Press (floor)', sets: 5, reps: 6, rest: '2m', hasWeight: true, defaultWeight: Math.round(53 * weightMultiplier) };
+                schedule.friday.exercises[2] = { name: 'Chest-Supported Rows', sets: 5, reps: 8, rest: '90s', hasWeight: true, defaultWeight: Math.round(45 * weightMultiplier) };
+                schedule.friday.exercises[3] = { name: 'Seated KB Press', sets: 4, reps: 8, rest: '2m', hasWeight: true, defaultWeight: Math.round(40 * weightMultiplier) };
+                schedule.friday.exercises[4] = { name: 'One-Arm Push-ups', sets: 3, reps: '5/side', rest: '2m' };
+            }
             
             return schedule;
         }
@@ -345,27 +406,7 @@
                 if (workout) {
                     total += workout.exercises.length;
                     workout.exercises.forEach((_, idx) => {
-                        if (state.completedExercises[`week${week}-${day}-${idx}`]) completed++;
-                    });
-                }
-            });
-            
-            return total > 0 ? Math.round((completed / total) * 100) : 0;
-        }
-
-        function getProgramCompletion() {
-            let total = 0, completed = 0;
-            
-            for (let week = 0; week <= 16; week++) {
-                const schedule = getWorkoutSchedule(week);
-                const days = week === 0 ? ['saturday', 'sunday'] : ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-                
-                days.forEach(day => {
-                    const workout = schedule[day];
-                    if (workout) {
-                        total += workout.exercises.length;
-                        workout.exercises.forEach((_, idx) => {
-                            if (state.completedExercises[`week${week}-${day}-${idx}`]) completed++;
+                                                    if (state.completedExercises[`week${week}-${day}-${idx}`]) completed++;
                         });
                     }
                 });
@@ -445,7 +486,7 @@
             let html = `
                 <div class="max-w-4xl mx-auto p-4">
                     <button onclick="goBack()" class="text-blue-400 mb-6">← Back</button>
-                    <div class="bg-slate-800 rounded-lg p-6 mb-6 border border-slate-700">
+                    <div class="sticky-header bg-slate-800 rounded-lg p-6 mb-6 border border-slate-700">
                         <div class="flex justify-between items-start">
                             <div>
                                 <h2 class="text-2xl font-bold mb-2">${workout.name}</h2>
@@ -542,7 +583,7 @@
             let html = `
                 <div class="max-w-6xl mx-auto p-4">
                     <h1 class="text-4xl font-bold mb-4 text-center bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                        16-Week Transformation
+                        RBA Fit
                     </h1>
                     ${state.currentWeek > 0 ? `
                         <div class="text-center mb-6">
@@ -587,15 +628,15 @@
                     </div>
 
                     <div class="bg-slate-800 rounded-lg p-6 mb-6 border border-slate-700">
-                        <div class="flex items-center justify-between">
+                        <div class="flex items-center justify-between mb-4">
                             <button onclick="changeWeek(-1)" ${state.currentWeek === 0 ? 'disabled' : ''}
                                 class="p-3 rounded-lg text-2xl ${state.currentWeek === 0 ? 'bg-slate-700 opacity-50' : 'bg-slate-700'}">
                                 ←
                             </button>
-                            <div class="text-center">
+                            <div class="text-center flex-1">
                                 <div class="text-3xl font-bold">Week ${state.currentWeek}</div>
                                 <div class="text-sm text-slate-400 mt-1">
-                                    ${state.currentWeek === 0 ? 'Prep Week' : `${state.currentWeek} of 16`}
+                                    ${getWeekDateRange(state.currentWeek)}
                                 </div>
                             </div>
                             <button onclick="changeWeek(1)" ${state.currentWeek === 16 ? 'disabled' : ''}
@@ -603,6 +644,13 @@
                                 →
                             </button>
                         </div>
+                        ${state.currentWeek !== getCurrentWeek() ? `
+                            <div class="text-center pt-3 border-t border-slate-700">
+                                <button onclick="jumpToCurrentWeek()" class="text-blue-400 text-sm hover:text-blue-300">
+                                    Jump to Current Week →
+                                </button>
+                            </div>
+                        ` : ''}
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -639,7 +687,6 @@
             return html + `</div></div>`;
         }
 
-        // Event handlers
         function goBack() {
             if (state.view === 'supplements') {
                 state.view = 'overview';
@@ -710,7 +757,6 @@
             render();
         }
 
-        // Handle browser back button
         window.addEventListener('popstate', function(event) {
             if (state.selectedDay) {
                 state.selectedDay = null;
@@ -721,8 +767,26 @@
             }
         });
 
-        // Initial render
         render();
     </script>
 </body>
 </html>
+                    });
+                }
+            });
+            
+            return total > 0 ? Math.round((completed / total) * 100) : 0;
+        }
+
+        function getProgramCompletion() {
+            let total = 0, completed = 0;
+            
+            for (let week = 0; week <= 16; week++) {
+                const schedule = getWorkoutSchedule(week);
+                const days = week === 0 ? ['saturday', 'sunday'] : ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+                
+                days.forEach(day => {
+                    const workout = schedule[day];
+                    if (workout) {
+                        total += workout.exercises.length;
+                        workout.exercises.forEach((_, idx) => {
