@@ -24,9 +24,9 @@
 
     <script>
         function getCurrentWeek() {
-            // Week 0: Oct 12-13, 2024
-            // Week 1: Oct 14-20, 2024
-            const startDate = new Date('2024-10-12'); // Saturday of Week 0
+            // Week 0: Oct 12-13, 2025
+            // Week 1: Oct 14-20, 2025
+            const startDate = new Date('2025-10-12'); // Saturday of Week 0
             const today = new Date();
             today.setHours(0, 0, 0, 0); // Reset to start of day
             startDate.setHours(0, 0, 0, 0);
@@ -57,14 +57,14 @@
         }
 
         function getWeekDates(week) {
-            const startDate = new Date('2024-10-11');
+            const startDate = new Date('2025-10-11');
             const weekStart = new Date(startDate);
             weekStart.setDate(startDate.getDate() + (week * 7) - 5);
             
             if (week === 0) {
                 return {
-                    saturday: new Date('2024-10-12'),
-                    sunday: new Date('2024-10-13')
+                    saturday: new Date('2025-10-12'),
+                    sunday: new Date('2025-10-13')
                 };
             }
             
