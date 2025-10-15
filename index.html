@@ -5,11 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>16-Week Transformation</title>
+    <title>RBA Fit</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#1e293b">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E💪%3C/text%3E%3C/svg%3E">
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .sticky-header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: linear-gradient(to bottom right, rgb(15, 23, 42), rgb(30, 41, 59));
+        }
+    </style>
 </head>
 <body class="bg-gradient-to-br from-slate-900 to-slate-800 text-white min-h-screen">
     <div id="app"></div>
@@ -69,6 +77,14 @@
 
         function formatDate(date) {
             return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        }
+
+        function getWeekDateRange(week) {
+            const dates = getWeekDates(week);
+            if (week === 0) {
+                return `${formatDate(dates.saturday)} - ${formatDate(dates.sunday)}`;
+            }
+            return `${formatDate(dates.monday)} - ${formatDate(dates.sunday)}`;
         }
 
         const supplementSchedule = {
@@ -170,7 +186,7 @@
                     { name: 'Jump Rope HIIT', sets: 8, reps: '45s on/45s off' },
                     { name: 'Slider Mt Climbers', sets: 3, reps: 20, rest: '45s' },
                     { name: 'Core: Burpees', sets: 3, reps: 10, rest: '60s' },
-                    { name: 'Core: Plank to Dog', sets: 3, reps: 12, rest: '45s' },
+                    { name: 'Core: High Plank Hold', sets: 3, reps: '45s', rest: '30s' },
                     { name: 'Cool-down', sets: 1, reps: '8 min' }
                 ]
             },
@@ -636,6 +652,12 @@
 
         function changeWeek(delta) {
             state.currentWeek = Math.max(0, Math.min(16, state.currentWeek + delta));
+            saveState();
+            render();
+        }
+
+        function jumpToCurrentWeek() {
+            state.currentWeek = getCurrentWeek();
             saveState();
             render();
         }
