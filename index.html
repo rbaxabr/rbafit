@@ -24,18 +24,23 @@
 
     <script>
         function getCurrentWeek() {
-            // Week 0: Oct 07-13, 2025
-            // Week 1: Oct 14-20, 2025
-            const startDate = new Date('2025-10-07'); // Saturday of Week 0
             const today = new Date();
-            today.setHours(0, 0, 0, 0); // Reset to start of day
-            startDate.setHours(0, 0, 0, 0);
+            today.setHours(0, 0, 0, 0);
             
-            const diffTime = today - startDate;
+            const week0Start = new Date('2025-10-12');
+            const week1Start = new Date('2025-10-14');
+            
+            week0Start.setHours(0, 0, 0, 0);
+            week1Start.setHours(0, 0, 0, 0);
+            
+            if (today < week0Start) return 0;
+            if (today >= week0Start && today < week1Start) return 0;
+            
+            const diffTime = today - week1Start;
             const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-            const weekNum = Math.floor(diffDays / 7);
+            const weekNum = Math.floor(diffDays / 7) + 1;
             
-            return Math.max(0, Math.min(16, weekNum));
+            return Math.max(1, Math.min(16, weekNum));
         }
 
         const state = {
@@ -54,6 +59,101 @@
             localStorage.setItem('exerciseWeights', JSON.stringify(state.exerciseWeights));
             localStorage.setItem('supplementLog', JSON.stringify(state.supplementLog));
             localStorage.setItem('lastWeek', state.currentWeek.toString());
+        }
+
+        // Smart weight progression system
+        function getExerciseHistory(exerciseName) {
+            const history = [];
+            Object.entries(state.exerciseWeights).forEach(([key, weight]) => {
+                if (key.includes(exerciseName)) {
+                    const match = key.match(/week(\d+)-(\w+)-(\d+)-set(\d+)/);
+                    if (match) {
+                        history.push({
+                            week: parseInt(match[1]),
+                            day: match[2],
+                            exerciseIdx: parseInt(match[3]),
+                            set: parseInt(match[4]),
+                            weight: weight
+                        });
+                    }
+                }
+            });
+            return history.sort((a, b) => a.week - b.week || a.set - b.set);
+        }
+
+        function calculateSmartWeight(exercise, currentWeek, day, exerciseIdx) {
+            // Map similar exercises for cross-reference
+            const exerciseGroups = {
+                'goblet-squats': ['Goblet Squats', 'Double KB Front Squats', 'Heavy Goblet Squats'],
+                'floor-press': ['DB Floor Press', 'Single-Arm Floor Press', 'DB Floor Press (tempo)', 'Heavy DB Press (floor)', 'Weighted Push-ups', 'Weighted Deficit Push-ups'],
+                'kb-rows': ['KB Rows', 'Bent-Over Rows'],
+                'kb-shoulder-press': ['KB Shoulder Press'],
+                'kb-swings': ['KB Swings'],
+                'step-ups': ['Single-Leg Step-ups', 'Bulgarian Split Squats'],
+                'kb-clean-press': ['KB Clean & Press', 'KB Snatches', 'Double KB Clean & Press'],
+                'single-leg-rdl': ['Single-Leg RDL'],
+                'lateral-raises': ['Lateral Raises'],
+                'hammer-curls': ['Hammer Curls', 'KB Curls'],
+                'tricep-extensions': ['Tricep Extensions', 'Skull Crushers'],
+                'weighted-carries': ['Weighted Carries'],
+                'face-pulls': ['Face Pulls'],
+                'kb-upright-rows': ['KB Upright Rows'],
+                'weighted-stairs': ['Weighted Stairs']
+            };
+
+            // Find which group this exercise belongs to
+            let exerciseGroup = null;
+            for (const [group, exercises] of Object.entries(exerciseGroups)) {
+                if (exercises.includes(exercise.name)) {
+                    exerciseGroup = exercises;
+                    break;
+                }
+            }
+
+            if (!exerciseGroup) return exercise.defaultWeight;
+
+            // Collect all historical weights for this exercise group
+            let allWeights = [];
+            exerciseGroup.forEach(exName => {
+                const history = getExerciseHistory(exName);
+                allWeights = allWeights.concat(history);
+            });
+
+            if (allWeights.length === 0) return exercise.defaultWeight;
+
+            // Filter to recent history (last 4 weeks)
+            const recentWeights = allWeights.filter(w => w.week >= currentWeek - 4 && w.week < currentWeek);
+            
+            if (recentWeights.length === 0) {
+                // No recent history, check if there's any older history
+                if (allWeights.length > 0) {
+                    const lastWeight = allWeights[allWeights.length - 1].weight;
+                    return lastWeight;
+                }
+                return exercise.defaultWeight;
+            }
+
+            // Calculate average of recent weights
+            const avgWeight = recentWeights.reduce((sum, w) => sum + w.weight, 0) / recentWeights.length;
+            
+            // Calculate trend (are weights increasing or decreasing?)
+            const sortedRecent = recentWeights.sort((a, b) => a.week - b.week);
+            const firstHalf = sortedRecent.slice(0, Math.floor(sortedRecent.length / 2));
+            const secondHalf = sortedRecent.slice(Math.floor(sortedRecent.length / 2));
+            
+            if (firstHalf.length > 0 && secondHalf.length > 0) {
+                const firstAvg = firstHalf.reduce((sum, w) => sum + w.weight, 0) / firstHalf.length;
+                const secondAvg = secondHalf.reduce((sum, w) => sum + w.weight, 0) / secondHalf.length;
+                
+                // If trending up, suggest slightly higher
+                if (secondAvg > firstAvg) {
+                    return Math.round(avgWeight + 2.5);
+                }
+                // If trending down or stable, use average
+                return Math.round(avgWeight);
+            }
+
+            return Math.round(avgWeight);
         }
 
         function getWeekDates(week) {
@@ -458,13 +558,19 @@
             let html = '<div class="mt-3 space-y-2">';
             for (let setNum = 1; setNum <= exercise.sets; setNum++) {
                 const weightKey = `week${state.currentWeek}-${state.selectedDay}-${exerciseIdx}-set${setNum}`;
-                const currentWeight = state.exerciseWeights[weightKey] || exercise.defaultWeight || 0;
+                const savedWeight = state.exerciseWeights[weightKey];
+                const smartWeight = calculateSmartWeight(exercise, state.currentWeek, state.selectedDay, exerciseIdx);
+                const currentWeight = savedWeight || smartWeight;
                 const isEditing = state.editingSet === `${state.selectedDay}-${exerciseIdx}-${setNum}`;
+                const isAdjusted = savedWeight && savedWeight !== exercise.defaultWeight;
+                const isSmart = !savedWeight && smartWeight !== exercise.defaultWeight;
                 
                 if (isEditing) {
                     html += `<div class="bg-slate-700/50 rounded-lg p-3 flex gap-2"><span class="text-sm font-semibold min-w-[50px]">Set ${setNum}:</span><input type="number" id="weightInput" value="${state.tempWeight}" oninput="state.tempWeight = this.value" class="flex-1 bg-slate-900 border border-slate-600 rounded px-3 py-2 text-white text-sm"><button onclick="saveWeight('${state.selectedDay}', ${exerciseIdx}, ${setNum})" class="bg-green-600 px-3 py-2 rounded">✓</button><button onclick="cancelEdit()" class="bg-slate-600 px-3 py-2 rounded">✕</button></div>`;
                 } else {
-                    html += `<div class="bg-slate-700/50 rounded-lg p-3 flex justify-between"><div><span class="text-sm text-slate-400">Set ${setNum}:</span><span class="text-lg font-bold text-blue-400 ml-2">${currentWeight} lbs</span></div><button onclick="editWeight('${state.selectedDay}', ${exerciseIdx}, ${setNum}, ${currentWeight})" class="bg-blue-600 px-3 py-1 rounded text-sm">Edit</button></div>`;
+                    const indicator = isSmart ? ' 🎯' : (isAdjusted ? ' 📝' : '');
+                    const weightColor = isSmart ? 'text-purple-400' : (isAdjusted ? 'text-green-400' : 'text-blue-400');
+                    html += `<div class="bg-slate-700/50 rounded-lg p-3 flex justify-between items-center"><div><span class="text-sm text-slate-400">Set ${setNum}:</span><span class="text-lg font-bold ${weightColor} ml-2">${currentWeight} lbs${indicator}</span>${isSmart ? '<span class="text-xs text-purple-300 ml-2">(smart)</span>' : ''}</div><button onclick="editWeight('${state.selectedDay}', ${exerciseIdx}, ${setNum}, ${currentWeight})" class="bg-blue-600 px-3 py-1 rounded text-sm">Edit</button></div>`;
                 }
             }
             return html + '</div>';
