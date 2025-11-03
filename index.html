@@ -997,6 +997,8 @@
             }
             
             const index = state.completedExercises[dayKey].indexOf(exerciseName);
+            const isNowCompleted = index === -1;
+            
             if (index > -1) {
                 state.completedExercises[dayKey].splice(index, 1);
             } else {
@@ -1004,7 +1006,42 @@
             }
             
             saveState();
-            render();
+            
+            // Update UI without full re-render to preserve scroll position
+            // Update progress bar
+            const completed = state.completedExercises[dayKey].length;
+            const schedule = getWorkoutSchedule(state.currentWeek);
+            const workout = schedule[state.selectedDay];
+            const total = workout.exercises.length;
+            const progress = (completed / total) * 100;
+            
+            // Update progress display in header
+            const progressBar = document.querySelector('.sticky-header .bg-blue-500');
+            const progressText = document.querySelector('.sticky-header .text-blue-400');
+            const progressPercent = document.querySelector('.sticky-header .text-slate-400');
+            
+            if (progressBar) progressBar.style.width = `${progress}%`;
+            if (progressText) progressText.textContent = `${completed}/${total}`;
+            if (progressPercent) progressPercent.textContent = `${Math.round(progress)}% Complete`;
+            
+            // Update the specific exercise's appearance
+            const exercises = document.querySelectorAll('.bg-slate-800.rounded-lg.p-5');
+            exercises.forEach(exerciseEl => {
+                const titleEl = exerciseEl.querySelector('h3');
+                if (titleEl && titleEl.textContent.includes(exerciseName)) {
+                    const button = exerciseEl.querySelector('button[onclick*="toggleExercise"]');
+                    if (button) {
+                        button.textContent = isNowCompleted ? '✔️' : '⭕';
+                    }
+                    if (isNowCompleted) {
+                        titleEl.classList.add('text-green-400', 'line-through');
+                        titleEl.classList.remove('text-white');
+                    } else {
+                        titleEl.classList.remove('text-green-400', 'line-through');
+                        titleEl.classList.add('text-white');
+                    }
+                }
+            });
         }
 
         function toggleSupplement(timeKey, suppName) {
