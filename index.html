@@ -33,6 +33,12 @@
             background-color: rgba(156, 163, 175, 0.2);
             border: 1px solid rgba(156, 163, 175, 0.3);
         }
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-slate-900 to-slate-800 text-white min-h-screen">
@@ -119,6 +125,11 @@
                 return `${formatDate(dates.saturday)} - ${formatDate(dates.sunday)}`;
             }
             return `${formatDate(dates.monday)} - ${formatDate(dates.sunday)}`;
+        }
+
+        function getDayDate(week, day) {
+            const dates = getWeekDates(week);
+            return dates[day] ? formatDate(dates[day]) : '';
         }
 
         // Helper function to check if collagen should be taken today
@@ -260,7 +271,6 @@
                 name: 'Lower Body', 
                 duration: '65 min',
                 location: 'home',
-                equipmentNeeded: ['KB: 20, 35, 53', 'DB: 20', 'Sliders', 'Med Ball: 15'],
                 exercises: [
                     { name: 'Dynamic Warm-up', sets: 1, reps: '8 min' },
                     { name: 'Box Jumps', sets: 3, reps: 8, rest: '90s', hasWeight: true, defaultWeight: 20 },
@@ -278,7 +288,6 @@
                 name: 'Upper Body', 
                 duration: '70 min',
                 location: 'home',
-                equipmentNeeded: ['DB: 20-40', 'KB: 25, 35', 'Med Ball: 15'],
                 exercises: [
                     { name: 'Dynamic Warm-up', sets: 1, reps: '8 min' },
                     { name: 'DB Floor Press', sets: 4, reps: 12, rest: '90s', hasWeight: true, defaultWeight: 35 },
@@ -313,7 +322,6 @@
                 name: 'Full Body Power', 
                 duration: '65 min',
                 location: 'home',
-                equipmentNeeded: ['KB: 25, 35', 'Med Ball: 15', 'Box: 20'],
                 exercises: [
                     { name: 'Dynamic Warm-up', sets: 1, reps: '8 min' },
                     { name: 'Broad Jumps', sets: 4, reps: 5, rest: '2m' },
@@ -322,7 +330,7 @@
                     { name: 'Box Jumps', sets: 4, reps: 8, rest: '90s', hasWeight: true, defaultWeight: 20 },
                     { name: 'KB Swings', sets: 4, reps: 25, rest: '90s', hasWeight: true, defaultWeight: 35 },
                     { name: 'Lateral Bounds', sets: 3, reps: '10/side', rest: '60s' },
-                    { name: 'Weighted Carries', sets: 3, reps: '50 yds', rest: '75s', hasWeight: true, defaultWeight: 35 },
+                    { name: 'Weighted Carries', sets: 3, reps: '500 steps', rest: '75s', hasWeight: true, defaultWeight: 35 },
                     { name: 'Med Ball Slams', sets: 3, reps: 15, rest: '45s', hasWeight: true, defaultWeight: 15 },
                     { name: 'Ball Pikes', sets: 3, reps: 10, rest: '45s' },
                     { name: 'Mobility', sets: 1, reps: '5 min' }
@@ -332,7 +340,6 @@
                 name: 'Upper Volume', 
                 duration: '65 min',
                 location: 'home',
-                equipmentNeeded: ['DB: 15-40', 'KB: 20', 'Med Ball: 15'],
                 exercises: [
                     { name: 'Dynamic Warm-up', sets: 1, reps: '8 min' },
                     { name: 'DB Floor Press', sets: 4, reps: 12, rest: '90s', hasWeight: true, defaultWeight: 35 },
@@ -351,7 +358,7 @@
                 name: 'Athletic Power', 
                 duration: '70 min',
                 location: 'track',
-                equipmentNeeded: ['Jump rope', 'Weighted vest: 15lb', 'Water'],
+                equipmentNeeded: ['Jump rope', 'Weighted vest', 'Water'],
                 exercises: [
                     { name: 'Dynamic Warm-up', sets: 1, reps: '12 min' },
                     { name: 'Power Sprints', sets: 8, reps: '50m @ 90%', rest: '2m' },
@@ -370,7 +377,6 @@
                 name: 'Active Recovery', 
                 duration: '30 min',
                 location: 'neighborhood',
-                equipmentNeeded: ['Foam roller'],
                 exercises: [
                     { name: 'Easy Walk', sets: 1, reps: '20 min' },
                     { name: 'Mobility Flow', sets: 1, reps: '5 min' },
@@ -400,7 +406,6 @@
                 name: 'Prep Recovery', 
                 duration: '30 min',
                 location: 'neighborhood',
-                equipmentNeeded: ['Foam roller'],
                 exercises: [
                     { name: 'Easy Walk', sets: 1, reps: '20 min' },
                     { name: 'Stretching', sets: 1, reps: '5 min' },
@@ -435,9 +440,9 @@
             
             if (phase === 3) {
                 schedule.monday.exercises[1] = { name: 'Depth Jumps', sets: 4, reps: 5, rest: '2m', hasWeight: true, defaultWeight: 20 };
-                schedule.monday.exercises[2] = { name: 'Double KB Front Squats', sets: 5, reps: 8, rest: '2m', hasWeight: true, defaultWeight: Math.round(40 * weightMultiplier) };
+                schedule.monday.exercises[2] = { name: 'DB Front Squats', sets: 5, reps: 8, rest: '2m', hasWeight: true, defaultWeight: Math.round(40 * weightMultiplier) };
                 schedule.tuesday.exercises[1] = { name: 'Weighted Deficit Push-ups', sets: 4, reps: 8, rest: '2m', hasWeight: true, defaultWeight: Math.round(25 * weightMultiplier) };
-                schedule.thursday.exercises[2] = { name: 'Double KB Clean & Press', sets: 5, reps: 6, rest: '2m', hasWeight: true, defaultWeight: Math.round(35 * weightMultiplier) };
+                schedule.thursday.exercises[2] = { name: 'DB Clean & Press', sets: 5, reps: 6, rest: '2m', hasWeight: true, defaultWeight: Math.round(35 * weightMultiplier) };
                 schedule.thursday.exercises[4] = { name: 'Box Jumps', sets: 4, reps: 8, rest: '90s', hasWeight: true, defaultWeight: 24 };
                 schedule.friday.exercises[1] = { name: 'DB Floor Press (tempo)', sets: 5, reps: 8, rest: '90s', hasWeight: true, defaultWeight: Math.round(40 * weightMultiplier) };
             }
@@ -473,14 +478,14 @@
                 return { type: 'box', options: [6, 20, 24, 30] };
             }
             
-            // Kettlebells - single available at each weight
+            // Kettlebells - single available at each weight, can expand by 9lb increments
             if (name.includes('kb ') || name.includes('kettlebell') || name.includes('goblet') || name.includes('swing')) {
-                return { type: 'kettlebell', options: [5, 10, 15, 20, 25, 35, 40, 44, 53, 62] };
+                return { type: 'kettlebell', options: [5, 10, 15, 20, 25, 35, 40, 44, 53, 62, 72, 81, 90] };
             }
             
-            // Dumbbells - two of each available
+            // Dumbbells - two of each available, can expand by 5lb increments
             if (name.includes('db ') || name.includes('dumbbell') || name.includes('curl') || name.includes('raise') || name.includes('skull crusher')) {
-                return { type: 'dumbbell', options: [2.5, 5, 7.5, 10, 12.5, 15, 17.5, 20, 22.5, 25, 30, 35, 40, 45, 50, 52.5] };
+                return { type: 'dumbbell', options: [2.5, 5, 7.5, 10, 12.5, 15, 17.5, 20, 22.5, 25, 30, 35, 40, 45, 50, 52.5, 55, 60, 65, 70, 75, 80] };
             }
             
             return { type: 'weight', increment: 5, min: 5 };
@@ -593,6 +598,33 @@
             };
         }
 
+        function getProgramProgress() {
+            let totalExercises = 0;
+            let completedExercises = 0;
+            
+            for (let week = 0; week <= 16; week++) {
+                const schedule = getWorkoutSchedule(week);
+                const days = week === 0 ? ['saturday', 'sunday'] : 
+                    ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+                
+                days.forEach(day => {
+                    const workout = schedule[day];
+                    if (workout) {
+                        const dayKey = `${week}-${day}`;
+                        const completed = state.completedExercises[dayKey] || [];
+                        totalExercises += workout.exercises.length;
+                        completedExercises += completed.length;
+                    }
+                });
+            }
+            
+            return {
+                completed: completedExercises,
+                total: totalExercises,
+                percentage: totalExercises > 0 ? Math.round((completedExercises / totalExercises) * 100) : 0
+            };
+        }
+
         function render() {
             const app = document.getElementById('app');
             
@@ -612,6 +644,8 @@
             const dateRange = getWeekDateRange(state.currentWeek);
             const currentWeek = getCurrentWeek();
             const weekProgress = getWeekProgress();
+            const programProgress = getProgramProgress();
+            const suppProgress = getTotalSupplementProgress();
             
             const days = state.currentWeek === 0 ? ['saturday', 'sunday'] : 
                 ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
@@ -619,7 +653,7 @@
             app.innerHTML = `
                 <div class="sticky-header shadow-xl">
                     <div class="p-6">
-                        <h1 class="text-3xl font-bold text-center mb-2">💪 RBA Fit</h1>
+                        <h1 class="text-3xl font-bold text-center mb-2 gradient-text">« rba | fit »</h1>
                         <div class="text-center text-slate-300 text-sm mb-4">${dateRange}</div>
                         
                         <div class="flex items-center justify-between mb-4">
@@ -643,7 +677,7 @@
                         ` : ''}
 
                         <button onclick="showSupplements()" class="w-full mt-2 px-4 py-2 bg-purple-600 hover:bg-purple-500 rounded-lg transition-colors flex items-center justify-center gap-2">
-                            💊 Daily Supplements
+                            💊 Daily Supplements (${suppProgress.percentage}%)
                         </button>
 
                         <div class="mt-4 bg-slate-700 rounded-lg p-3">
@@ -655,6 +689,17 @@
                                 <div class="bg-blue-500 h-3 rounded-full transition-all" style="width: ${weekProgress.percentage}%"></div>
                             </div>
                             <div class="text-center text-xs text-slate-400 mt-1">${weekProgress.percentage}% Complete</div>
+                        </div>
+
+                        <div class="mt-3 bg-gradient-to-r from-purple-900 to-blue-900 rounded-lg p-3">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm text-slate-200">Overall Program Progress</span>
+                                <span class="text-sm font-bold text-purple-300">${programProgress.completed}/${programProgress.total}</span>
+                            </div>
+                            <div class="w-full bg-slate-700 rounded-full h-3">
+                                <div class="bg-gradient-to-r from-purple-500 to-blue-500 h-3 rounded-full transition-all" style="width: ${programProgress.percentage}%"></div>
+                            </div>
+                            <div class="text-center text-xs text-slate-300 mt-1">${programProgress.percentage}% Complete</div>
                         </div>
                     </div>
                 </div>
@@ -668,16 +713,17 @@
                         const completedCount = (state.completedExercises[dayKey] || []).length;
                         const totalExercises = workout.exercises.length;
                         const progress = (completedCount / totalExercises) * 100;
+                        const dayDate = getDayDate(state.currentWeek, day);
                         
                         return `
                             <div onclick="selectDay('${day}')" class="bg-slate-800 rounded-lg p-5 hover:bg-slate-750 transition-all cursor-pointer border border-slate-700 hover:border-blue-500">
                                 <div class="flex justify-between items-start mb-3">
                                     <div>
-                                        <h3 class="text-xl font-bold capitalize text-blue-400">${day}</h3>
+                                        <h3 class="text-xl font-bold capitalize text-blue-400">${day} <span class="text-sm text-slate-400 font-normal">${dayDate}</span></h3>
                                         <p class="text-lg text-white mt-1">${workout.name}</p>
                                         <p class="text-sm text-slate-400">${workout.duration} • ${workout.location}</p>
                                         ${workout.equipmentNeeded ? `
-                                            <p class="text-xs text-slate-500 mt-1">📦 ${workout.equipmentNeeded.join(' • ')}</p>
+                                            <p class="text-xs text-yellow-400 mt-1">📦 Bring: ${workout.equipmentNeeded.join(', ')}</p>
                                         ` : ''}
                                     </div>
                                     <div class="text-right">
@@ -705,6 +751,7 @@
             const completedCount = completed.length;
             const totalExercises = workout.exercises.length;
             const progress = (completedCount / totalExercises) * 100;
+            const dayDate = getDayDate(state.currentWeek, state.selectedDay);
             
             // Scroll to top
             setTimeout(() => window.scrollTo(0, 0), 0);
@@ -715,12 +762,12 @@
                         <button onclick="backToOverview()" class="mb-4 px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors">
                             ← Back
                         </button>
-                        <h2 class="text-2xl font-bold capitalize">${state.selectedDay}</h2>
+                        <h2 class="text-2xl font-bold capitalize">${state.selectedDay} <span class="text-base text-slate-400 font-normal">${dayDate}</span></h2>
                         <p class="text-xl text-blue-400 mt-1">${workout.name}</p>
                         <p class="text-sm text-slate-400 mt-1">${workout.duration} • ${workout.location}</p>
                         ${workout.note ? `<p class="text-xs text-yellow-400 mt-2">⚠️ ${workout.note}</p>` : ''}
                         ${workout.equipmentNeeded ? `
-                            <p class="text-xs text-slate-400 mt-2">📦 Bring: ${workout.equipmentNeeded.join(', ')}</p>
+                            <p class="text-xs text-yellow-400 mt-2">📦 Bring: ${workout.equipmentNeeded.join(', ')}</p>
                         ` : ''}
                         
                         <div class="mt-4 bg-slate-700 rounded-lg p-3">
@@ -760,7 +807,7 @@
                                         </p>
                                     </div>
                                     <button onclick="toggleExercise('${exercise.name}')" class="ml-4 text-2xl">
-                                        ${isCompleted ? '✅' : '⭕'}
+                                        ${isCompleted ? '✔️' : '⭕'}
                                     </button>
                                 </div>
                                 
@@ -889,7 +936,7 @@
                                                     onclick="toggleSupplement('${timeKey}', '${supp.name}')"
                                                     class="text-2xl"
                                                 >
-                                                    ${taken ? '✅' : '⭕'}
+                                                    ${taken ? '✔️' : '⭕'}
                                                 </button>
                                             </div>
                                         `;
@@ -926,17 +973,20 @@
         function selectDay(day) {
             state.selectedDay = day;
             state.view = 'workout';
+            history.pushState({ view: 'workout', day: day }, '', '');
             render();
         }
 
         function backToOverview() {
             state.view = 'overview';
             state.editingSet = null;
+            history.pushState({ view: 'overview' }, '', '');
             render();
         }
 
         function showSupplements() {
             state.view = 'supplements';
+            history.pushState({ view: 'supplements' }, '', '');
             render();
         }
 
@@ -1014,16 +1064,15 @@
             }, 200);
         }
 
-        // Prevent default back button behavior on mobile
+        // Handle browser back button properly
         window.addEventListener('popstate', function(event) {
-            event.preventDefault();
             if (state.view !== 'overview') {
                 backToOverview();
             }
         });
 
-        // Push initial state
-        history.pushState({ view: 'overview' }, '', '');
+        // Initialize with proper history state
+        history.replaceState({ view: 'overview' }, '', '');
 
         // Initialize
         render();
