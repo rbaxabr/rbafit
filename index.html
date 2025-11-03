@@ -17,6 +17,22 @@
             z-index: 50;
             background: linear-gradient(to bottom right, rgb(15, 23, 42), rgb(30, 41, 59));
         }
+        .muscle-tag {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            margin-left: 4px;
+            opacity: 0.8;
+        }
+        .primary-muscle {
+            background-color: rgba(59, 130, 246, 0.3);
+            border: 1px solid rgba(59, 130, 246, 0.5);
+        }
+        .secondary-muscle {
+            background-color: rgba(156, 163, 175, 0.2);
+            border: 1px solid rgba(156, 163, 175, 0.3);
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-slate-900 to-slate-800 text-white min-h-screen">
@@ -105,13 +121,20 @@
             return `${formatDate(dates.monday)} - ${formatDate(dates.sunday)}`;
         }
 
+        // Helper function to check if collagen should be taken today
+        function shouldTakeCollagenToday() {
+            const today = new Date();
+            const startDate = new Date(2025, 9, 11); // Oct 11, 2025 - start of program
+            const daysSinceStart = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
+            return daysSinceStart % 2 === 0; // Every other day
+        }
+
         const supplementSchedule = {
             preworkout: {
                 time: '6:00 AM',
                 note: 'Before training',
                 supplements: [
-                    { name: 'Beta-Alanine', dose: '3.2g (4 caps)', icon: '⚡', conditional: true },
-                    { name: 'Collagen', dose: '1 scoop', icon: '🦴' }
+                    { name: 'Beta-Alanine', dose: '3.2g (4 caps)', icon: '⚡', conditional: true }
                 ]
             },
             morning: {
@@ -126,6 +149,13 @@
                     { name: 'Vitamin C', dose: '500mg', icon: '🍊' }
                 ]
             },
+            afternoon: {
+                time: '3:00 PM',
+                note: 'Mid-day (every other day)',
+                supplements: [
+                    { name: 'Collagen', dose: '1 scoop', icon: '🦴', conditional: true, checkFunction: shouldTakeCollagenToday }
+                ]
+            },
             evening: {
                 time: '9:30 PM',
                 note: 'Before bed',
@@ -136,6 +166,75 @@
                 ]
             }
         };
+
+        // Muscle group definitions for exercises
+        const muscleMappings = {
+            'Box Jumps': { primary: ['Quads'], secondary: ['Glutes', 'Calves'] },
+            'Goblet Squats': { primary: ['Quads', 'Glutes'], secondary: ['Core'] },
+            'Single-Leg Step-ups': { primary: ['Quads', 'Glutes'], secondary: ['Balance'] },
+            'KB Swings': { primary: ['Glutes', 'Hamstrings'], secondary: ['Core', 'Shoulders'] },
+            'Walking Lunges': { primary: ['Quads', 'Glutes'], secondary: ['Balance'] },
+            'Slider Leg Curls': { primary: ['Hamstrings'], secondary: ['Glutes'] },
+            'Bulgarian Split Squats': { primary: ['Quads', 'Glutes'], secondary: ['Balance'] },
+            'Single-Leg RDL': { primary: ['Hamstrings', 'Glutes'], secondary: ['Core'] },
+            'Double KB Front Squats': { primary: ['Quads', 'Glutes'], secondary: ['Core'] },
+            'Heavy Goblet Squats': { primary: ['Quads', 'Glutes'], secondary: ['Core'] },
+            
+            'DB Floor Press': { primary: ['Chest'], secondary: ['Triceps', 'Shoulders'] },
+            'KB Rows': { primary: ['Back'], secondary: ['Biceps'] },
+            'KB Shoulder Press': { primary: ['Shoulders'], secondary: ['Triceps'] },
+            'Push-ups': { primary: ['Chest'], secondary: ['Triceps', 'Core'] },
+            'KB Upright Rows': { primary: ['Shoulders'], secondary: ['Traps'] },
+            'Hammer Curls': { primary: ['Biceps'], secondary: ['Forearms'] },
+            'Tricep Extensions': { primary: ['Triceps'], secondary: [] },
+            'Bent-Over Rows': { primary: ['Back'], secondary: ['Biceps'] },
+            'Lateral Raises': { primary: ['Shoulders'], secondary: [] },
+            'Pike Push-ups': { primary: ['Shoulders'], secondary: ['Triceps'] },
+            'KB Curls': { primary: ['Biceps'], secondary: [] },
+            'Skull Crushers': { primary: ['Triceps'], secondary: [] },
+            'Face Pulls': { primary: ['Rear Delts'], secondary: ['Traps'] },
+            'Weighted Push-ups': { primary: ['Chest'], secondary: ['Triceps', 'Core'] },
+            'Single-Arm Floor Press': { primary: ['Chest'], secondary: ['Triceps', 'Core'] },
+            'Weighted Deficit Push-ups': { primary: ['Chest'], secondary: ['Triceps'] },
+            'Explosive Push-ups (clap)': { primary: ['Chest', 'Power'], secondary: ['Triceps'] },
+            'DB Floor Press (tempo)': { primary: ['Chest'], secondary: ['Triceps'] },
+            'Heavy DB Press (floor)': { primary: ['Chest'], secondary: ['Triceps'] },
+            
+            'KB Clean & Press': { primary: ['Full Body'], secondary: ['Power'] },
+            'Broad Jumps': { primary: ['Power', 'Legs'], secondary: [] },
+            'Weighted Carries': { primary: ['Core', 'Grip'], secondary: ['Traps'] },
+            'KB Snatches': { primary: ['Full Body'], secondary: ['Power'] },
+            'Double KB Clean & Press': { primary: ['Full Body'], secondary: ['Power'] },
+            'Depth Jumps': { primary: ['Power', 'Quads'], secondary: [] },
+            'Broad Jumps (max distance)': { primary: ['Power', 'Legs'], secondary: [] },
+            
+            'Sprint Intervals': { primary: ['Cardio', 'Legs'], secondary: [] },
+            'Stadium Stairs': { primary: ['Cardio', 'Quads'], secondary: ['Glutes'] },
+            'Jump Rope HIIT': { primary: ['Cardio'], secondary: ['Calves'] },
+            'Slider Mt Climbers': { primary: ['Core'], secondary: ['Shoulders'] },
+            'Power Sprints': { primary: ['Speed', 'Legs'], secondary: [] },
+            'Agility T-Drill': { primary: ['Agility'], secondary: ['Legs'] },
+            'Lateral Bounds': { primary: ['Lateral Power'], secondary: ['Legs'] },
+            'Jump Rope': { primary: ['Cardio'], secondary: ['Calves'] },
+            'Weighted Stairs': { primary: ['Cardio', 'Quads'], secondary: ['Glutes'] },
+            
+            'Med Ball Slams': { primary: ['Core', 'Power'], secondary: ['Shoulders'] },
+            'Plank Hold': { primary: ['Core'], secondary: [] },
+            'Med Ball Twists': { primary: ['Obliques'], secondary: ['Core'] },
+            'Dead Bugs': { primary: ['Core'], secondary: [] },
+            'Burpees': { primary: ['Full Body'], secondary: ['Cardio'] },
+            'High Plank Hold': { primary: ['Core'], secondary: ['Shoulders'] },
+            'Ball Pikes': { primary: ['Core'], secondary: ['Shoulders'] },
+            'Side Throws': { primary: ['Obliques'], secondary: ['Core'] },
+            'Ball Rollouts': { primary: ['Core'], secondary: [] },
+            'High Knees': { primary: ['Cardio'], secondary: ['Hip Flexors'] },
+            'V-ups': { primary: ['Core'], secondary: [] },
+            'Bicycle Crunches': { primary: ['Abs', 'Obliques'], secondary: [] }
+        };
+
+        function getMuscleGroups(exerciseName) {
+            return muscleMappings[exerciseName] || { primary: [], secondary: [] };
+        }
 
         function getPhase(week) {
             if (week === 0) return 0;
@@ -161,6 +260,7 @@
                 name: 'Lower Body', 
                 duration: '65 min',
                 location: 'home',
+                equipmentNeeded: ['KB: 20, 35, 53', 'DB: 20', 'Sliders', 'Med Ball: 15'],
                 exercises: [
                     { name: 'Dynamic Warm-up', sets: 1, reps: '8 min' },
                     { name: 'Box Jumps', sets: 3, reps: 8, rest: '90s', hasWeight: true, defaultWeight: 20 },
@@ -169,8 +269,8 @@
                     { name: 'KB Swings', sets: 4, reps: 20, rest: '75s', hasWeight: true, defaultWeight: 35 },
                     { name: 'Walking Lunges', sets: 3, reps: '20 steps', rest: '75s', hasWeight: true, defaultWeight: 20 },
                     { name: 'Slider Leg Curls', sets: 3, reps: 12, rest: '60s' },
-                    { name: 'Core: Med Ball Slams', sets: 3, reps: 15, rest: '45s', hasWeight: true, defaultWeight: 15 },
-                    { name: 'Core: Plank Hold', sets: 3, reps: '45s', rest: '30s' },
+                    { name: 'Med Ball Slams', sets: 3, reps: 15, rest: '45s', hasWeight: true, defaultWeight: 15 },
+                    { name: 'Plank Hold', sets: 3, reps: '45s', rest: '30s' },
                     { name: 'Mobility Cool-down', sets: 1, reps: '5 min' }
                 ]
             },
@@ -178,6 +278,7 @@
                 name: 'Upper Body', 
                 duration: '70 min',
                 location: 'home',
+                equipmentNeeded: ['DB: 20-40', 'KB: 25, 35', 'Med Ball: 15'],
                 exercises: [
                     { name: 'Dynamic Warm-up', sets: 1, reps: '8 min' },
                     { name: 'DB Floor Press', sets: 4, reps: 12, rest: '90s', hasWeight: true, defaultWeight: 35 },
@@ -187,8 +288,8 @@
                     { name: 'KB Upright Rows', sets: 3, reps: 15, rest: '60s', hasWeight: true, defaultWeight: 25 },
                     { name: 'Hammer Curls', sets: 3, reps: 15, rest: '60s', hasWeight: true, defaultWeight: 20 },
                     { name: 'Tricep Extensions', sets: 3, reps: 15, rest: '60s', hasWeight: true, defaultWeight: 25 },
-                    { name: 'Core: Med Ball Twists', sets: 3, reps: 20, rest: '45s', hasWeight: true, defaultWeight: 15 },
-                    { name: 'Core: Dead Bugs', sets: 3, reps: '12/side', rest: '30s' },
+                    { name: 'Med Ball Twists', sets: 3, reps: 20, rest: '45s', hasWeight: true, defaultWeight: 15 },
+                    { name: 'Dead Bugs', sets: 3, reps: '12/side', rest: '30s' },
                     { name: 'Stretch', sets: 1, reps: '5 min' }
                 ]
             },
@@ -196,15 +297,15 @@
                 name: 'HIIT Conditioning', 
                 duration: '60 min',
                 location: 'track',
-                note: 'Bring: Jump rope, sliders, water',
+                equipmentNeeded: ['Jump rope', 'Sliders', 'Water'],
                 exercises: [
                     { name: 'Warm-up Jog', sets: 1, reps: '8 min' },
                     { name: 'Sprint Intervals', sets: 8, reps: '200m @ 80%', rest: '90s' },
                     { name: 'Stadium Stairs', sets: 6, reps: 'full climb', rest: '90s' },
                     { name: 'Jump Rope HIIT', sets: 8, reps: '45s on/45s off' },
                     { name: 'Slider Mt Climbers', sets: 3, reps: 20, rest: '45s' },
-                    { name: 'Core: Burpees', sets: 3, reps: 10, rest: '60s' },
-                    { name: 'Core: High Plank Hold', sets: 3, reps: '45s', rest: '30s' },
+                    { name: 'Burpees', sets: 3, reps: 10, rest: '60s' },
+                    { name: 'High Plank Hold', sets: 3, reps: '45s', rest: '30s' },
                     { name: 'Cool-down', sets: 1, reps: '8 min' }
                 ]
             },
@@ -212,6 +313,7 @@
                 name: 'Full Body Power', 
                 duration: '65 min',
                 location: 'home',
+                equipmentNeeded: ['KB: 25, 35', 'Med Ball: 15', 'Box: 20'],
                 exercises: [
                     { name: 'Dynamic Warm-up', sets: 1, reps: '8 min' },
                     { name: 'Broad Jumps', sets: 4, reps: 5, rest: '2m' },
@@ -221,8 +323,8 @@
                     { name: 'KB Swings', sets: 4, reps: 25, rest: '90s', hasWeight: true, defaultWeight: 35 },
                     { name: 'Lateral Bounds', sets: 3, reps: '10/side', rest: '60s' },
                     { name: 'Weighted Carries', sets: 3, reps: '50 yds', rest: '75s', hasWeight: true, defaultWeight: 35 },
-                    { name: 'Core: Med Ball Slams', sets: 3, reps: 15, rest: '45s', hasWeight: true, defaultWeight: 15 },
-                    { name: 'Core: Ball Pikes', sets: 3, reps: 10, rest: '45s' },
+                    { name: 'Med Ball Slams', sets: 3, reps: 15, rest: '45s', hasWeight: true, defaultWeight: 15 },
+                    { name: 'Ball Pikes', sets: 3, reps: 10, rest: '45s' },
                     { name: 'Mobility', sets: 1, reps: '5 min' }
                 ]
             },
@@ -230,6 +332,7 @@
                 name: 'Upper Volume', 
                 duration: '65 min',
                 location: 'home',
+                equipmentNeeded: ['DB: 15-40', 'KB: 20', 'Med Ball: 15'],
                 exercises: [
                     { name: 'Dynamic Warm-up', sets: 1, reps: '8 min' },
                     { name: 'DB Floor Press', sets: 4, reps: 12, rest: '90s', hasWeight: true, defaultWeight: 35 },
@@ -239,8 +342,8 @@
                     { name: 'KB Curls', sets: 3, reps: 15, rest: '60s', hasWeight: true, defaultWeight: 20 },
                     { name: 'Skull Crushers', sets: 3, reps: 15, rest: '60s', hasWeight: true, defaultWeight: 20 },
                     { name: 'Face Pulls', sets: 3, reps: 20, rest: '60s', hasWeight: true, defaultWeight: 15 },
-                    { name: 'Core: Side Throws', sets: 3, reps: '12/side', rest: '45s', hasWeight: true, defaultWeight: 15 },
-                    { name: 'Core: Ball Rollouts', sets: 3, reps: 10, rest: '45s' },
+                    { name: 'Side Throws', sets: 3, reps: '12/side', rest: '45s', hasWeight: true, defaultWeight: 15 },
+                    { name: 'Ball Rollouts', sets: 3, reps: 10, rest: '45s' },
                     { name: 'Stretch', sets: 1, reps: '5 min' }
                 ]
             },
@@ -248,7 +351,7 @@
                 name: 'Athletic Power', 
                 duration: '70 min',
                 location: 'track',
-                note: 'Bring: Jump rope, weighted vest, sliders, water',
+                equipmentNeeded: ['Jump rope', 'Weighted vest: 15lb', 'Water'],
                 exercises: [
                     { name: 'Dynamic Warm-up', sets: 1, reps: '12 min' },
                     { name: 'Power Sprints', sets: 8, reps: '50m @ 90%', rest: '2m' },
@@ -257,9 +360,9 @@
                     { name: 'Lateral Bounds', sets: 3, reps: '10/side', rest: '60s' },
                     { name: 'Jump Rope', sets: 5, reps: '1 min', rest: '60s' },
                     { name: 'Weighted Stairs', sets: 5, reps: 'full climb', rest: '90s', hasWeight: true, defaultWeight: 15 },
-                    { name: 'Core: High Knees', sets: 3, reps: '30s', rest: '30s' },
-                    { name: 'Core: V-ups', sets: 3, reps: 15, rest: '45s' },
-                    { name: 'Core: Bicycle Crunches', sets: 3, reps: 20, rest: '30s' },
+                    { name: 'High Knees', sets: 3, reps: '30s', rest: '30s' },
+                    { name: 'V-ups', sets: 3, reps: 15, rest: '45s' },
+                    { name: 'Bicycle Crunches', sets: 3, reps: 20, rest: '30s' },
                     { name: 'Cool-down', sets: 1, reps: '8 min' }
                 ]
             },
@@ -267,6 +370,7 @@
                 name: 'Active Recovery', 
                 duration: '40 min',
                 location: 'home',
+                equipmentNeeded: ['Jump rope', 'Foam roller'],
                 exercises: [
                     { name: 'Easy Jog/Peloton', sets: 1, reps: '20 min' },
                     { name: 'Jump Rope Easy', sets: 1, reps: '5 min' },
@@ -281,7 +385,7 @@
                 name: 'Prep Power', 
                 duration: '55 min',
                 location: 'track',
-                note: 'Bring: Jump rope, sliders, water - 75% intensity',
+                equipmentNeeded: ['Jump rope', 'Sliders', 'Water'],
                 exercises: [
                     { name: 'Dynamic Warm-up', sets: 1, reps: '12 min' },
                     { name: 'Build-up Sprints', sets: 6, reps: '40m @ 75%', rest: '2m' },
@@ -289,7 +393,7 @@
                     { name: 'Agility Drills', sets: 1, reps: '8 min' },
                     { name: 'Jump Rope', sets: 5, reps: '1 min on/off' },
                     { name: 'Easy Stairs', sets: 4, reps: 'walk up/jog down', rest: '90s' },
-                    { name: 'Core: Plank', sets: 3, reps: '30s', rest: '30s' },
+                    { name: 'Plank', sets: 3, reps: '30s', rest: '30s' },
                     { name: 'Mobility', sets: 1, reps: '8 min' }
                 ]
             },
@@ -297,6 +401,7 @@
                 name: 'Prep Recovery', 
                 duration: '40 min',
                 location: 'home',
+                equipmentNeeded: ['Jump rope', 'Foam roller'],
                 exercises: [
                     { name: 'Walk/Easy Jog', sets: 1, reps: '20 min' },
                     { name: 'Jump Rope', sets: 1, reps: '8 min' },
@@ -332,425 +437,472 @@
             
             if (phase === 3) {
                 schedule.monday.exercises[1] = { name: 'Depth Jumps', sets: 4, reps: 5, rest: '2m', hasWeight: true, defaultWeight: 20 };
-                schedule.monday.exercises[2] = { name: 'Double KB Front Squats', sets: 5, reps: 8, rest: '2m', hasWeight: true, defaultWeight: Math.round(45 * weightMultiplier) };
+                schedule.monday.exercises[2] = { name: 'Double KB Front Squats', sets: 5, reps: 8, rest: '2m', hasWeight: true, defaultWeight: Math.round(40 * weightMultiplier) };
                 schedule.tuesday.exercises[1] = { name: 'Weighted Deficit Push-ups', sets: 4, reps: 8, rest: '2m', hasWeight: true, defaultWeight: Math.round(25 * weightMultiplier) };
-                schedule.thursday.exercises[2] = { name: 'Double KB Clean & Press', sets: 5, reps: 6, rest: '2m', hasWeight: true, defaultWeight: Math.round(40 * weightMultiplier) };
+                schedule.thursday.exercises[2] = { name: 'Double KB Clean & Press', sets: 5, reps: 6, rest: '2m', hasWeight: true, defaultWeight: Math.round(35 * weightMultiplier) };
                 schedule.thursday.exercises[4] = { name: 'Box Jumps', sets: 4, reps: 8, rest: '90s', hasWeight: true, defaultWeight: 24 };
-                schedule.friday.exercises[1] = { name: 'DB Floor Press (tempo)', sets: 5, reps: 8, rest: '90s', hasWeight: true, defaultWeight: Math.round(45 * weightMultiplier) };
+                schedule.friday.exercises[1] = { name: 'DB Floor Press (tempo)', sets: 5, reps: 8, rest: '90s', hasWeight: true, defaultWeight: Math.round(40 * weightMultiplier) };
             }
             
             if (phase === 4) {
                 schedule.monday.exercises[1] = { name: 'Box Jumps (max height)', sets: 5, reps: 4, rest: '2m', hasWeight: true, defaultWeight: 24 };
-                schedule.monday.exercises[2] = { name: 'Heavy Goblet Squats', sets: 5, reps: 6, rest: '2.5m', hasWeight: true, defaultWeight: Math.round(53 * weightMultiplier) };
+                schedule.monday.exercises[2] = { name: 'Heavy Goblet Squats', sets: 5, reps: 6, rest: '2.5m', hasWeight: true, defaultWeight: 53 };
                 schedule.tuesday.exercises[1] = { name: 'Explosive Push-ups (clap)', sets: 5, reps: 6, rest: '2m' };
                 schedule.thursday.exercises[1] = { name: 'Broad Jumps (max distance)', sets: 6, reps: 3, rest: '2.5m' };
                 schedule.thursday.exercises[4] = { name: 'Box Jumps', sets: 4, reps: 8, rest: '90s', hasWeight: true, defaultWeight: 30 };
-                schedule.friday.exercises[1] = { name: 'Heavy DB Press (floor)', sets: 5, reps: 6, rest: '2m', hasWeight: true, defaultWeight: Math.round(53 * weightMultiplier) };
+                schedule.friday.exercises[1] = { name: 'Heavy DB Press (floor)', sets: 5, reps: 6, rest: '2m', hasWeight: true, defaultWeight: 50 };
             }
             
             return schedule;
         }
 
-        // Equipment constraints
+        // Equipment constraints - UPDATED with actual equipment
         function getEquipmentType(exerciseName) {
             const name = exerciseName.toLowerCase();
             
+            // Weighted vest
             if (name.includes('weighted stairs') || name.includes('weighted vest')) {
-                return { type: 'vest', increment: 2.5, max: 40, min: 0 };
+                return { type: 'vest', options: [0, 10, 15, 20, 25, 30, 35, 40] };
             }
             
-            if (name.includes('med ball') || name.includes('medicine ball')) {
-                return { type: 'medball', options: [10, 15, 20, 30, 40] };
+            // Medicine balls
+            if (name.includes('med ball') || name.includes('medicine ball') || name.includes('ball slam') || name.includes('ball twist') || name.includes('side throw')) {
+                return { type: 'medball', options: [5, 10, 15, 20, 30, 40] };
             }
             
+            // Box heights
             if (name.includes('box jump')) {
                 return { type: 'box', options: [6, 20, 24, 30] };
+            }
+            
+            // Kettlebells - single available at each weight
+            if (name.includes('kb ') || name.includes('kettlebell') || name.includes('goblet') || name.includes('swing')) {
+                return { type: 'kettlebell', options: [5, 10, 15, 20, 25, 35, 40, 44, 53, 62] };
+            }
+            
+            // Dumbbells - two of each available
+            if (name.includes('db ') || name.includes('dumbbell') || name.includes('curl') || name.includes('raise') || name.includes('skull crusher')) {
+                return { type: 'dumbbell', options: [2.5, 5, 7.5, 10, 12.5, 15, 17.5, 20, 22.5, 25, 30, 35, 40, 45, 50, 52.5] };
             }
             
             return { type: 'weight', increment: 5, min: 5 };
         }
 
-        function constrainWeight(weight, exerciseName) {
-            const equipment = getEquipmentType(exerciseName);
+        function getClosestWeight(target, equipment) {
+            if (!equipment.options) return target;
             
-            if (equipment.type === 'vest') {
-                const constrained = Math.round(weight / equipment.increment) * equipment.increment;
-                return Math.max(equipment.min, Math.min(equipment.max, constrained));
-            }
-            
-            if (equipment.type === 'medball' || equipment.type === 'box') {
-                return equipment.options.reduce((prev, curr) => 
-                    Math.abs(curr - weight) < Math.abs(prev - weight) ? curr : prev
-                );
-            }
-            
-            const constrained = Math.round(weight / equipment.increment) * equipment.increment;
-            return Math.max(equipment.min, constrained);
+            // Find closest available weight
+            return equipment.options.reduce((prev, curr) => 
+                Math.abs(curr - target) < Math.abs(prev - target) ? curr : prev
+            );
         }
 
-        function getExerciseHistory(exerciseName) {
-            const history = [];
+        function getSmartRecommendation(exerciseName, setIndex, week) {
+            const key = `${week}-${exerciseName}-${setIndex}`;
+            const stored = state.exerciseWeights[key];
             
-            Object.entries(state.exerciseWeights).forEach(([key, weight]) => {
-                const match = key.match(/week(\d+)-(\w+)-(\d+)-set(\d+)/);
-                if (match) {
-                    const week = parseInt(match[1]);
-                    const day = match[2];
-                    const exerciseIdx = parseInt(match[3]);
-                    
-                    const schedule = getWorkoutSchedule(week);
-                    const workout = schedule[day];
-                    if (workout && workout.exercises[exerciseIdx]) {
-                        const exercise = workout.exercises[exerciseIdx];
-                        if (exercise.name === exerciseName) {
-                            history.push({
-                                week: week,
-                                day: day,
-                                exerciseIdx: exerciseIdx,
-                                set: parseInt(match[4]),
-                                weight: weight
-                            });
-                        }
-                    }
-                }
-            });
+            if (stored) return stored;
             
-            return history.sort((a, b) => a.week - b.week || a.set - b.set);
-        }
-
-        function calculateSmartWeight(exercise, currentWeek, day, exerciseIdx) {
-            const exerciseGroups = {
-                'goblet-squats': ['Goblet Squats', 'Double KB Front Squats', 'Heavy Goblet Squats'],
-                'floor-press': ['DB Floor Press', 'Single-Arm Floor Press', 'DB Floor Press (tempo)', 'Heavy DB Press (floor)', 'Weighted Push-ups', 'Weighted Deficit Push-ups', 'Explosive Push-ups (clap)'],
-                'kb-rows': ['KB Rows', 'Bent-Over Rows'],
-                'kb-shoulder-press': ['KB Shoulder Press'],
-                'kb-swings': ['KB Swings'],
-                'step-ups': ['Single-Leg Step-ups', 'Bulgarian Split Squats'],
-                'kb-clean-press': ['KB Clean & Press', 'KB Snatches', 'Double KB Clean & Press'],
-                'single-leg-rdl': ['Single-Leg RDL'],
-                'lateral-raises': ['Lateral Raises'],
-                'hammer-curls': ['Hammer Curls', 'KB Curls'],
-                'tricep-extensions': ['Tricep Extensions', 'Skull Crushers'],
-                'weighted-carries': ['Weighted Carries'],
-                'face-pulls': ['Face Pulls'],
-                'kb-upright-rows': ['KB Upright Rows'],
-                'weighted-stairs': ['Weighted Stairs'],
-                'walking-lunges': ['Walking Lunges'],
-                'box-jumps': ['Box Jumps', 'Box Jumps (max height)', 'Depth Jumps'],
-                'med-ball': ['Core: Med Ball Slams', 'Core: Med Ball Twists', 'Core: Side Throws']
-            };
-
-            let exerciseGroup = null;
-            for (const [group, exercises] of Object.entries(exerciseGroups)) {
-                if (exercises.includes(exercise.name)) {
-                    exerciseGroup = exercises;
-                    break;
-                }
+            // Look for previous set in SAME workout session only
+            if (setIndex > 0) {
+                const prevKey = `${week}-${exerciseName}-${setIndex - 1}`;
+                const prevWeight = state.exerciseWeights[prevKey];
+                if (prevWeight) return prevWeight;
             }
-
-            if (!exerciseGroup) return constrainWeight(exercise.defaultWeight, exercise.name);
-
-            let allWeights = [];
-            exerciseGroup.forEach(exName => {
-                const history = getExerciseHistory(exName);
-                allWeights = allWeights.concat(history);
-            });
-
-            if (allWeights.length === 0) return constrainWeight(exercise.defaultWeight, exercise.name);
-
-            const recentWeights = allWeights.filter(w => w.week >= currentWeek - 4 && w.week < currentWeek);
             
-            if (recentWeights.length === 0) {
-                const sortedAll = allWeights.sort((a, b) => a.week - b.week);
-                const lastWeight = sortedAll[sortedAll.length - 1].weight;
-                return constrainWeight(lastWeight, exercise.name);
+            // Look for last week's same set
+            if (week > 0) {
+                const lastWeekKey = `${week - 1}-${exerciseName}-${setIndex}`;
+                const lastWeek = state.exerciseWeights[lastWeekKey];
+                if (lastWeek) return lastWeek;
             }
-
-            const avgWeight = recentWeights.reduce((sum, w) => sum + w.weight, 0) / recentWeights.length;
             
-            const sortedRecent = [...recentWeights].sort((a, b) => a.week - b.week);
-            const midpoint = Math.floor(sortedRecent.length / 2);
-            const firstHalf = sortedRecent.slice(0, midpoint);
-            const secondHalf = sortedRecent.slice(midpoint);
-            
-            if (firstHalf.length > 0 && secondHalf.length > 0) {
-                const firstAvg = firstHalf.reduce((sum, w) => sum + w.weight, 0) / firstHalf.length;
-                const secondAvg = secondHalf.reduce((sum, w) => sum + w.weight, 0) / secondHalf.length;
-                
-                const equipment = getEquipmentType(exercise.name);
-                const progressionAmount = equipment.type === 'vest' ? 2.5 : 5;
-                
-                if (secondAvg > firstAvg + 2) {
-                    return constrainWeight(avgWeight + progressionAmount, exercise.name);
-                }
-                return constrainWeight(avgWeight, exercise.name);
-            }
-
-            return constrainWeight(Math.round(avgWeight), exercise.name);
-        }
-
-        function getSuppCompletion() {
-            const today = new Date().toDateString();
-            const dayOfWeek = new Date().getDay();
-            const isRestDay = dayOfWeek === 0 || dayOfWeek === 3;
-            
-            let total = 0, completed = 0;
-            
-            Object.keys(supplementSchedule).forEach(time => {
-                supplementSchedule[time].supplements.forEach((supp, idx) => {
-                    if (supp.conditional && isRestDay) return;
-                    total++;
-                    if (state.supplementLog[`${today}-${time}-${idx}`]) completed++;
-                });
-            });
-            
-            return total > 0 ? Math.round((completed / total) * 100) : 0;
-        }
-
-        function getDayCompletion(day) {
-            const schedule = getWorkoutSchedule(state.currentWeek);
-            const workout = schedule[day];
-            if (!workout) return 0;
-            const completed = workout.exercises.filter((_, idx) => 
-                state.completedExercises[`week${state.currentWeek}-${day}-${idx}`]
-            ).length;
-            return Math.round((completed / workout.exercises.length) * 100);
-        }
-
-        function getWeekCompletion(week) {
+            // Return default
             const schedule = getWorkoutSchedule(week);
-            const days = week === 0 ? ['saturday', 'sunday'] : ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-            
-            let total = 0, completed = 0;
-            
-            days.forEach(day => {
-                const workout = schedule[day];
-                if (workout) {
-                    total += workout.exercises.length;
-                    workout.exercises.forEach((_, idx) => {
-                        if (state.completedExercises[`week${week}-${day}-${idx}`]) completed++;
-                    });
+            for (const day in schedule) {
+                const exercise = schedule[day].exercises.find(ex => ex.name === exerciseName);
+                if (exercise && exercise.hasWeight) {
+                    const equipment = getEquipmentType(exerciseName);
+                    return getClosestWeight(exercise.defaultWeight, equipment);
                 }
-            });
-            
-            return total > 0 ? Math.round((completed / total) * 100) : 0;
-        }
-
-        function getProgramCompletion() {
-            let total = 0, completed = 0;
-            
-            for (let week = 0; week <= 16; week++) {
-                const schedule = getWorkoutSchedule(week);
-                const days = week === 0 ? ['saturday', 'sunday'] : ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-                
-                days.forEach(day => {
-                    const workout = schedule[day];
-                    if (workout) {
-                        total += workout.exercises.length;
-                        workout.exercises.forEach((_, idx) => {
-                            if (state.completedExercises[`week${week}-${day}-${idx}`]) completed++;
-                        });
-                    }
-                });
             }
             
-            return total > 0 ? Math.round((completed / total) * 100) : 0;
+            return 0;
+        }
+
+        function updateFutureSets(exerciseName, currentSetIndex, newWeight, week, totalSets) {
+            // Only update sets AFTER the current one, never before
+            for (let i = currentSetIndex + 1; i < totalSets; i++) {
+                const futureKey = `${week}-${exerciseName}-${i}`;
+                state.exerciseWeights[futureKey] = newWeight;
+            }
+            saveState();
         }
 
         function render() {
             const app = document.getElementById('app');
-            if (state.view === 'supplements') {
-                app.innerHTML = renderSupplements();
-            } else if (state.selectedDay) {
-                app.innerHTML = renderWorkoutDetail();
-            } else {
-                app.innerHTML = renderOverview();
+            
+            if (state.view === 'overview') {
+                renderOverview(app);
+            } else if (state.view === 'workout') {
+                renderWorkout(app);
+            } else if (state.view === 'supplements') {
+                renderSupplements(app);
             }
         }
 
-        function renderSupplements() {
-            const today = new Date().toDateString();
-            const dayOfWeek = new Date().getDay();
-            const isRestDay = dayOfWeek === 0 || dayOfWeek === 3;
+        function renderOverview(app) {
+            const schedule = getWorkoutSchedule(state.currentWeek);
+            const phase = getPhase(state.currentWeek);
+            const phaseInfo = getPhaseInfo(phase);
+            const dateRange = getWeekDateRange(state.currentWeek);
             
-            let html = `<div class="max-w-4xl mx-auto p-4"><button onclick="goBack()" class="text-blue-400 mb-6">← Back</button><div class="bg-slate-800 rounded-lg p-6 mb-6 border border-slate-700"><h2 class="text-3xl font-bold mb-2">Daily Supplements</h2><div class="text-4xl font-bold text-blue-400">${getSuppCompletion()}%</div><p class="text-sm text-slate-400 mt-2">${isRestDay ? '🧘 Rest day - No Beta-Alanine' : '💪 Training day'}</p></div>`;
+            const days = state.currentWeek === 0 ? ['saturday', 'sunday'] : 
+                ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
             
-            Object.entries(supplementSchedule).forEach(([timeKey, timeData]) => {
-                html += `<div class="bg-slate-800 rounded-lg p-6 mb-6 border border-slate-700"><div class="mb-4"><h3 class="text-xl font-bold capitalize">${timeKey}</h3><p class="text-sm text-slate-400">${timeData.time} • ${timeData.note}</p></div><div class="space-y-3">`;
-                
-                timeData.supplements.forEach((supp, idx) => {
-                    if (supp.conditional && isRestDay) return;
-                    const isChecked = state.supplementLog[`${today}-${timeKey}-${idx}`];
-                    html += `<div onclick="toggleSupplement('${timeKey}', ${idx})" class="flex items-center gap-4 p-4 rounded-lg cursor-pointer ${isChecked ? 'bg-green-900/30 border border-green-600' : 'bg-slate-700/50 border border-slate-600'}"><div class="text-2xl">${isChecked ? '✓' : '○'}</div><div class="text-3xl">${supp.icon}</div><div class="flex-1"><div class="font-semibold">${supp.name}</div><div class="text-sm text-slate-400">${supp.dose}</div></div></div>`;
-                });
-                
-                html += `</div></div>`;
-            });
-            
-            return html + `</div>`;
+            app.innerHTML = `
+                <div class="sticky-header shadow-xl">
+                    <div class="p-6">
+                        <h1 class="text-3xl font-bold text-center mb-2">💪 rba | fit</h1>
+                        <div class="text-center text-slate-300 text-sm mb-4">${dateRange}</div>
+                        
+                        <div class="flex items-center justify-between mb-4">
+                            <button onclick="changeWeek(-1)" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors" ${state.currentWeek === 0 ? 'disabled' : ''}>
+                                ← Week ${state.currentWeek - 1}
+                            </button>
+                            <div class="text-center">
+                                <div class="text-2xl font-bold">Week ${state.currentWeek}</div>
+                                <div class="text-sm text-blue-400">${phaseInfo.name}</div>
+                                <div class="text-xs text-slate-400">${phaseInfo.focus}</div>
+                            </div>
+                            <button onclick="changeWeek(1)" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors" ${state.currentWeek === 16 ? 'disabled' : ''}>
+                                Week ${state.currentWeek + 1} →
+                            </button>
+                        </div>
+
+                        <button onclick="showSupplements()" class="w-full mt-2 px-4 py-2 bg-purple-600 hover:bg-purple-500 rounded-lg transition-colors flex items-center justify-center gap-2">
+                            💊 Daily Supplements
+                        </button>
+                    </div>
+                </div>
+
+                <div class="p-6 space-y-4">
+                    ${days.map(day => {
+                        const workout = schedule[day];
+                        if (!workout) return '';
+                        
+                        const dayKey = `${state.currentWeek}-${day}`;
+                        const completedCount = (state.completedExercises[dayKey] || []).length;
+                        const totalExercises = workout.exercises.length;
+                        const progress = (completedCount / totalExercises) * 100;
+                        
+                        return `
+                            <div onclick="selectDay('${day}')" class="bg-slate-800 rounded-lg p-5 hover:bg-slate-750 transition-all cursor-pointer border border-slate-700 hover:border-blue-500">
+                                <div class="flex justify-between items-start mb-3">
+                                    <div>
+                                        <h3 class="text-xl font-bold capitalize text-blue-400">${day}</h3>
+                                        <p class="text-lg text-white mt-1">${workout.name}</p>
+                                        <p class="text-sm text-slate-400">${workout.duration} • ${workout.location}</p>
+                                        ${workout.equipmentNeeded ? `
+                                            <p class="text-xs text-slate-500 mt-1">📦 ${workout.equipmentNeeded.join(' • ')}</p>
+                                        ` : ''}
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-2xl mb-1">${completedCount === totalExercises ? '✅' : '📋'}</div>
+                                        <div class="text-sm text-slate-400">${completedCount}/${totalExercises}</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="w-full bg-slate-700 rounded-full h-2">
+                                    <div class="bg-blue-500 h-2 rounded-full transition-all" style="width: ${progress}%"></div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
         }
 
-        function renderWorkoutDetail() {
+        function renderWorkout(app) {
             const schedule = getWorkoutSchedule(state.currentWeek);
             const workout = schedule[state.selectedDay];
-            const phase = getPhase(state.currentWeek);
-            const phaseInfo = getPhaseInfo(phase);
-            const dates = getWeekDates(state.currentWeek);
-            const dayDate = dates[state.selectedDay];
+            const dayKey = `${state.currentWeek}-${state.selectedDay}`;
+            const completed = state.completedExercises[dayKey] || [];
             
-            let html = `<div class="max-w-4xl mx-auto p-4"><button onclick="goBack()" class="text-blue-400 mb-6">← Back</button><div class="sticky-header bg-slate-800 rounded-lg p-6 mb-6 border border-slate-700"><div class="flex justify-between items-start"><div><h2 class="text-2xl font-bold mb-2">${workout.name}</h2><div class="text-sm text-slate-400 space-x-2"><span>Week ${state.currentWeek}</span>${state.currentWeek > 0 ? `<span>• ${phaseInfo.name}</span>` : ''}<span>• ${formatDate(dayDate)}</span><span>• ${workout.duration}</span><span>• ${workout.location}</span></div>${workout.note ? `<div class="text-xs text-blue-300 mt-2">💡 ${workout.note}</div>` : ''}</div><div class="text-3xl font-bold text-blue-400">${getDayCompletion(state.selectedDay)}%</div></div></div><div class="space-y-3">`;
-            
-            workout.exercises.forEach((exercise, idx) => {
-                const isCompleted = state.completedExercises[`week${state.currentWeek}-${state.selectedDay}-${idx}`];
-                html += `<div class="bg-slate-800 rounded-lg p-4 border ${isCompleted ? 'border-green-500 bg-green-900/20' : 'border-slate-700'}"><div class="flex items-start gap-3"><div onclick="toggleExercise('${state.selectedDay}', ${idx})" class="cursor-pointer mt-1 text-2xl">${isCompleted ? '✓' : '○'}</div><div class="flex-1"><div class="font-semibold text-lg mb-1">${exercise.name}</div><div class="text-sm text-slate-400">Sets: ${exercise.sets} • Reps: ${exercise.reps}${exercise.rest ? ` • Rest: ${exercise.rest}` : ''}</div>${exercise.hasWeight ? renderWeightSets(exercise, idx) : ''}</div></div></div>`;
-            });
-            
-            return html + `</div><button onclick="goBack()" class="w-full mt-6 bg-green-600 py-4 rounded-lg font-bold text-lg">Complete Workout</button></div>`;
+            app.innerHTML = `
+                <div class="sticky-header shadow-xl">
+                    <div class="p-6">
+                        <button onclick="backToOverview()" class="mb-4 px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors">
+                            ← Back
+                        </button>
+                        <h2 class="text-2xl font-bold capitalize">${state.selectedDay}</h2>
+                        <p class="text-xl text-blue-400 mt-1">${workout.name}</p>
+                        <p class="text-sm text-slate-400 mt-1">${workout.duration} • ${workout.location}</p>
+                        ${workout.note ? `<p class="text-xs text-yellow-400 mt-2">⚠️ ${workout.note}</p>` : ''}
+                        ${workout.equipmentNeeded ? `
+                            <p class="text-xs text-slate-400 mt-2">📦 Bring: ${workout.equipmentNeeded.join(', ')}</p>
+                        ` : ''}
+                    </div>
+                </div>
+
+                <div class="p-6 space-y-4">
+                    ${workout.exercises.map((exercise, exIndex) => {
+                        const isCompleted = completed.includes(exercise.name);
+                        const muscles = getMuscleGroups(exercise.name);
+                        
+                        return `
+                            <div class="bg-slate-800 rounded-lg p-5 border border-slate-700">
+                                <div class="flex justify-between items-start mb-3">
+                                    <div class="flex-1">
+                                        <h3 class="text-lg font-bold ${isCompleted ? 'text-green-400 line-through' : 'text-white'}">
+                                            ${exercise.name}
+                                            ${muscles.primary.length > 0 ? muscles.primary.map(m => 
+                                                `<span class="muscle-tag primary-muscle">${m}</span>`
+                                            ).join('') : ''}
+                                            ${muscles.secondary.length > 0 ? muscles.secondary.slice(0, 2).map(m => 
+                                                `<span class="muscle-tag secondary-muscle">${m}</span>`
+                                            ).join('') : ''}
+                                        </h3>
+                                        <p class="text-sm text-slate-400 mt-1">
+                                            ${exercise.sets} sets × ${exercise.reps} reps
+                                            ${exercise.rest ? ` • ${exercise.rest} rest` : ''}
+                                        </p>
+                                    </div>
+                                    <button onclick="toggleExercise('${exercise.name}')" class="ml-4 text-3xl">
+                                        ${isCompleted ? '✅' : '⭕'}
+                                    </button>
+                                </div>
+                                
+                                ${exercise.hasWeight ? `
+                                    <div class="mt-3 pt-3 border-t border-slate-700">
+                                        <div class="grid grid-cols-${Math.min(exercise.sets, 4)} gap-2">
+                                            ${Array.from({ length: exercise.sets }, (_, i) => {
+                                                const weight = getSmartRecommendation(exercise.name, i, state.currentWeek);
+                                                const equipment = getEquipmentType(exercise.name);
+                                                
+                                                return `
+                                                    <div class="text-center">
+                                                        <div class="text-xs text-slate-500 mb-1">Set ${i + 1}</div>
+                                                        ${state.editingSet === `${exercise.name}-${i}` ? `
+                                                            <input 
+                                                                type="number" 
+                                                                inputmode="decimal"
+                                                                value="${state.tempWeight}"
+                                                                onchange="saveWeight('${exercise.name}', ${i}, this.value, ${exercise.sets})"
+                                                                onblur="cancelEdit()"
+                                                                class="w-full px-2 py-1 bg-slate-700 border border-blue-500 rounded text-center text-white"
+                                                                autofocus
+                                                                id="weight-input-${exercise.name}-${i}"
+                                                            />
+                                                        ` : `
+                                                            <div class="flex items-center justify-center gap-1">
+                                                                <span class="text-lg font-bold text-blue-400">${weight}</span>
+                                                                <button 
+                                                                    onclick="startEdit('${exercise.name}', ${i}, ${weight})"
+                                                                    class="text-slate-500 hover:text-blue-400 transition-colors"
+                                                                >✏️</button>
+                                                            </div>
+                                                        `}
+                                                        <div class="text-xs text-slate-600">${equipment.type === 'box' ? 'in' : 'lbs'}</div>
+                                                    </div>
+                                                `;
+                                            }).join('')}
+                                        </div>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
         }
 
-        function renderWeightSets(exercise, exerciseIdx) {
-            const equipment = getEquipmentType(exercise.name);
-            let html = '<div class="mt-3 space-y-2">';
+        function renderSupplements(app) {
+            const today = new Date().toISOString().split('T')[0];
+            const dayLog = state.supplementLog[today] || {};
             
-            let equipmentInfo = '';
-            if (equipment.type === 'vest') {
-                equipmentInfo = `<div class="text-xs text-slate-500 mb-2">Weighted vest: ${equipment.increment}lb increments, max ${equipment.max}lbs</div>`;
-            } else if (equipment.type === 'medball') {
-                equipmentInfo = `<div class="text-xs text-slate-500 mb-2">Medicine balls available: ${equipment.options.join(', ')}lbs</div>`;
-            } else if (equipment.type === 'box') {
-                equipmentInfo = `<div class="text-xs text-slate-500 mb-2">Box heights available: ${equipment.options.join('", ')}\"</div>`;
-            } else {
-                equipmentInfo = `<div class="text-xs text-slate-500 mb-2">DB/KB: ${equipment.increment}lb increments</div>`;
-            }
-            html += equipmentInfo;
-            
-            for (let setNum = 1; setNum <= exercise.sets; setNum++) {
-                const weightKey = `week${state.currentWeek}-${state.selectedDay}-${exerciseIdx}-set${setNum}`;
-                const savedWeight = state.exerciseWeights[weightKey];
-                const smartWeight = calculateSmartWeight(exercise, state.currentWeek, state.selectedDay, exerciseIdx);
-                const currentWeight = savedWeight || smartWeight;
-                const isEditing = state.editingSet === `${state.selectedDay}-${exerciseIdx}-${setNum}`;
-                const isAdjusted = savedWeight && savedWeight !== constrainWeight(exercise.defaultWeight, exercise.name);
-                const isSmart = !savedWeight && smartWeight !== constrainWeight(exercise.defaultWeight, exercise.name);
-                
-                const unit = equipment.type === 'box' ? '"' : ' lbs';
-                
-                if (isEditing) {
-                    html += `<div class="bg-slate-700/50 rounded-lg p-3 flex gap-2"><span class="text-sm font-semibold min-w-[50px]">Set ${setNum}:</span><input type="number" id="weightInput" value="${state.tempWeight}" oninput="state.tempWeight = this.value" class="flex-1 bg-slate-900 border border-slate-600 rounded px-3 py-2 text-white text-sm" step="${equipment.increment || 5}"><button onclick="saveWeight('${state.selectedDay}', ${exerciseIdx}, ${setNum}, '${exercise.name}')" class="bg-green-600 px-3 py-2 rounded">✓</button><button onclick="cancelEdit()" class="bg-slate-600 px-3 py-2 rounded">✕</button></div>`;
-                } else {
-                    const indicator = isSmart ? ' 🎯' : (isAdjusted ? ' 📝' : '');
-                    const weightColor = isSmart ? 'text-purple-400' : (isAdjusted ? 'text-green-400' : 'text-blue-400');
-                    html += `<div class="bg-slate-700/50 rounded-lg p-3 flex justify-between items-center"><div><span class="text-sm text-slate-400">Set ${setNum}:</span><span class="text-lg font-bold ${weightColor} ml-2">${currentWeight}${unit}${indicator}</span>${isSmart ? '<span class="text-xs text-purple-300 ml-2">(smart)</span>' : ''}</div><button onclick="editWeight('${state.selectedDay}', ${exerciseIdx}, ${setNum}, ${currentWeight})" class="bg-blue-600 px-3 py-1 rounded text-sm">Edit</button></div>`;
-                }
-            }
-            return html + '</div>';
-        }
+            app.innerHTML = `
+                <div class="sticky-header shadow-xl">
+                    <div class="p-6">
+                        <button onclick="backToOverview()" class="mb-4 px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors">
+                            ← Back
+                        </button>
+                        <h2 class="text-2xl font-bold">💊 Daily Supplements</h2>
+                        <p class="text-sm text-slate-400 mt-1">${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
+                    </div>
+                </div>
 
-        function renderOverview() {
-            const phase = getPhase(state.currentWeek);
-            const phaseInfo = getPhaseInfo(phase);
-            const schedule = getWorkoutSchedule(state.currentWeek);
-            const days = state.currentWeek === 0 ? ['saturday', 'sunday'] : ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-            const dayLabels = state.currentWeek === 0 ? ['Sat', 'Sun'] : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-            const dates = getWeekDates(state.currentWeek);
-            
-            let html = `<div class="max-w-6xl mx-auto p-4"><h1 class="text-4xl font-bold mb-4 text-center bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">«rba | fit»</h1>${state.currentWeek > 0 ? `<div class="text-center mb-6"><div class="inline-block bg-purple-600/20 border border-purple-500 rounded-lg px-6 py-2"><span class="text-purple-300 font-semibold">Phase ${phase}: ${phaseInfo.name}</span><span class="text-slate-400 text-sm ml-3">• ${phaseInfo.focus}</span></div></div>` : ''}<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6"><button onclick="state.view = 'supplements'; render()" class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-6 text-left"><div class="flex items-center justify-between mb-3"><div class="flex items-center gap-3"><span class="text-3xl">💊</span><h3 class="text-2xl font-bold">Supplements</h3></div><div class="text-3xl font-bold">${getSuppCompletion()}%</div></div><p>Track daily supplements</p></button><div class="bg-slate-800 rounded-lg p-6 border border-slate-700"><div class="flex items-center gap-3 mb-4"><span class="text-3xl text-orange-400">💪</span><h3 class="text-2xl font-bold">Progress</h3></div><div class="space-y-4"><div class="flex justify-between items-center"><span class="text-sm text-slate-400">Week ${state.currentWeek}</span><span class="text-2xl font-bold text-orange-400">${getWeekCompletion(state.currentWeek)}%</span></div><div class="pt-3 border-t border-slate-600"><div class="flex justify-between items-center"><span class="text-sm text-slate-400">Overall Program</span><span class="text-2xl font-bold text-green-400">${getProgramCompletion()}%</span></div></div></div></div></div><div class="sticky-header bg-slate-800 rounded-lg p-6 mb-6 border border-slate-700"><div class="flex items-center justify-between mb-4"><button onclick="changeWeek(-1)" ${state.currentWeek === 0 ? 'disabled' : ''} class="p-3 rounded-lg text-2xl ${state.currentWeek === 0 ? 'bg-slate-700 opacity-50' : 'bg-slate-700'}">←</button><div class="text-center flex-1"><div class="text-3xl font-bold">Week ${state.currentWeek}</div><div class="text-sm text-slate-400 mt-1">${getWeekDateRange(state.currentWeek)}</div></div><button onclick="changeWeek(1)" ${state.currentWeek === 16 ? 'disabled' : ''} class="p-3 rounded-lg text-2xl ${state.currentWeek === 16 ? 'bg-slate-700 opacity-50' : 'bg-slate-700'}">→</button></div>${state.currentWeek !== getCurrentWeek() ? `<div class="text-center pt-3 border-t border-slate-700"><button onclick="jumpToCurrentWeek()" class="text-blue-400 text-sm hover:text-blue-300">Jump to Current Week →</button></div>` : ''}</div><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">`;
-            
-            days.forEach((day, idx) => {
-                const workout = schedule[day];
-                if (!workout) return;
-                const completion = getDayCompletion(day);
-                const dayDate = dates[day];
-                html += `<div onclick="selectDay('${day}')" class="bg-slate-800 rounded-lg p-5 border border-slate-700 cursor-pointer hover:border-slate-600 transition-colors"><div class="flex justify-between items-start mb-3"><div><div class="text-sm text-slate-400 mb-1">${dayLabels[idx]} - ${formatDate(dayDate)}</div><div class="font-bold text-lg">${workout.name}</div></div><div class="text-2xl font-bold ${completion === 100 ? 'text-green-400' : 'text-blue-400'}">${completion}%</div></div><div class="text-sm text-slate-400 mb-3">💪 ${workout.duration} • ${workout.location}</div><div class="w-full bg-slate-700 rounded-full h-2"><div class="h-2 rounded-full ${completion === 100 ? 'bg-green-500' : 'bg-blue-500'}" style="width: ${completion}%"></div></div></div>`;
-            });
-            
-            return html + `</div></div>`;
-        }
-
-        function goBack() {
-            if (state.view === 'supplements') {
-                state.view = 'overview';
-            } else if (state.selectedDay) {
-                state.selectedDay = null;
-            }
-            render();
-            window.history.pushState({}, '');
-            window.scrollTo(0, 0);
+                <div class="p-6 space-y-6">
+                    ${Object.entries(supplementSchedule).map(([timeKey, timeData]) => {
+                        // Filter supplements based on conditional checks
+                        let supplements = timeData.supplements;
+                        
+                        // Special handling for pre-workout beta-alanine (only on workout days - not Sunday)
+                        if (timeKey === 'preworkout') {
+                            const dayOfWeek = new Date().getDay();
+                            if (dayOfWeek === 0) { // Sunday
+                                supplements = [];
+                            }
+                        }
+                        
+                        // Filter out conditional supplements if their check function returns false
+                        supplements = supplements.filter(supp => {
+                            if (supp.conditional && supp.checkFunction) {
+                                return supp.checkFunction();
+                            }
+                            return true;
+                        });
+                        
+                        // Skip entire time block if no supplements
+                        if (supplements.length === 0) return '';
+                        
+                        return `
+                            <div class="bg-slate-800 rounded-lg p-5 border border-slate-700">
+                                <div class="flex justify-between items-center mb-4">
+                                    <div>
+                                        <h3 class="text-xl font-bold text-purple-400">${timeData.time}</h3>
+                                        <p class="text-sm text-slate-400">${timeData.note}</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="space-y-3">
+                                    ${supplements.map(supp => {
+                                        const suppKey = `${timeKey}-${supp.name}`;
+                                        const taken = dayLog[suppKey] || false;
+                                        
+                                        return `
+                                            <div class="flex items-center justify-between p-3 bg-slate-900 rounded-lg">
+                                                <div class="flex items-center gap-3">
+                                                    <span class="text-2xl">${supp.icon}</span>
+                                                    <div>
+                                                        <p class="font-semibold ${taken ? 'text-green-400 line-through' : 'text-white'}">${supp.name}</p>
+                                                        <p class="text-xs text-slate-400">${supp.dose}</p>
+                                                    </div>
+                                                </div>
+                                                <button 
+                                                    onclick="toggleSupplement('${timeKey}', '${supp.name}')"
+                                                    class="text-3xl"
+                                                >
+                                                    ${taken ? '✅' : '⭕'}
+                                                </button>
+                                            </div>
+                                        `;
+                                    }).join('')}
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                    
+                    <div class="bg-blue-900 bg-opacity-30 rounded-lg p-4 border border-blue-700">
+                        <p class="text-sm text-blue-300">
+                            <strong>💡 Tip:</strong> Beta-Alanine is only on workout days (Mon-Sat). Collagen alternates every other day at 3 PM.
+                        </p>
+                    </div>
+                </div>
+            `;
         }
 
         function changeWeek(delta) {
-            state.currentWeek = Math.max(0, Math.min(16, state.currentWeek + delta));
-            saveState();
-            render();
-        }
-
-        function jumpToCurrentWeek() {
-            state.currentWeek = getCurrentWeek();
-            saveState();
-            render();
-        }
-
-        function selectDay(day) {
-            state.selectedDay = day;
-            render();
-            window.history.pushState({ view: 'workout', day: day }, '');
-            window.scrollTo(0, 0);
-        }
-
-        function toggleSupplement(time, idx) {
-            const today = new Date().toDateString();
-            const key = `${today}-${time}-${idx}`;
-            state.supplementLog[key] = !state.supplementLog[key];
-            saveState();
-            render();
-        }
-
-        function toggleExercise(day, idx) {
-            const key = `week${state.currentWeek}-${day}-${idx}`;
-            state.completedExercises[key] = !state.completedExercises[key];
-            saveState();
-            render();
-        }
-
-        function editWeight(day, exerciseIdx, setNum, currentWeight) {
-            state.editingSet = `${day}-${exerciseIdx}-${setNum}`;
-            state.tempWeight = currentWeight.toString();
-            render();
-            setTimeout(() => {
-                const input = document.getElementById('weightInput');
-                if (input) input.focus();
-            }, 100);
-        }
-
-        function saveWeight(day, exerciseIdx, setNum, exerciseName) {
-            if (state.tempWeight) {
-                const inputWeight = parseInt(state.tempWeight);
-                const constrainedWeight = constrainWeight(inputWeight, exerciseName);
-                const weightKey = `week${state.currentWeek}-${day}-${exerciseIdx}-set${setNum}`;
-                state.exerciseWeights[weightKey] = constrainedWeight;
-                state.editingSet = null;
-                state.tempWeight = '';
+            const newWeek = state.currentWeek + delta;
+            if (newWeek >= 0 && newWeek <= 16) {
+                state.currentWeek = newWeek;
                 saveState();
                 render();
             }
         }
 
-        function cancelEdit() {
+        function selectDay(day) {
+            state.selectedDay = day;
+            state.view = 'workout';
+            render();
+        }
+
+        function backToOverview() {
+            state.view = 'overview';
+            state.editingSet = null;
+            render();
+        }
+
+        function showSupplements() {
+            state.view = 'supplements';
+            render();
+        }
+
+        function toggleExercise(exerciseName) {
+            const dayKey = `${state.currentWeek}-${state.selectedDay}`;
+            if (!state.completedExercises[dayKey]) {
+                state.completedExercises[dayKey] = [];
+            }
+            
+            const index = state.completedExercises[dayKey].indexOf(exerciseName);
+            if (index > -1) {
+                state.completedExercises[dayKey].splice(index, 1);
+            } else {
+                state.completedExercises[dayKey].push(exerciseName);
+            }
+            
+            saveState();
+            render();
+        }
+
+        function toggleSupplement(timeKey, suppName) {
+            const today = new Date().toISOString().split('T')[0];
+            if (!state.supplementLog[today]) {
+                state.supplementLog[today] = {};
+            }
+            
+            const suppKey = `${timeKey}-${suppName}`;
+            state.supplementLog[today][suppKey] = !state.supplementLog[today][suppKey];
+            
+            saveState();
+            render();
+        }
+
+        function startEdit(exerciseName, setIndex, currentWeight) {
+            state.editingSet = `${exerciseName}-${setIndex}`;
+            state.tempWeight = currentWeight.toString();
+            render();
+            
+            // Focus and select all text, with cursor at the end
+            setTimeout(() => {
+                const input = document.getElementById(`weight-input-${exerciseName}-${setIndex}`);
+                if (input) {
+                    input.focus();
+                    // Set cursor to the end
+                    const length = input.value.length;
+                    input.setSelectionRange(length, length);
+                }
+            }, 100);
+        }
+
+        function saveWeight(exerciseName, setIndex, value, totalSets) {
+            const newWeight = parseFloat(value);
+            if (!isNaN(newWeight) && newWeight > 0) {
+                const key = `${state.currentWeek}-${exerciseName}-${setIndex}`;
+                state.exerciseWeights[key] = newWeight;
+                
+                // Update all future sets (not past sets)
+                updateFutureSets(exerciseName, setIndex, newWeight, state.currentWeek, totalSets);
+                
+                saveState();
+            }
+            
             state.editingSet = null;
             state.tempWeight = '';
             render();
         }
 
-        window.addEventListener('popstate', function(event) {
-            if (state.selectedDay) {
-                state.selectedDay = null;
-                render();
-            } else if (state.view === 'supplements') {
-                state.view = 'overview';
-                render();
-            }
-        });
+        function cancelEdit() {
+            setTimeout(() => {
+                if (state.editingSet) {
+                    state.editingSet = null;
+                    state.tempWeight = '';
+                    render();
+                }
+            }, 200);
+        }
 
+        // Initialize
         render();
     </script>
 </body>
