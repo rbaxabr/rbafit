@@ -219,16 +219,16 @@
             'Heavy Goblet Squats': { primary: ['Quads', 'Glutes'], secondary: ['Core'] },
             
             'DB Floor Press': { primary: ['Chest'], secondary: ['Triceps', 'Shoulders'] },
-            'KB Rows': { primary: ['Back'], secondary: ['Biceps'] },
-            'KB Shoulder Press': { primary: ['Shoulders'], secondary: ['Triceps'] },
+            'KB Rows (single-arm)': { primary: ['Back'], secondary: ['Biceps'] },
+            'KB Shoulder Press (single-arm)': { primary: ['Shoulders'], secondary: ['Triceps'] },
             'Push-ups': { primary: ['Chest'], secondary: ['Triceps', 'Core'] },
-            'KB Upright Rows': { primary: ['Shoulders'], secondary: ['Traps'] },
+            'KB Upright Rows (single-arm)': { primary: ['Shoulders'], secondary: ['Traps'] },
             'Hammer Curls': { primary: ['Biceps'], secondary: ['Forearms'] },
             'Tricep Extensions': { primary: ['Triceps'], secondary: [] },
             'Bent-Over Rows': { primary: ['Back'], secondary: ['Biceps'] },
             'Lateral Raises': { primary: ['Shoulders'], secondary: [] },
             'Pike Push-ups': { primary: ['Shoulders'], secondary: ['Triceps'] },
-            'KB Curls': { primary: ['Biceps'], secondary: [] },
+            'KB Curls (single-arm)': { primary: ['Biceps'], secondary: [] },
             'Skull Crushers': { primary: ['Triceps'], secondary: [] },
             'Face Pulls': { primary: ['Rear Delts'], secondary: ['Traps'] },
             'Weighted Push-ups': { primary: ['Chest'], secondary: ['Triceps', 'Core'] },
@@ -237,6 +237,9 @@
             'Explosive Push-ups (clap)': { primary: ['Chest', 'Power'], secondary: ['Triceps'] },
             'DB Floor Press (tempo)': { primary: ['Chest'], secondary: ['Triceps'] },
             'Heavy DB Press (floor)': { primary: ['Chest'], secondary: ['Triceps'] },
+            'DB Front Squats': { primary: ['Quads', 'Glutes'], secondary: ['Core'] },
+            'DB Clean & Press': { primary: ['Full Body'], secondary: ['Power'] },
+            'DB Bent-Over Rows': { primary: ['Back'], secondary: ['Biceps'] },
             
             'KB Clean & Press': { primary: ['Full Body'], secondary: ['Power'] },
             'Broad Jumps': { primary: ['Power', 'Legs'], secondary: [] },
@@ -318,10 +321,10 @@
                 exercises: [
                     { name: 'Dynamic Warm-up', sets: 1, reps: '8 min' },
                     { name: 'DB Floor Press', sets: 4, reps: 12, rest: '90s', hasWeight: true, defaultWeight: 35 },
-                    { name: 'KB Rows', sets: 4, reps: '15/side', rest: '90s', hasWeight: true, defaultWeight: 35 },
-                    { name: 'KB Shoulder Press', sets: 4, reps: 12, rest: '75s', hasWeight: true, defaultWeight: 25 },
+                    { name: 'KB Rows (single-arm)', sets: 4, reps: '15/side', rest: '90s', hasWeight: true, defaultWeight: 35 },
+                    { name: 'KB Shoulder Press (single-arm)', sets: 4, reps: '12/side', rest: '75s', hasWeight: true, defaultWeight: 25 },
                     { name: 'Push-ups', sets: 3, reps: 15, rest: '75s' },
-                    { name: 'KB Upright Rows', sets: 3, reps: 15, rest: '60s', hasWeight: true, defaultWeight: 25 },
+                    { name: 'KB Upright Rows (single-arm)', sets: 3, reps: '15/side', rest: '60s', hasWeight: true, defaultWeight: 25 },
                     { name: 'Hammer Curls', sets: 3, reps: 15, rest: '60s', hasWeight: true, defaultWeight: 20 },
                     { name: 'Tricep Extensions', sets: 3, reps: 15, rest: '60s', hasWeight: true, defaultWeight: 25 },
                     { name: 'Med Ball Twists', sets: 3, reps: 20, rest: '45s', hasWeight: true, defaultWeight: 15 },
@@ -357,7 +360,7 @@
                     { name: 'Box Jumps', sets: 4, reps: 8, rest: '90s', hasWeight: true, defaultWeight: 20 },
                     { name: 'KB Swings', sets: 4, reps: 25, rest: '90s', hasWeight: true, defaultWeight: 35 },
                     { name: 'Lateral Bounds', sets: 3, reps: '10/side', rest: '60s' },
-                    { name: 'Weighted Carries', sets: 3, reps: '500 steps', rest: '75s', hasWeight: true, defaultWeight: 35 },
+                    { name: 'Weighted Carries', sets: 3, reps: '100 steps', rest: '75s', hasWeight: true, defaultWeight: 35 },
                     { name: 'Med Ball Slams', sets: 3, reps: 15, rest: '45s', hasWeight: true, defaultWeight: 15 },
                     { name: 'Ball Pikes', sets: 3, reps: 10, rest: '45s' },
                     { name: 'Mobility', sets: 1, reps: '5 min' }
@@ -370,10 +373,10 @@
                 exercises: [
                     { name: 'Dynamic Warm-up', sets: 1, reps: '8 min' },
                     { name: 'DB Floor Press', sets: 4, reps: 12, rest: '90s', hasWeight: true, defaultWeight: 35 },
-                    { name: 'Bent-Over Rows', sets: 4, reps: 15, rest: '75s', hasWeight: true, defaultWeight: 35 },
+                    { name: 'DB Bent-Over Rows', sets: 4, reps: 15, rest: '75s', hasWeight: true, defaultWeight: 35 },
                     { name: 'Lateral Raises', sets: 3, reps: 15, rest: '60s', hasWeight: true, defaultWeight: 15 },
                     { name: 'Pike Push-ups', sets: 3, reps: 12, rest: '75s' },
-                    { name: 'KB Curls', sets: 3, reps: 15, rest: '60s', hasWeight: true, defaultWeight: 20 },
+                    { name: 'KB Curls (single-arm)', sets: 3, reps: '15/side', rest: '60s', hasWeight: true, defaultWeight: 20 },
                     { name: 'Skull Crushers', sets: 3, reps: 15, rest: '60s', hasWeight: true, defaultWeight: 20 },
                     { name: 'Face Pulls', sets: 3, reps: 20, rest: '60s', hasWeight: true, defaultWeight: 15 },
                     { name: 'Side Throws', sets: 3, reps: '12/side', rest: '45s', hasWeight: true, defaultWeight: 15 },
@@ -388,11 +391,11 @@
                 equipmentNeeded: ['Jump rope', 'Weighted vest', 'Water'],
                 exercises: [
                     { name: 'Dynamic Warm-up', sets: 1, reps: '12 min' },
-                    { name: 'Power Sprints', sets: 8, reps: '50m @ 90%', rest: '2m' },
+                    { name: 'Power Sprints', sets: 8, reps: '50 yds @ 90%', rest: '2m' },
                     { name: 'Broad Jumps', sets: 4, reps: 5, rest: '90s' },
                     { name: 'Agility T-Drill', sets: 6, reps: 1, rest: '90s' },
                     { name: 'Lateral Bounds', sets: 3, reps: '10/side', rest: '60s' },
-                    { name: 'Jump Rope', sets: 5, reps: '1 min', rest: '60s' },
+                    { name: 'Jump Rope', sets: 5, reps: '30-45s', rest: '60s' },
                     { name: 'Weighted Stairs', sets: 5, reps: 'full climb', rest: '90s', hasWeight: true, defaultWeight: 15 },
                     { name: 'High Knees', sets: 3, reps: '30s', rest: '30s' },
                     { name: 'V-ups', sets: 3, reps: 15, rest: '45s' },
@@ -682,31 +685,31 @@
                     <div class="p-4">
                         <h1 class="text-2xl font-bold text-center mb-1 gradient-text">« rba | fit »</h1>
                         
-                        <div class="flex items-center justify-between mb-3">
-                            <button onclick="changeWeek(-1)" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors text-sm" ${state.currentWeek === 0 ? 'disabled' : ''}>
-                                ← W${state.currentWeek - 1}
+                        <div class="flex items-center justify-between mb-3 gap-2">
+                            <button onclick="changeWeek(-1)" class="px-3 py-1.5 text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-lg transition-all text-sm font-medium" ${state.currentWeek === 0 ? 'disabled style="opacity: 0.3"' : ''}>
+                                ← Previous
                             </button>
-                            <div class="text-center">
+                            <div class="text-center flex-1">
                                 <div class="text-xl font-bold">Week ${state.currentWeek}</div>
                                 <div class="text-xs text-slate-400">${dateRange}</div>
                                 <div class="text-xs text-blue-400">${phaseInfo.name} • ${phaseInfo.focus}</div>
                             </div>
-                            <button onclick="changeWeek(1)" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors text-sm" ${state.currentWeek === 16 ? 'disabled' : ''}>
-                                W${state.currentWeek + 1} →
+                            <button onclick="changeWeek(1)" class="px-3 py-1.5 text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-lg transition-all text-sm font-medium" ${state.currentWeek === 16 ? 'disabled style="opacity: 0.3"' : ''}>
+                                Next →
                             </button>
                         </div>
 
                         ${state.currentWeek !== currentWeek ? `
-                            <button onclick="jumpToCurrentWeek()" class="w-full mb-2 px-3 py-1.5 bg-green-600 hover:bg-green-500 rounded-lg transition-colors text-sm">
+                            <button onclick="jumpToCurrentWeek()" class="w-full mb-2 px-3 py-1.5 text-green-400 hover:text-white hover:bg-green-600/30 border border-green-500/50 hover:border-green-400 rounded-lg transition-all text-sm font-medium">
                                 Jump to Current Week (${currentWeek})
                             </button>
                         ` : ''}
 
-                        <button onclick="showSupplements()" class="w-full mb-2 px-3 py-1.5 bg-purple-600 hover:bg-purple-500 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm">
+                        <button onclick="showSupplements()" class="w-full mb-2 px-3 py-1.5 text-purple-300 hover:text-white hover:bg-purple-600/30 border border-purple-500/50 hover:border-purple-400 rounded-lg transition-all flex items-center justify-center gap-2 text-sm font-medium">
                             💊 Daily Supplements (${suppProgress.percentage}%)
                         </button>
 
-                        <div class="bg-slate-700 rounded-lg p-2 mb-2">
+                        <div class="bg-slate-700/50 rounded-lg p-2 mb-2 border border-slate-600">
                             <div class="flex justify-between items-center mb-1">
                                 <span class="text-xs text-slate-300">Week Progress</span>
                                 <span class="text-xs font-bold text-blue-400">${weekProgress.percentage}%</span>
@@ -716,12 +719,12 @@
                             </div>
                         </div>
 
-                        <div class="bg-gradient-to-r from-purple-900 to-blue-900 rounded-lg p-2">
+                        <div class="bg-gradient-to-r from-purple-900/50 to-blue-900/50 rounded-lg p-2 border border-purple-500/30">
                             <div class="flex justify-between items-center mb-1">
                                 <span class="text-xs text-slate-200">Program Progress</span>
                                 <span class="text-xs font-bold text-purple-300">${programProgress.percentage}%</span>
                             </div>
-                            <div class="w-full bg-slate-700 rounded-full h-2">
+                            <div class="w-full bg-slate-700/50 rounded-full h-2">
                                 <div class="bg-gradient-to-r from-purple-500 to-blue-500 h-2 rounded-full transition-all" style="width: ${programProgress.percentage}%"></div>
                             </div>
                         </div>
@@ -783,26 +786,33 @@
             app.innerHTML = `
                 <div class="sticky-header shadow-xl">
                     <div class="p-4">
-                        <button onclick="backToOverview()" class="mb-3 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors text-sm">
+                        <button onclick="backToOverview()" class="mb-3 px-3 py-1.5 text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-lg transition-all text-sm font-medium">
                             ← Back
                         </button>
-                        <div class="mb-3">
-                            <h2 class="text-xl font-bold capitalize">${state.selectedDay} <span class="text-sm text-slate-400 font-normal">${dayDate}</span></h2>
-                            <p class="text-lg text-blue-400">${workout.name}</p>
-                            <p class="text-xs text-slate-400">${workout.duration} • ${workout.location}</p>
-                            ${workout.note ? `<p class="text-xs text-yellow-400 mt-1">⚠️ ${workout.note}</p>` : ''}
-                            ${workout.equipmentNeeded ? `
-                                <p class="text-xs text-yellow-400 mt-1">📦 Bring: ${workout.equipmentNeeded.join(', ')}</p>
-                            ` : ''}
-                        </div>
-                        
-                        <div class="bg-slate-700 rounded-lg p-2">
-                            <div class="flex justify-between items-center mb-1">
-                                <span class="text-xs text-slate-300">Day Progress</span>
-                                <span class="text-xs font-bold text-blue-400">${Math.round(progress)}%</span>
+                        <div class="flex items-start justify-between gap-4 mb-2">
+                            <div class="flex-1">
+                                <h2 class="text-xl font-bold capitalize">${state.selectedDay}</h2>
+                                <p class="text-sm text-slate-400">${dayDate}</p>
+                                <p class="text-lg text-blue-400 mt-1">${workout.name}</p>
+                                <p class="text-xs text-slate-400">${workout.duration} • ${workout.location}</p>
+                                ${workout.note ? `<p class="text-xs text-yellow-400 mt-1">⚠️ ${workout.note}</p>` : ''}
+                                ${workout.equipmentNeeded ? `
+                                    <p class="text-xs text-yellow-400 mt-1">📦 ${workout.equipmentNeeded.join(', ')}</p>
+                                ` : ''}
                             </div>
-                            <div class="w-full bg-slate-600 rounded-full h-2">
-                                <div class="bg-blue-500 h-2 rounded-full transition-all" style="width: ${progress}%"></div>
+                            <div class="flex flex-col items-center justify-center">
+                                <svg class="transform -rotate-90" width="80" height="80">
+                                    <circle cx="40" cy="40" r="32" fill="none" stroke="rgb(71, 85, 105)" stroke-width="6"/>
+                                    <circle cx="40" cy="40" r="32" fill="none" stroke="rgb(59, 130, 246)" stroke-width="6" 
+                                            stroke-dasharray="${2 * Math.PI * 32}" 
+                                            stroke-dashoffset="${2 * Math.PI * 32 * (1 - progress / 100)}"
+                                            stroke-linecap="round"
+                                            style="transition: stroke-dashoffset 0.5s ease"/>
+                                </svg>
+                                <div class="absolute text-center">
+                                    <div class="text-xl font-bold text-blue-400">${Math.round(progress)}%</div>
+                                    <div class="text-xs text-slate-400">${completedCount}/${totalExercises}</div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -838,7 +848,7 @@
                                 
                                 ${exercise.hasWeight ? `
                                     <div class="mt-3 pt-3 border-t border-slate-700">
-                                        <div class="grid grid-cols-${Math.min(exercise.sets, 4)} gap-2">
+                                        <div class="grid gap-2" style="grid-template-columns: repeat(${Math.min(exercise.sets, 5)}, minmax(0, 1fr))">
                                             ${Array.from({ length: exercise.sets }, (_, i) => {
                                                 const weight = getSmartRecommendation(exercise.name, i, state.currentWeek);
                                                 const equipment = getEquipmentType(exercise.name);
@@ -891,7 +901,7 @@
             app.innerHTML = `
                 <div class="sticky-header shadow-xl">
                     <div class="p-4">
-                        <button onclick="backToOverview()" class="mb-3 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors text-sm">
+                        <button onclick="backToOverview()" class="mb-3 px-3 py-1.5 text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-lg transition-all text-sm font-medium">
                             ← Back
                         </button>
                         <div class="mb-3">
