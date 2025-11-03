@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>«rba | fit»</title>
+    <title>« rba | fit »</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#1e293b">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E💪%3C/text%3E%3C/svg%3E">
@@ -368,13 +368,12 @@
             },
             sunday: { 
                 name: 'Active Recovery', 
-                duration: '40 min',
-                location: 'home',
-                equipmentNeeded: ['Jump rope', 'Foam roller'],
+                duration: '30 min',
+                location: 'neighborhood',
+                equipmentNeeded: ['Foam roller'],
                 exercises: [
-                    { name: 'Easy Jog/Peloton', sets: 1, reps: '20 min' },
-                    { name: 'Jump Rope Easy', sets: 1, reps: '5 min' },
-                    { name: 'Mobility Flow', sets: 1, reps: '10 min' },
+                    { name: 'Easy Walk', sets: 1, reps: '20 min' },
+                    { name: 'Mobility Flow', sets: 1, reps: '5 min' },
                     { name: 'Foam Rolling', sets: 1, reps: '5 min' }
                 ]
             }
@@ -399,14 +398,13 @@
             },
             sunday: { 
                 name: 'Prep Recovery', 
-                duration: '40 min',
-                location: 'home',
-                equipmentNeeded: ['Jump rope', 'Foam roller'],
+                duration: '30 min',
+                location: 'neighborhood',
+                equipmentNeeded: ['Foam roller'],
                 exercises: [
-                    { name: 'Walk/Easy Jog', sets: 1, reps: '20 min' },
-                    { name: 'Jump Rope', sets: 1, reps: '8 min' },
-                    { name: 'Stretching', sets: 1, reps: '8 min' },
-                    { name: 'Foam Rolling', sets: 1, reps: '4 min' }
+                    { name: 'Easy Walk', sets: 1, reps: '20 min' },
+                    { name: 'Stretching', sets: 1, reps: '5 min' },
+                    { name: 'Foam Rolling', sets: 1, reps: '5 min' }
                 ]
             }
         };
@@ -539,6 +537,62 @@
             saveState();
         }
 
+        function getTotalSupplementProgress() {
+            const today = new Date().toISOString().split('T')[0];
+            const dayLog = state.supplementLog[today] || {};
+            
+            let total = 0;
+            let completed = 0;
+            
+            // Special handling for pre-workout beta-alanine (only on workout days - not Sunday)
+            const dayOfWeek = new Date().getDay();
+            const includePreworkout = dayOfWeek !== 0;
+            
+            Object.entries(supplementSchedule).forEach(([timeKey, timeData]) => {
+                if (timeKey === 'preworkout' && !includePreworkout) return;
+                
+                let supplements = timeData.supplements.filter(supp => {
+                    if (supp.conditional && supp.checkFunction) {
+                        return supp.checkFunction();
+                    }
+                    return true;
+                });
+                
+                supplements.forEach(supp => {
+                    total++;
+                    const suppKey = `${timeKey}-${supp.name}`;
+                    if (dayLog[suppKey]) completed++;
+                });
+            });
+            
+            return { completed, total, percentage: total > 0 ? Math.round((completed / total) * 100) : 0 };
+        }
+
+        function getWeekProgress() {
+            const schedule = getWorkoutSchedule(state.currentWeek);
+            const days = state.currentWeek === 0 ? ['saturday', 'sunday'] : 
+                ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+            
+            let totalExercises = 0;
+            let completedExercises = 0;
+            
+            days.forEach(day => {
+                const workout = schedule[day];
+                if (workout) {
+                    const dayKey = `${state.currentWeek}-${day}`;
+                    const completed = state.completedExercises[dayKey] || [];
+                    totalExercises += workout.exercises.length;
+                    completedExercises += completed.length;
+                }
+            });
+            
+            return {
+                completed: completedExercises,
+                total: totalExercises,
+                percentage: totalExercises > 0 ? Math.round((completedExercises / totalExercises) * 100) : 0
+            };
+        }
+
         function render() {
             const app = document.getElementById('app');
             
@@ -556,6 +610,8 @@
             const phase = getPhase(state.currentWeek);
             const phaseInfo = getPhaseInfo(phase);
             const dateRange = getWeekDateRange(state.currentWeek);
+            const currentWeek = getCurrentWeek();
+            const weekProgress = getWeekProgress();
             
             const days = state.currentWeek === 0 ? ['saturday', 'sunday'] : 
                 ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
@@ -563,7 +619,7 @@
             app.innerHTML = `
                 <div class="sticky-header shadow-xl">
                     <div class="p-6">
-                        <h1 class="text-3xl font-bold text-center mb-2">💪 rba | fit</h1>
+                        <h1 class="text-3xl font-bold text-center mb-2">💪 RBA Fit</h1>
                         <div class="text-center text-slate-300 text-sm mb-4">${dateRange}</div>
                         
                         <div class="flex items-center justify-between mb-4">
@@ -580,9 +636,26 @@
                             </button>
                         </div>
 
+                        ${state.currentWeek !== currentWeek ? `
+                            <button onclick="jumpToCurrentWeek()" class="w-full mb-2 px-4 py-2 bg-green-600 hover:bg-green-500 rounded-lg transition-colors">
+                                Jump to Current Week (${currentWeek})
+                            </button>
+                        ` : ''}
+
                         <button onclick="showSupplements()" class="w-full mt-2 px-4 py-2 bg-purple-600 hover:bg-purple-500 rounded-lg transition-colors flex items-center justify-center gap-2">
                             💊 Daily Supplements
                         </button>
+
+                        <div class="mt-4 bg-slate-700 rounded-lg p-3">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm text-slate-300">Week Progress</span>
+                                <span class="text-sm font-bold text-blue-400">${weekProgress.completed}/${weekProgress.total}</span>
+                            </div>
+                            <div class="w-full bg-slate-600 rounded-full h-3">
+                                <div class="bg-blue-500 h-3 rounded-full transition-all" style="width: ${weekProgress.percentage}%"></div>
+                            </div>
+                            <div class="text-center text-xs text-slate-400 mt-1">${weekProgress.percentage}% Complete</div>
+                        </div>
                     </div>
                 </div>
 
@@ -608,7 +681,7 @@
                                         ` : ''}
                                     </div>
                                     <div class="text-right">
-                                        <div class="text-2xl mb-1">${completedCount === totalExercises ? '✅' : '📋'}</div>
+                                        <div class="text-xl mb-1">${completedCount === totalExercises ? '✅' : '⭕'}</div>
                                         <div class="text-sm text-slate-400">${completedCount}/${totalExercises}</div>
                                     </div>
                                 </div>
@@ -629,6 +702,13 @@
             const dayKey = `${state.currentWeek}-${state.selectedDay}`;
             const completed = state.completedExercises[dayKey] || [];
             
+            const completedCount = completed.length;
+            const totalExercises = workout.exercises.length;
+            const progress = (completedCount / totalExercises) * 100;
+            
+            // Scroll to top
+            setTimeout(() => window.scrollTo(0, 0), 0);
+            
             app.innerHTML = `
                 <div class="sticky-header shadow-xl">
                     <div class="p-6">
@@ -642,6 +722,17 @@
                         ${workout.equipmentNeeded ? `
                             <p class="text-xs text-slate-400 mt-2">📦 Bring: ${workout.equipmentNeeded.join(', ')}</p>
                         ` : ''}
+                        
+                        <div class="mt-4 bg-slate-700 rounded-lg p-3">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm text-slate-300">Day Progress</span>
+                                <span class="text-sm font-bold text-blue-400">${completedCount}/${totalExercises}</span>
+                            </div>
+                            <div class="w-full bg-slate-600 rounded-full h-3">
+                                <div class="bg-blue-500 h-3 rounded-full transition-all" style="width: ${progress}%"></div>
+                            </div>
+                            <div class="text-center text-xs text-slate-400 mt-1">${Math.round(progress)}% Complete</div>
+                        </div>
                     </div>
                 </div>
 
@@ -668,7 +759,7 @@
                                             ${exercise.rest ? ` • ${exercise.rest} rest` : ''}
                                         </p>
                                     </div>
-                                    <button onclick="toggleExercise('${exercise.name}')" class="ml-4 text-3xl">
+                                    <button onclick="toggleExercise('${exercise.name}')" class="ml-4 text-2xl">
                                         ${isCompleted ? '✅' : '⭕'}
                                     </button>
                                 </div>
@@ -699,7 +790,7 @@
                                                                 <span class="text-lg font-bold text-blue-400">${weight}</span>
                                                                 <button 
                                                                     onclick="startEdit('${exercise.name}', ${i}, ${weight})"
-                                                                    class="text-slate-500 hover:text-blue-400 transition-colors"
+                                                                    class="text-slate-500 hover:text-blue-400 transition-colors text-sm"
                                                                 >✏️</button>
                                                             </div>
                                                         `}
@@ -720,6 +811,10 @@
         function renderSupplements(app) {
             const today = new Date().toISOString().split('T')[0];
             const dayLog = state.supplementLog[today] || {};
+            const suppProgress = getTotalSupplementProgress();
+            
+            // Scroll to top
+            setTimeout(() => window.scrollTo(0, 0), 0);
             
             app.innerHTML = `
                 <div class="sticky-header shadow-xl">
@@ -729,6 +824,17 @@
                         </button>
                         <h2 class="text-2xl font-bold">💊 Daily Supplements</h2>
                         <p class="text-sm text-slate-400 mt-1">${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
+                        
+                        <div class="mt-4 bg-slate-700 rounded-lg p-3">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm text-slate-300">Daily Progress</span>
+                                <span class="text-sm font-bold text-purple-400">${suppProgress.completed}/${suppProgress.total}</span>
+                            </div>
+                            <div class="w-full bg-slate-600 rounded-full h-3">
+                                <div class="bg-purple-500 h-3 rounded-full transition-all" style="width: ${suppProgress.percentage}%"></div>
+                            </div>
+                            <div class="text-center text-xs text-slate-400 mt-1">${suppProgress.percentage}% Complete</div>
+                        </div>
                     </div>
                 </div>
 
@@ -781,7 +887,7 @@
                                                 </div>
                                                 <button 
                                                     onclick="toggleSupplement('${timeKey}', '${supp.name}')"
-                                                    class="text-3xl"
+                                                    class="text-2xl"
                                                 >
                                                     ${taken ? '✅' : '⭕'}
                                                 </button>
@@ -809,6 +915,12 @@
                 saveState();
                 render();
             }
+        }
+
+        function jumpToCurrentWeek() {
+            state.currentWeek = getCurrentWeek();
+            saveState();
+            render();
         }
 
         function selectDay(day) {
@@ -901,6 +1013,17 @@
                 }
             }, 200);
         }
+
+        // Prevent default back button behavior on mobile
+        window.addEventListener('popstate', function(event) {
+            event.preventDefault();
+            if (state.view !== 'overview') {
+                backToOverview();
+            }
+        });
+
+        // Push initial state
+        history.pushState({ view: 'overview' }, '', '');
 
         // Initialize
         render();
