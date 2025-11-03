@@ -39,6 +39,33 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
+        /* Smooth transitions */
+        * {
+            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+        }
+        /* Card hover effects */
+        .workout-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .workout-card:active {
+            transform: scale(0.98);
+        }
+        /* Progress bar animation */
+        .progress-bar {
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        /* Button press effect */
+        button:active {
+            transform: scale(0.95);
+        }
+        /* Input focus glow */
+        input:focus {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
+        /* Smooth scroll */
+        html {
+            scroll-behavior: smooth;
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-slate-900 to-slate-800 text-white min-h-screen">
@@ -116,7 +143,7 @@
         }
 
         function formatDate(date) {
-            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
         }
 
         function getWeekDateRange(week) {
@@ -652,54 +679,51 @@
             
             app.innerHTML = `
                 <div class="sticky-header shadow-xl">
-                    <div class="p-6">
-                        <h1 class="text-3xl font-bold text-center mb-2 gradient-text">« rba | fit »</h1>
-                        <div class="text-center text-slate-300 text-sm mb-4">${dateRange}</div>
+                    <div class="p-4">
+                        <h1 class="text-2xl font-bold text-center mb-1 gradient-text">« rba | fit »</h1>
                         
-                        <div class="flex items-center justify-between mb-4">
-                            <button onclick="changeWeek(-1)" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors" ${state.currentWeek === 0 ? 'disabled' : ''}>
-                                ← Week ${state.currentWeek - 1}
+                        <div class="flex items-center justify-between mb-3">
+                            <button onclick="changeWeek(-1)" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors text-sm" ${state.currentWeek === 0 ? 'disabled' : ''}>
+                                ← W${state.currentWeek - 1}
                             </button>
                             <div class="text-center">
-                                <div class="text-2xl font-bold">Week ${state.currentWeek}</div>
-                                <div class="text-sm text-blue-400">${phaseInfo.name}</div>
-                                <div class="text-xs text-slate-400">${phaseInfo.focus}</div>
+                                <div class="text-xl font-bold">Week ${state.currentWeek}</div>
+                                <div class="text-xs text-slate-400">${dateRange}</div>
+                                <div class="text-xs text-blue-400">${phaseInfo.name} • ${phaseInfo.focus}</div>
                             </div>
-                            <button onclick="changeWeek(1)" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors" ${state.currentWeek === 16 ? 'disabled' : ''}>
-                                Week ${state.currentWeek + 1} →
+                            <button onclick="changeWeek(1)" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors text-sm" ${state.currentWeek === 16 ? 'disabled' : ''}>
+                                W${state.currentWeek + 1} →
                             </button>
                         </div>
 
                         ${state.currentWeek !== currentWeek ? `
-                            <button onclick="jumpToCurrentWeek()" class="w-full mb-2 px-4 py-2 bg-green-600 hover:bg-green-500 rounded-lg transition-colors">
+                            <button onclick="jumpToCurrentWeek()" class="w-full mb-2 px-3 py-1.5 bg-green-600 hover:bg-green-500 rounded-lg transition-colors text-sm">
                                 Jump to Current Week (${currentWeek})
                             </button>
                         ` : ''}
 
-                        <button onclick="showSupplements()" class="w-full mt-2 px-4 py-2 bg-purple-600 hover:bg-purple-500 rounded-lg transition-colors flex items-center justify-center gap-2">
+                        <button onclick="showSupplements()" class="w-full mb-2 px-3 py-1.5 bg-purple-600 hover:bg-purple-500 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm">
                             💊 Daily Supplements (${suppProgress.percentage}%)
                         </button>
 
-                        <div class="mt-4 bg-slate-700 rounded-lg p-3">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="text-sm text-slate-300">Week Progress</span>
-                                <span class="text-sm font-bold text-blue-400">${weekProgress.completed}/${weekProgress.total}</span>
+                        <div class="bg-slate-700 rounded-lg p-2 mb-2">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-xs text-slate-300">Week Progress</span>
+                                <span class="text-xs font-bold text-blue-400">${weekProgress.percentage}%</span>
                             </div>
-                            <div class="w-full bg-slate-600 rounded-full h-3">
-                                <div class="bg-blue-500 h-3 rounded-full transition-all" style="width: ${weekProgress.percentage}%"></div>
+                            <div class="w-full bg-slate-600 rounded-full h-2">
+                                <div class="bg-blue-500 h-2 rounded-full transition-all" style="width: ${weekProgress.percentage}%"></div>
                             </div>
-                            <div class="text-center text-xs text-slate-400 mt-1">${weekProgress.percentage}% Complete</div>
                         </div>
 
-                        <div class="mt-3 bg-gradient-to-r from-purple-900 to-blue-900 rounded-lg p-3">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="text-sm text-slate-200">Overall Program Progress</span>
-                                <span class="text-sm font-bold text-purple-300">${programProgress.completed}/${programProgress.total}</span>
+                        <div class="bg-gradient-to-r from-purple-900 to-blue-900 rounded-lg p-2">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-xs text-slate-200">Program Progress</span>
+                                <span class="text-xs font-bold text-purple-300">${programProgress.percentage}%</span>
                             </div>
-                            <div class="w-full bg-slate-700 rounded-full h-3">
-                                <div class="bg-gradient-to-r from-purple-500 to-blue-500 h-3 rounded-full transition-all" style="width: ${programProgress.percentage}%"></div>
+                            <div class="w-full bg-slate-700 rounded-full h-2">
+                                <div class="bg-gradient-to-r from-purple-500 to-blue-500 h-2 rounded-full transition-all" style="width: ${programProgress.percentage}%"></div>
                             </div>
-                            <div class="text-center text-xs text-slate-300 mt-1">${programProgress.percentage}% Complete</div>
                         </div>
                     </div>
                 </div>
@@ -716,7 +740,7 @@
                         const dayDate = getDayDate(state.currentWeek, day);
                         
                         return `
-                            <div onclick="selectDay('${day}')" class="bg-slate-800 rounded-lg p-5 hover:bg-slate-750 transition-all cursor-pointer border border-slate-700 hover:border-blue-500">
+                            <div onclick="selectDay('${day}')" class="workout-card bg-slate-800 rounded-lg p-5 hover:bg-slate-750 cursor-pointer border border-slate-700 hover:border-blue-500 shadow-lg hover:shadow-xl">
                                 <div class="flex justify-between items-start mb-3">
                                     <div>
                                         <h3 class="text-xl font-bold capitalize text-blue-400">${day} <span class="text-sm text-slate-400 font-normal">${dayDate}</span></h3>
@@ -727,13 +751,13 @@
                                         ` : ''}
                                     </div>
                                     <div class="text-right">
-                                        <div class="text-xl mb-1">${completedCount === totalExercises ? '✅' : '⭕'}</div>
+                                        <div class="text-xl mb-1">${completedCount === totalExercises ? '✔️' : '⭕'}</div>
                                         <div class="text-sm text-slate-400">${completedCount}/${totalExercises}</div>
                                     </div>
                                 </div>
                                 
                                 <div class="w-full bg-slate-700 rounded-full h-2">
-                                    <div class="bg-blue-500 h-2 rounded-full transition-all" style="width: ${progress}%"></div>
+                                    <div class="progress-bar bg-blue-500 h-2 rounded-full" style="width: ${progress}%"></div>
                                 </div>
                             </div>
                         `;
@@ -758,27 +782,28 @@
             
             app.innerHTML = `
                 <div class="sticky-header shadow-xl">
-                    <div class="p-6">
-                        <button onclick="backToOverview()" class="mb-4 px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors">
+                    <div class="p-4">
+                        <button onclick="backToOverview()" class="mb-3 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors text-sm">
                             ← Back
                         </button>
-                        <h2 class="text-2xl font-bold capitalize">${state.selectedDay} <span class="text-base text-slate-400 font-normal">${dayDate}</span></h2>
-                        <p class="text-xl text-blue-400 mt-1">${workout.name}</p>
-                        <p class="text-sm text-slate-400 mt-1">${workout.duration} • ${workout.location}</p>
-                        ${workout.note ? `<p class="text-xs text-yellow-400 mt-2">⚠️ ${workout.note}</p>` : ''}
-                        ${workout.equipmentNeeded ? `
-                            <p class="text-xs text-yellow-400 mt-2">📦 Bring: ${workout.equipmentNeeded.join(', ')}</p>
-                        ` : ''}
+                        <div class="mb-3">
+                            <h2 class="text-xl font-bold capitalize">${state.selectedDay} <span class="text-sm text-slate-400 font-normal">${dayDate}</span></h2>
+                            <p class="text-lg text-blue-400">${workout.name}</p>
+                            <p class="text-xs text-slate-400">${workout.duration} • ${workout.location}</p>
+                            ${workout.note ? `<p class="text-xs text-yellow-400 mt-1">⚠️ ${workout.note}</p>` : ''}
+                            ${workout.equipmentNeeded ? `
+                                <p class="text-xs text-yellow-400 mt-1">📦 Bring: ${workout.equipmentNeeded.join(', ')}</p>
+                            ` : ''}
+                        </div>
                         
-                        <div class="mt-4 bg-slate-700 rounded-lg p-3">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="text-sm text-slate-300">Day Progress</span>
-                                <span class="text-sm font-bold text-blue-400">${completedCount}/${totalExercises}</span>
+                        <div class="bg-slate-700 rounded-lg p-2">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-xs text-slate-300">Day Progress</span>
+                                <span class="text-xs font-bold text-blue-400">${Math.round(progress)}%</span>
                             </div>
-                            <div class="w-full bg-slate-600 rounded-full h-3">
-                                <div class="bg-blue-500 h-3 rounded-full transition-all" style="width: ${progress}%"></div>
+                            <div class="w-full bg-slate-600 rounded-full h-2">
+                                <div class="bg-blue-500 h-2 rounded-full transition-all" style="width: ${progress}%"></div>
                             </div>
-                            <div class="text-center text-xs text-slate-400 mt-1">${Math.round(progress)}% Complete</div>
                         </div>
                     </div>
                 </div>
@@ -789,7 +814,7 @@
                         const muscles = getMuscleGroups(exercise.name);
                         
                         return `
-                            <div class="bg-slate-800 rounded-lg p-5 border border-slate-700">
+                            <div class="bg-slate-800 rounded-lg p-5 border border-slate-700 shadow-md hover:shadow-lg transition-shadow">
                                 <div class="flex justify-between items-start mb-3">
                                     <div class="flex-1">
                                         <h3 class="text-lg font-bold ${isCompleted ? 'text-green-400 line-through' : 'text-white'}">
@@ -865,22 +890,23 @@
             
             app.innerHTML = `
                 <div class="sticky-header shadow-xl">
-                    <div class="p-6">
-                        <button onclick="backToOverview()" class="mb-4 px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors">
+                    <div class="p-4">
+                        <button onclick="backToOverview()" class="mb-3 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors text-sm">
                             ← Back
                         </button>
-                        <h2 class="text-2xl font-bold">💊 Daily Supplements</h2>
-                        <p class="text-sm text-slate-400 mt-1">${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
+                        <div class="mb-3">
+                            <h2 class="text-xl font-bold">💊 Daily Supplements</h2>
+                            <p class="text-xs text-slate-400">${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
+                        </div>
                         
-                        <div class="mt-4 bg-slate-700 rounded-lg p-3">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="text-sm text-slate-300">Daily Progress</span>
-                                <span class="text-sm font-bold text-purple-400">${suppProgress.completed}/${suppProgress.total}</span>
+                        <div class="bg-slate-700 rounded-lg p-2">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-xs text-slate-300">Daily Progress</span>
+                                <span class="text-xs font-bold text-purple-400">${suppProgress.percentage}%</span>
                             </div>
-                            <div class="w-full bg-slate-600 rounded-full h-3">
-                                <div class="bg-purple-500 h-3 rounded-full transition-all" style="width: ${suppProgress.percentage}%"></div>
+                            <div class="w-full bg-slate-600 rounded-full h-2">
+                                <div class="bg-purple-500 h-2 rounded-full transition-all" style="width: ${suppProgress.percentage}%"></div>
                             </div>
-                            <div class="text-center text-xs text-slate-400 mt-1">${suppProgress.percentage}% Complete</div>
                         </div>
                     </div>
                 </div>
@@ -1062,14 +1088,18 @@
             state.tempWeight = currentWeight.toString();
             render();
             
-            // Focus and select all text, with cursor at the end
+            // Focus and place cursor at the end
             setTimeout(() => {
                 const input = document.getElementById(`weight-input-${exerciseName}-${setIndex}`);
                 if (input) {
                     input.focus();
-                    // Set cursor to the end
+                    // Set cursor to the end by setting selection range
                     const length = input.value.length;
                     input.setSelectionRange(length, length);
+                    // For iOS, also try scrolling the input
+                    if (input.scrollLeft !== undefined) {
+                        input.scrollLeft = input.scrollWidth;
+                    }
                 }
             }, 100);
         }
