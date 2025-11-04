@@ -40,31 +40,55 @@
             background-clip: text;
         }
         /* Smooth transitions */
-        * {
-            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+        button {
+            transition: all 0.2s ease;
         }
-        /* Card hover effects */
+        button:active {
+            transform: scale(0.95);
+        }
         .workout-card {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .workout-card:active {
             transform: scale(0.98);
         }
-        /* Progress bar animation */
         .progress-bar {
             transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        /* Button press effect */
-        button:active {
-            transform: scale(0.95);
-        }
-        /* Input focus glow */
         input:focus {
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
         }
-        /* Smooth scroll */
         html {
             scroll-behavior: smooth;
+        }
+        /* Progress Rings - Apple Watch Style */
+        .progress-ring {
+            position: relative;
+            width: 110px;
+            height: 110px;
+        }
+        .progress-ring-circle {
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+        .progress-ring-bg {
+            fill: none;
+            stroke: rgba(71, 85, 105, 0.3);
+        }
+        .progress-ring-fill {
+            fill: none;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .ring-program { stroke: url(#gradient-program); }
+        .ring-week { stroke: url(#gradient-week); }
+        .ring-supplement { stroke: url(#gradient-supplement); }
+        .progress-ring-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
         }
     </style>
 </head>
@@ -76,10 +100,8 @@
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             
-            // Week 0: Oct 11-12, 2025 (Saturday-Sunday)
-            // Week 1: Oct 13-19, 2025 (Monday starts)
-            const week0Start = new Date(2025, 9, 11); // Month is 0-indexed, so 9 = October
-            const week1Start = new Date(2025, 9, 13); // Monday Oct 13
+            const week0Start = new Date(2025, 9, 11);
+            const week1Start = new Date(2025, 9, 13);
             
             week0Start.setHours(0, 0, 0, 0);
             week1Start.setHours(0, 0, 0, 0);
@@ -113,10 +135,6 @@
         }
 
         function getWeekDates(week) {
-            // Week 0: Saturday Oct 11 - Sunday Oct 12, 2025
-            // Week 1: Monday Oct 13 - Sunday Oct 19, 2025
-            // Week 2: Monday Oct 20 - Sunday Oct 26, 2025, etc.
-            
             if (week === 0) {
                 return {
                     saturday: new Date(2025, 9, 11),
@@ -124,7 +142,6 @@
                 };
             }
             
-            // Week 1 starts on Monday, Oct 13
             const week1Monday = new Date(2025, 9, 13);
             const daysFromWeek1 = (week - 1) * 7;
             
@@ -159,12 +176,11 @@
             return dates[day] ? formatDate(dates[day]) : '';
         }
 
-        // Helper function to check if collagen should be taken today
         function shouldTakeCollagenToday() {
             const today = new Date();
-            const startDate = new Date(2025, 9, 11); // Oct 11, 2025 - start of program
+            const startDate = new Date(2025, 9, 11);
             const daysSinceStart = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
-            return daysSinceStart % 2 === 0; // Every other day
+            return daysSinceStart % 2 === 0;
         }
 
         const supplementSchedule = {
@@ -205,7 +221,6 @@
             }
         };
 
-        // Muscle group definitions for exercises
         const muscleMappings = {
             'Box Jumps': { primary: ['Quads'], secondary: ['Glutes', 'Calves'] },
             'Goblet Squats': { primary: ['Quads', 'Glutes'], secondary: ['Core'] },
@@ -215,20 +230,19 @@
             'Slider Leg Curls': { primary: ['Hamstrings'], secondary: ['Glutes'] },
             'Bulgarian Split Squats': { primary: ['Quads', 'Glutes'], secondary: ['Balance'] },
             'Single-Leg RDL': { primary: ['Hamstrings', 'Glutes'], secondary: ['Core'] },
-            'Double KB Front Squats': { primary: ['Quads', 'Glutes'], secondary: ['Core'] },
+            'DB Front Squats': { primary: ['Quads', 'Glutes'], secondary: ['Core'] },
             'Heavy Goblet Squats': { primary: ['Quads', 'Glutes'], secondary: ['Core'] },
-            
             'DB Floor Press': { primary: ['Chest'], secondary: ['Triceps', 'Shoulders'] },
-            'KB Rows (single-arm)': { primary: ['Back'], secondary: ['Biceps'] },
-            'KB Shoulder Press (single-arm)': { primary: ['Shoulders'], secondary: ['Triceps'] },
+            'KB Rows': { primary: ['Back'], secondary: ['Biceps'] },
+            'KB Shoulder Press': { primary: ['Shoulders'], secondary: ['Triceps'] },
             'Push-ups': { primary: ['Chest'], secondary: ['Triceps', 'Core'] },
-            'KB Upright Rows (single-arm)': { primary: ['Shoulders'], secondary: ['Traps'] },
+            'KB Upright Rows': { primary: ['Shoulders'], secondary: ['Traps'] },
             'Hammer Curls': { primary: ['Biceps'], secondary: ['Forearms'] },
             'Tricep Extensions': { primary: ['Triceps'], secondary: [] },
             'Bent-Over Rows': { primary: ['Back'], secondary: ['Biceps'] },
             'Lateral Raises': { primary: ['Shoulders'], secondary: [] },
             'Pike Push-ups': { primary: ['Shoulders'], secondary: ['Triceps'] },
-            'KB Curls (single-arm)': { primary: ['Biceps'], secondary: [] },
+            'KB Curls': { primary: ['Biceps'], secondary: [] },
             'Skull Crushers': { primary: ['Triceps'], secondary: [] },
             'Face Pulls': { primary: ['Rear Delts'], secondary: ['Traps'] },
             'Weighted Push-ups': { primary: ['Chest'], secondary: ['Triceps', 'Core'] },
@@ -237,18 +251,13 @@
             'Explosive Push-ups (clap)': { primary: ['Chest', 'Power'], secondary: ['Triceps'] },
             'DB Floor Press (tempo)': { primary: ['Chest'], secondary: ['Triceps'] },
             'Heavy DB Press (floor)': { primary: ['Chest'], secondary: ['Triceps'] },
-            'DB Front Squats': { primary: ['Quads', 'Glutes'], secondary: ['Core'] },
-            'DB Clean & Press': { primary: ['Full Body'], secondary: ['Power'] },
-            'DB Bent-Over Rows': { primary: ['Back'], secondary: ['Biceps'] },
-            
             'KB Clean & Press': { primary: ['Full Body'], secondary: ['Power'] },
             'Broad Jumps': { primary: ['Power', 'Legs'], secondary: [] },
             'Weighted Carries': { primary: ['Core', 'Grip'], secondary: ['Traps'] },
             'KB Snatches': { primary: ['Full Body'], secondary: ['Power'] },
-            'Double KB Clean & Press': { primary: ['Full Body'], secondary: ['Power'] },
+            'DB Clean & Press': { primary: ['Full Body'], secondary: ['Power'] },
             'Depth Jumps': { primary: ['Power', 'Quads'], secondary: [] },
             'Broad Jumps (max distance)': { primary: ['Power', 'Legs'], secondary: [] },
-            
             'Sprint Intervals': { primary: ['Cardio', 'Legs'], secondary: [] },
             'Stadium Stairs': { primary: ['Cardio', 'Quads'], secondary: ['Glutes'] },
             'Jump Rope HIIT': { primary: ['Cardio'], secondary: ['Calves'] },
@@ -258,7 +267,6 @@
             'Lateral Bounds': { primary: ['Lateral Power'], secondary: ['Legs'] },
             'Jump Rope': { primary: ['Cardio'], secondary: ['Calves'] },
             'Weighted Stairs': { primary: ['Cardio', 'Quads'], secondary: ['Glutes'] },
-            
             'Med Ball Slams': { primary: ['Core', 'Power'], secondary: ['Shoulders'] },
             'Plank Hold': { primary: ['Core'], secondary: [] },
             'Med Ball Twists': { primary: ['Obliques'], secondary: ['Core'] },
@@ -305,7 +313,7 @@
                     { name: 'Dynamic Warm-up', sets: 1, reps: '8 min' },
                     { name: 'Box Jumps', sets: 3, reps: 8, rest: '90s', hasWeight: true, defaultWeight: 20 },
                     { name: 'Goblet Squats', sets: 4, reps: 15, rest: '90s', hasWeight: true, defaultWeight: 35 },
-                    { name: 'Single-Leg Step-ups', sets: 3, reps: '12/side', rest: '75s', hasWeight: true, defaultWeight: 20 },
+                    { name: 'Single-Leg Step-ups', sets: 3, reps: '12 each leg', rest: '75s', hasWeight: true, defaultWeight: 20 },
                     { name: 'KB Swings', sets: 4, reps: 20, rest: '75s', hasWeight: true, defaultWeight: 35 },
                     { name: 'Walking Lunges', sets: 3, reps: '20 steps', rest: '75s', hasWeight: true, defaultWeight: 20 },
                     { name: 'Slider Leg Curls', sets: 3, reps: 12, rest: '60s' },
@@ -321,14 +329,14 @@
                 exercises: [
                     { name: 'Dynamic Warm-up', sets: 1, reps: '8 min' },
                     { name: 'DB Floor Press', sets: 4, reps: 12, rest: '90s', hasWeight: true, defaultWeight: 35 },
-                    { name: 'KB Rows (single-arm)', sets: 4, reps: '15/side', rest: '90s', hasWeight: true, defaultWeight: 35 },
-                    { name: 'KB Shoulder Press (single-arm)', sets: 4, reps: '12/side', rest: '75s', hasWeight: true, defaultWeight: 25 },
+                    { name: 'KB Rows', sets: 4, reps: '15 each arm', rest: '90s', hasWeight: true, defaultWeight: 35 },
+                    { name: 'KB Shoulder Press', sets: 4, reps: 12, rest: '75s', hasWeight: true, defaultWeight: 25 },
                     { name: 'Push-ups', sets: 3, reps: 15, rest: '75s' },
-                    { name: 'KB Upright Rows (single-arm)', sets: 3, reps: '15/side', rest: '60s', hasWeight: true, defaultWeight: 25 },
+                    { name: 'KB Upright Rows', sets: 3, reps: 15, rest: '60s', hasWeight: true, defaultWeight: 25 },
                     { name: 'Hammer Curls', sets: 3, reps: 15, rest: '60s', hasWeight: true, defaultWeight: 20 },
                     { name: 'Tricep Extensions', sets: 3, reps: 15, rest: '60s', hasWeight: true, defaultWeight: 25 },
                     { name: 'Med Ball Twists', sets: 3, reps: 20, rest: '45s', hasWeight: true, defaultWeight: 15 },
-                    { name: 'Dead Bugs', sets: 3, reps: '12/side', rest: '30s' },
+                    { name: 'Dead Bugs', sets: 3, reps: '12 each side', rest: '30s' },
                     { name: 'Stretch', sets: 1, reps: '5 min' }
                 ]
             },
@@ -355,12 +363,12 @@
                 exercises: [
                     { name: 'Dynamic Warm-up', sets: 1, reps: '8 min' },
                     { name: 'Broad Jumps', sets: 4, reps: 5, rest: '2m' },
-                    { name: 'KB Clean & Press', sets: 4, reps: '8/side', rest: '2m', hasWeight: true, defaultWeight: 35 },
-                    { name: 'Single-Leg RDL', sets: 3, reps: '12/side', rest: '75s', hasWeight: true, defaultWeight: 25 },
+                    { name: 'KB Clean & Press', sets: 4, reps: '8 each arm', rest: '2m', hasWeight: true, defaultWeight: 35 },
+                    { name: 'Single-Leg RDL', sets: 3, reps: '12 each leg', rest: '75s', hasWeight: true, defaultWeight: 25 },
                     { name: 'Box Jumps', sets: 4, reps: 8, rest: '90s', hasWeight: true, defaultWeight: 20 },
                     { name: 'KB Swings', sets: 4, reps: 25, rest: '90s', hasWeight: true, defaultWeight: 35 },
-                    { name: 'Lateral Bounds', sets: 3, reps: '10/side', rest: '60s' },
-                    { name: 'Weighted Carries', sets: 3, reps: '100 steps', rest: '75s', hasWeight: true, defaultWeight: 35 },
+                    { name: 'Lateral Bounds', sets: 3, reps: '10 each side', rest: '60s' },
+                    { name: 'Weighted Carries', sets: 3, reps: '150 steps', rest: '75s', hasWeight: true, defaultWeight: 35 },
                     { name: 'Med Ball Slams', sets: 3, reps: 15, rest: '45s', hasWeight: true, defaultWeight: 15 },
                     { name: 'Ball Pikes', sets: 3, reps: 10, rest: '45s' },
                     { name: 'Mobility', sets: 1, reps: '5 min' }
@@ -373,13 +381,13 @@
                 exercises: [
                     { name: 'Dynamic Warm-up', sets: 1, reps: '8 min' },
                     { name: 'DB Floor Press', sets: 4, reps: 12, rest: '90s', hasWeight: true, defaultWeight: 35 },
-                    { name: 'DB Bent-Over Rows', sets: 4, reps: 15, rest: '75s', hasWeight: true, defaultWeight: 35 },
+                    { name: 'Bent-Over Rows', sets: 4, reps: 15, rest: '75s', hasWeight: true, defaultWeight: 35 },
                     { name: 'Lateral Raises', sets: 3, reps: 15, rest: '60s', hasWeight: true, defaultWeight: 15 },
                     { name: 'Pike Push-ups', sets: 3, reps: 12, rest: '75s' },
-                    { name: 'KB Curls (single-arm)', sets: 3, reps: '15/side', rest: '60s', hasWeight: true, defaultWeight: 20 },
+                    { name: 'KB Curls', sets: 3, reps: 15, rest: '60s', hasWeight: true, defaultWeight: 20 },
                     { name: 'Skull Crushers', sets: 3, reps: 15, rest: '60s', hasWeight: true, defaultWeight: 20 },
                     { name: 'Face Pulls', sets: 3, reps: 20, rest: '60s', hasWeight: true, defaultWeight: 15 },
-                    { name: 'Side Throws', sets: 3, reps: '12/side', rest: '45s', hasWeight: true, defaultWeight: 15 },
+                    { name: 'Side Throws', sets: 3, reps: '12 each side', rest: '45s', hasWeight: true, defaultWeight: 15 },
                     { name: 'Ball Rollouts', sets: 3, reps: 10, rest: '45s' },
                     { name: 'Stretch', sets: 1, reps: '5 min' }
                 ]
@@ -387,15 +395,15 @@
             saturday: { 
                 name: 'Athletic Power', 
                 duration: '70 min',
-                location: 'track',
+                location: 'field',
                 equipmentNeeded: ['Jump rope', 'Weighted vest', 'Water'],
                 exercises: [
                     { name: 'Dynamic Warm-up', sets: 1, reps: '12 min' },
                     { name: 'Power Sprints', sets: 8, reps: '50 yds @ 90%', rest: '2m' },
                     { name: 'Broad Jumps', sets: 4, reps: 5, rest: '90s' },
                     { name: 'Agility T-Drill', sets: 6, reps: 1, rest: '90s' },
-                    { name: 'Lateral Bounds', sets: 3, reps: '10/side', rest: '60s' },
-                    { name: 'Jump Rope', sets: 5, reps: '30-45s', rest: '60s' },
+                    { name: 'Lateral Bounds', sets: 3, reps: '10 each side', rest: '60s' },
+                    { name: 'Jump Rope', sets: 5, reps: '1 min', rest: '60s' },
                     { name: 'Weighted Stairs', sets: 5, reps: 'full climb', rest: '90s', hasWeight: true, defaultWeight: 15 },
                     { name: 'High Knees', sets: 3, reps: '30s', rest: '30s' },
                     { name: 'V-ups', sets: 3, reps: 15, rest: '45s' },
@@ -419,11 +427,11 @@
             saturday: { 
                 name: 'Prep Power', 
                 duration: '55 min',
-                location: 'track',
+                location: 'field',
                 equipmentNeeded: ['Jump rope', 'Sliders', 'Water'],
                 exercises: [
                     { name: 'Dynamic Warm-up', sets: 1, reps: '12 min' },
-                    { name: 'Build-up Sprints', sets: 6, reps: '40m @ 75%', rest: '2m' },
+                    { name: 'Build-up Sprints', sets: 6, reps: '40 yds @ 75%', rest: '2m' },
                     { name: 'Broad Jumps', sets: 3, reps: 5, rest: '90s' },
                     { name: 'Agility Drills', sets: 1, reps: '8 min' },
                     { name: 'Jump Rope', sets: 5, reps: '1 min on/off' },
@@ -462,10 +470,10 @@
             });
             
             if (phase === 2) {
-                schedule.monday.exercises[3] = { name: 'Bulgarian Split Squats', sets: 4, reps: '10/side', rest: '90s', hasWeight: true, defaultWeight: Math.round(30 * weightMultiplier) };
+                schedule.monday.exercises[3] = { name: 'Bulgarian Split Squats', sets: 4, reps: '10 each leg', rest: '90s', hasWeight: true, defaultWeight: Math.round(30 * weightMultiplier) };
                 schedule.tuesday.exercises[1] = { name: 'Weighted Push-ups', sets: 4, reps: 10, rest: '90s', hasWeight: true, defaultWeight: Math.round(20 * weightMultiplier) };
-                schedule.thursday.exercises[2] = { name: 'KB Snatches', sets: 4, reps: '8/side', rest: '2m', hasWeight: true, defaultWeight: Math.round(35 * weightMultiplier) };
-                schedule.friday.exercises[1] = { name: 'Single-Arm Floor Press', sets: 4, reps: '10/side', rest: '90s', hasWeight: true, defaultWeight: Math.round(35 * weightMultiplier) };
+                schedule.thursday.exercises[2] = { name: 'KB Snatches', sets: 4, reps: '8 each arm', rest: '2m', hasWeight: true, defaultWeight: Math.round(35 * weightMultiplier) };
+                schedule.friday.exercises[1] = { name: 'Single-Arm Floor Press', sets: 4, reps: '10 each arm', rest: '90s', hasWeight: true, defaultWeight: Math.round(35 * weightMultiplier) };
             }
             
             if (phase === 3) {
@@ -489,31 +497,25 @@
             return schedule;
         }
 
-        // Equipment constraints - UPDATED with actual equipment
         function getEquipmentType(exerciseName) {
             const name = exerciseName.toLowerCase();
             
-            // Weighted vest
             if (name.includes('weighted stairs') || name.includes('weighted vest')) {
                 return { type: 'vest', options: [0, 10, 15, 20, 25, 30, 35, 40] };
             }
             
-            // Medicine balls
             if (name.includes('med ball') || name.includes('medicine ball') || name.includes('ball slam') || name.includes('ball twist') || name.includes('side throw')) {
                 return { type: 'medball', options: [5, 10, 15, 20, 30, 40] };
             }
             
-            // Box heights
             if (name.includes('box jump')) {
                 return { type: 'box', options: [6, 20, 24, 30] };
             }
             
-            // Kettlebells - single available at each weight, can expand by 9lb increments
             if (name.includes('kb ') || name.includes('kettlebell') || name.includes('goblet') || name.includes('swing')) {
                 return { type: 'kettlebell', options: [5, 10, 15, 20, 25, 35, 40, 44, 53, 62, 72, 81, 90] };
             }
             
-            // Dumbbells - two of each available, can expand by 5lb increments
             if (name.includes('db ') || name.includes('dumbbell') || name.includes('curl') || name.includes('raise') || name.includes('skull crusher')) {
                 return { type: 'dumbbell', options: [2.5, 5, 7.5, 10, 12.5, 15, 17.5, 20, 22.5, 25, 30, 35, 40, 45, 50, 52.5, 55, 60, 65, 70, 75, 80] };
             }
@@ -523,8 +525,6 @@
 
         function getClosestWeight(target, equipment) {
             if (!equipment.options) return target;
-            
-            // Find closest available weight
             return equipment.options.reduce((prev, curr) => 
                 Math.abs(curr - target) < Math.abs(prev - target) ? curr : prev
             );
@@ -536,21 +536,18 @@
             
             if (stored) return stored;
             
-            // Look for previous set in SAME workout session only
             if (setIndex > 0) {
                 const prevKey = `${week}-${exerciseName}-${setIndex - 1}`;
                 const prevWeight = state.exerciseWeights[prevKey];
                 if (prevWeight) return prevWeight;
             }
             
-            // Look for last week's same set
             if (week > 0) {
                 const lastWeekKey = `${week - 1}-${exerciseName}-${setIndex}`;
                 const lastWeek = state.exerciseWeights[lastWeekKey];
                 if (lastWeek) return lastWeek;
             }
             
-            // Return default
             const schedule = getWorkoutSchedule(week);
             for (const day in schedule) {
                 const exercise = schedule[day].exercises.find(ex => ex.name === exerciseName);
@@ -564,7 +561,6 @@
         }
 
         function updateFutureSets(exerciseName, currentSetIndex, newWeight, week, totalSets) {
-            // Only update sets AFTER the current one, never before
             for (let i = currentSetIndex + 1; i < totalSets; i++) {
                 const futureKey = `${week}-${exerciseName}-${i}`;
                 state.exerciseWeights[futureKey] = newWeight;
@@ -579,7 +575,6 @@
             let total = 0;
             let completed = 0;
             
-            // Special handling for pre-workout beta-alanine (only on workout days - not Sunday)
             const dayOfWeek = new Date().getDay();
             const includePreworkout = dayOfWeek !== 0;
             
@@ -655,6 +650,73 @@
             };
         }
 
+        function renderProgressRing(percentage, label, colorClass) {
+            const radius = 45;
+            const stroke = 7;
+            const normalizedRadius = radius - stroke / 2;
+            const circumference = normalizedRadius * 2 * Math.PI;
+            const strokeDashoffset = circumference - (percentage / 100) * circumference;
+            
+            return `
+                <div class="progress-ring">
+                    <svg height="110" width="110" class="progress-ring-circle">
+                        <defs>
+                            <linearGradient id="gradient-program" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#a855f7;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:1" />
+                            </linearGradient>
+                            <linearGradient id="gradient-week" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:1" />
+                            </linearGradient>
+                            <linearGradient id="gradient-supplement" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#ec4899;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <circle
+                            class="progress-ring-bg"
+                            stroke-width="${stroke}"
+                            r="${normalizedRadius}"
+                            cx="55"
+                            cy="55"
+                        />
+                        <circle
+                            class="progress-ring-fill ${colorClass}"
+                            stroke-width="${stroke}"
+                            stroke-dasharray="${circumference} ${circumference}"
+                            style="stroke-dashoffset: ${strokeDashoffset}"
+                            r="${normalizedRadius}"
+                            cx="55"
+                            cy="55"
+                        />
+                    </svg>
+                    <div class="progress-ring-text">
+                        <div class="text-xl font-bold text-white">${percentage}%</div>
+                        <div class="text-xs text-slate-400">${label}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateRingProgress(ringClass, percentage) {
+            const ring = document.querySelector(`.${ringClass}`);
+            if (ring) {
+                const radius = 45;
+                const stroke = 7;
+                const normalizedRadius = radius - stroke / 2;
+                const circumference = normalizedRadius * 2 * Math.PI;
+                const strokeDashoffset = circumference - (percentage / 100) * circumference;
+                ring.style.strokeDashoffset = strokeDashoffset;
+                
+                const ringContainer = ring.closest('.progress-ring');
+                if (ringContainer) {
+                    const percentText = ringContainer.querySelector('.text-xl');
+                    if (percentText) percentText.textContent = `${percentage}%`;
+                }
+            }
+        }
+
         function render() {
             const app = document.getElementById('app');
             
@@ -682,56 +744,42 @@
             
             app.innerHTML = `
                 <div class="sticky-header shadow-xl">
-                    <div class="p-4">
-                        <h1 class="text-2xl font-bold text-center mb-1 gradient-text">« rba | fit »</h1>
+                    <div class="p-5">
+                        <h1 class="text-3xl font-bold text-center mb-2 gradient-text">« rba | fit »</h1>
                         
-                        <div class="flex items-center justify-between mb-3 gap-2">
-                            <button onclick="changeWeek(-1)" class="px-3 py-1.5 text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-lg transition-all text-sm font-medium" ${state.currentWeek === 0 ? 'disabled style="opacity: 0.3"' : ''}>
+                        <div class="flex items-center justify-between mb-4">
+                            <button onclick="changeWeek(-1)" class="px-4 py-2 border border-slate-600 hover:border-slate-400 hover:bg-slate-700/30 rounded-lg text-sm text-slate-300" ${state.currentWeek === 0 ? 'disabled style="opacity: 0.3"' : ''}>
                                 ← Previous
                             </button>
-                            <div class="text-center flex-1">
-                                <div class="text-xl font-bold">Week ${state.currentWeek}</div>
+                            <div class="text-center flex-1 px-2">
+                                <div class="text-2xl font-bold">Week ${state.currentWeek}</div>
                                 <div class="text-xs text-slate-400">${dateRange}</div>
-                                <div class="text-xs text-blue-400">${phaseInfo.name} • ${phaseInfo.focus}</div>
+                                <div class="text-xs text-blue-400">${phaseInfo.name}</div>
                             </div>
-                            <button onclick="changeWeek(1)" class="px-3 py-1.5 text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-lg transition-all text-sm font-medium" ${state.currentWeek === 16 ? 'disabled style="opacity: 0.3"' : ''}>
+                            <button onclick="changeWeek(1)" class="px-4 py-2 border border-slate-600 hover:border-slate-400 hover:bg-slate-700/30 rounded-lg text-sm text-slate-300" ${state.currentWeek === 16 ? 'disabled style="opacity: 0.3"' : ''}>
                                 Next →
                             </button>
                         </div>
 
                         ${state.currentWeek !== currentWeek ? `
-                            <button onclick="jumpToCurrentWeek()" class="w-full mb-2 px-3 py-1.5 text-green-400 hover:text-white hover:bg-green-600/30 border border-green-500/50 hover:border-green-400 rounded-lg transition-all text-sm font-medium">
+                            <button onclick="jumpToCurrentWeek()" class="w-full mb-3 px-4 py-2 bg-green-600 hover:bg-green-500 rounded-lg text-sm font-medium">
                                 Jump to Current Week (${currentWeek})
                             </button>
                         ` : ''}
 
-                        <button onclick="showSupplements()" class="w-full mb-2 px-3 py-1.5 text-purple-300 hover:text-white hover:bg-purple-600/30 border border-purple-500/50 hover:border-purple-400 rounded-lg transition-all flex items-center justify-center gap-2 text-sm font-medium">
-                            💊 Daily Supplements (${suppProgress.percentage}%)
+                        <button onclick="showSupplements()" class="w-full mb-4 px-4 py-2 bg-purple-600 hover:bg-purple-500 rounded-lg flex items-center justify-center gap-2 text-sm font-medium">
+                            💊 Daily Supplements
                         </button>
 
-                        <div class="bg-slate-700/50 rounded-lg p-2 mb-2 border border-slate-600">
-                            <div class="flex justify-between items-center mb-1">
-                                <span class="text-xs text-slate-300">Week Progress</span>
-                                <span class="text-xs font-bold text-blue-400">${weekProgress.percentage}%</span>
-                            </div>
-                            <div class="w-full bg-slate-600 rounded-full h-2">
-                                <div class="bg-blue-500 h-2 rounded-full transition-all" style="width: ${weekProgress.percentage}%"></div>
-                            </div>
-                        </div>
-
-                        <div class="bg-gradient-to-r from-purple-900/50 to-blue-900/50 rounded-lg p-2 border border-purple-500/30">
-                            <div class="flex justify-between items-center mb-1">
-                                <span class="text-xs text-slate-200">Program Progress</span>
-                                <span class="text-xs font-bold text-purple-300">${programProgress.percentage}%</span>
-                            </div>
-                            <div class="w-full bg-slate-700/50 rounded-full h-2">
-                                <div class="bg-gradient-to-r from-purple-500 to-blue-500 h-2 rounded-full transition-all" style="width: ${programProgress.percentage}%"></div>
-                            </div>
+                        <div class="flex justify-around items-center mb-2">
+                            ${renderProgressRing(programProgress.percentage, 'Program', 'ring-program')}
+                            ${renderProgressRing(weekProgress.percentage, 'Week', 'ring-week')}
+                            ${renderProgressRing(suppProgress.percentage, 'Daily', 'ring-supplement')}
                         </div>
                     </div>
                 </div>
 
-                <div class="p-6 space-y-4">
+                <div class="p-5 space-y-4">
                     ${days.map(day => {
                         const workout = schedule[day];
                         if (!workout) return '';
@@ -743,7 +791,7 @@
                         const dayDate = getDayDate(state.currentWeek, day);
                         
                         return `
-                            <div onclick="selectDay('${day}')" class="workout-card bg-slate-800 rounded-lg p-5 hover:bg-slate-750 cursor-pointer border border-slate-700 hover:border-blue-500 shadow-lg hover:shadow-xl">
+                            <div onclick="selectDay('${day}')" class="workout-card bg-slate-800 rounded-lg p-5 cursor-pointer border border-slate-700 hover:border-blue-500 shadow-lg hover:shadow-xl">
                                 <div class="flex justify-between items-start mb-3">
                                     <div>
                                         <h3 class="text-xl font-bold capitalize text-blue-400">${day} <span class="text-sm text-slate-400 font-normal">${dayDate}</span></h3>
@@ -780,51 +828,38 @@
             const progress = (completedCount / totalExercises) * 100;
             const dayDate = getDayDate(state.currentWeek, state.selectedDay);
             
-            // Scroll to top
             setTimeout(() => window.scrollTo(0, 0), 0);
             
             app.innerHTML = `
                 <div class="sticky-header shadow-xl">
                     <div class="p-4">
-                        <button onclick="backToOverview()" class="mb-3 px-3 py-1.5 text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-lg transition-all text-sm font-medium">
+                        <button onclick="backToOverview()" class="mb-3 px-4 py-2 border border-slate-600 hover:border-slate-400 hover:bg-slate-700/30 rounded-lg text-sm text-slate-300">
                             ← Back
                         </button>
-                        <div class="flex items-start justify-between gap-4 mb-2">
+                        <div class="flex justify-between items-start">
                             <div class="flex-1">
-                                <h2 class="text-xl font-bold capitalize">${state.selectedDay}</h2>
-                                <p class="text-sm text-slate-400">${dayDate}</p>
-                                <p class="text-lg text-blue-400 mt-1">${workout.name}</p>
+                                <h2 class="text-2xl font-bold capitalize">${state.selectedDay} <span class="text-sm text-slate-400 font-normal">${dayDate}</span></h2>
+                                <p class="text-lg text-blue-400">${workout.name}</p>
                                 <p class="text-xs text-slate-400">${workout.duration} • ${workout.location}</p>
                                 ${workout.note ? `<p class="text-xs text-yellow-400 mt-1">⚠️ ${workout.note}</p>` : ''}
                                 ${workout.equipmentNeeded ? `
-                                    <p class="text-xs text-yellow-400 mt-1">📦 ${workout.equipmentNeeded.join(', ')}</p>
+                                    <p class="text-xs text-yellow-400 mt-1">📦 Bring: ${workout.equipmentNeeded.join(', ')}</p>
                                 ` : ''}
                             </div>
-                            <div class="flex flex-col items-center justify-center">
-                                <svg class="transform -rotate-90" width="80" height="80">
-                                    <circle cx="40" cy="40" r="32" fill="none" stroke="rgb(71, 85, 105)" stroke-width="6"/>
-                                    <circle cx="40" cy="40" r="32" fill="none" stroke="rgb(59, 130, 246)" stroke-width="6" 
-                                            stroke-dasharray="${2 * Math.PI * 32}" 
-                                            stroke-dashoffset="${2 * Math.PI * 32 * (1 - progress / 100)}"
-                                            stroke-linecap="round"
-                                            style="transition: stroke-dashoffset 0.5s ease"/>
-                                </svg>
-                                <div class="absolute text-center">
-                                    <div class="text-xl font-bold text-blue-400">${Math.round(progress)}%</div>
-                                    <div class="text-xs text-slate-400">${completedCount}/${totalExercises}</div>
-                                </div>
+                            <div class="ml-4">
+                                ${renderProgressRing(Math.round(progress), `${completedCount}/${totalExercises}`, 'ring-week')}
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="p-6 space-y-4">
+                <div class="p-5 space-y-4">
                     ${workout.exercises.map((exercise, exIndex) => {
                         const isCompleted = completed.includes(exercise.name);
                         const muscles = getMuscleGroups(exercise.name);
                         
                         return `
-                            <div class="bg-slate-800 rounded-lg p-5 border border-slate-700 shadow-md hover:shadow-lg transition-shadow">
+                            <div class="bg-slate-800 rounded-lg p-5 border border-slate-700 shadow-md">
                                 <div class="flex justify-between items-start mb-3">
                                     <div class="flex-1">
                                         <h3 class="text-lg font-bold ${isCompleted ? 'text-green-400 line-through' : 'text-white'}">
@@ -837,7 +872,7 @@
                                             ).join('') : ''}
                                         </h3>
                                         <p class="text-sm text-slate-400 mt-1">
-                                            ${exercise.sets} sets × ${exercise.reps} reps
+                                            ${exercise.sets} sets × ${exercise.reps}
                                             ${exercise.rest ? ` • ${exercise.rest} rest` : ''}
                                         </p>
                                     </div>
@@ -848,7 +883,7 @@
                                 
                                 ${exercise.hasWeight ? `
                                     <div class="mt-3 pt-3 border-t border-slate-700">
-                                        <div class="grid gap-2" style="grid-template-columns: repeat(${Math.min(exercise.sets, 5)}, minmax(0, 1fr))">
+                                        <div class="grid grid-cols-${Math.min(exercise.sets, 4)} gap-2">
                                             ${Array.from({ length: exercise.sets }, (_, i) => {
                                                 const weight = getSmartRecommendation(exercise.name, i, state.currentWeek);
                                                 const equipment = getEquipmentType(exercise.name);
@@ -871,8 +906,8 @@
                                                             <div class="flex items-center justify-center gap-1">
                                                                 <span class="text-lg font-bold text-blue-400">${weight}</span>
                                                                 <button 
-                                                                    onclick="startEdit('${exercise.name}', ${i}, ${weight})"
-                                                                    class="text-slate-500 hover:text-blue-400 transition-colors text-sm"
+                                                                    onclick="event.stopPropagation(); startEdit('${exercise.name}', ${i}, ${weight})"
+                                                                    class="text-slate-500 hover:text-blue-400 text-sm"
                                                                 >✏️</button>
                                                             </div>
                                                         `}
@@ -895,46 +930,35 @@
             const dayLog = state.supplementLog[today] || {};
             const suppProgress = getTotalSupplementProgress();
             
-            // Scroll to top
             setTimeout(() => window.scrollTo(0, 0), 0);
             
             app.innerHTML = `
                 <div class="sticky-header shadow-xl">
                     <div class="p-4">
-                        <button onclick="backToOverview()" class="mb-3 px-3 py-1.5 text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-lg transition-all text-sm font-medium">
+                        <button onclick="backToOverview()" class="mb-3 px-4 py-2 border border-slate-600 hover:border-slate-400 hover:bg-slate-700/30 rounded-lg text-sm text-slate-300">
                             ← Back
                         </button>
-                        <div class="mb-3">
-                            <h2 class="text-xl font-bold">💊 Daily Supplements</h2>
-                            <p class="text-xs text-slate-400">${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
-                        </div>
-                        
-                        <div class="bg-slate-700 rounded-lg p-2">
-                            <div class="flex justify-between items-center mb-1">
-                                <span class="text-xs text-slate-300">Daily Progress</span>
-                                <span class="text-xs font-bold text-purple-400">${suppProgress.percentage}%</span>
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <h2 class="text-2xl font-bold">💊 Daily Supplements</h2>
+                                <p class="text-xs text-slate-400">${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
                             </div>
-                            <div class="w-full bg-slate-600 rounded-full h-2">
-                                <div class="bg-purple-500 h-2 rounded-full transition-all" style="width: ${suppProgress.percentage}%"></div>
+                            <div class="ml-4">
+                                ${renderProgressRing(suppProgress.percentage, `${suppProgress.completed}/${suppProgress.total}`, 'ring-supplement')}
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="p-6 space-y-6">
+                <div class="p-5 space-y-6">
                     ${Object.entries(supplementSchedule).map(([timeKey, timeData]) => {
-                        // Filter supplements based on conditional checks
                         let supplements = timeData.supplements;
                         
-                        // Special handling for pre-workout beta-alanine (only on workout days - not Sunday)
                         if (timeKey === 'preworkout') {
                             const dayOfWeek = new Date().getDay();
-                            if (dayOfWeek === 0) { // Sunday
-                                supplements = [];
-                            }
+                            if (dayOfWeek === 0) supplements = [];
                         }
                         
-                        // Filter out conditional supplements if their check function returns false
                         supplements = supplements.filter(supp => {
                             if (supp.conditional && supp.checkFunction) {
                                 return supp.checkFunction();
@@ -942,19 +966,16 @@
                             return true;
                         });
                         
-                        // Skip entire time block if no supplements
                         if (supplements.length === 0) return '';
                         
                         return `
-                            <div class="bg-slate-800 rounded-lg p-5 border border-slate-700">
-                                <div class="flex justify-between items-center mb-4">
-                                    <div>
-                                        <h3 class="text-xl font-bold text-purple-400">${timeData.time}</h3>
-                                        <p class="text-sm text-slate-400">${timeData.note}</p>
-                                    </div>
+                            <div class="bg-slate-800 rounded-lg p-4 border border-slate-700 shadow-md">
+                                <div class="mb-3">
+                                    <h3 class="text-lg font-bold text-purple-400">${timeData.time}</h3>
+                                    <p class="text-xs text-slate-400">${timeData.note}</p>
                                 </div>
                                 
-                                <div class="space-y-3">
+                                <div class="space-y-2">
                                     ${supplements.map(supp => {
                                         const suppKey = `${timeKey}-${supp.name}`;
                                         const taken = dayLog[suppKey] || false;
@@ -962,7 +983,7 @@
                                         return `
                                             <div class="flex items-center justify-between p-3 bg-slate-900 rounded-lg">
                                                 <div class="flex items-center gap-3">
-                                                    <span class="text-2xl">${supp.icon}</span>
+                                                    <span class="text-xl">${supp.icon}</span>
                                                     <div>
                                                         <p class="font-semibold ${taken ? 'text-green-400 line-through' : 'text-white'}">${supp.name}</p>
                                                         <p class="text-xs text-slate-400">${supp.dose}</p>
@@ -1043,24 +1064,17 @@
             
             saveState();
             
-            // Update UI without full re-render to preserve scroll position
-            // Update progress bar
+            // Update UI without full re-render
             const completed = state.completedExercises[dayKey].length;
             const schedule = getWorkoutSchedule(state.currentWeek);
             const workout = schedule[state.selectedDay];
             const total = workout.exercises.length;
-            const progress = (completed / total) * 100;
+            const progress = Math.round((completed / total) * 100);
             
-            // Update progress display in header
-            const progressBar = document.querySelector('.sticky-header .bg-blue-500');
-            const progressText = document.querySelector('.sticky-header .text-blue-400');
-            const progressPercent = document.querySelector('.sticky-header .text-slate-400');
+            // Update ring
+            updateRingProgress('ring-week', progress);
             
-            if (progressBar) progressBar.style.width = `${progress}%`;
-            if (progressText) progressText.textContent = `${completed}/${total}`;
-            if (progressPercent) progressPercent.textContent = `${Math.round(progress)}% Complete`;
-            
-            // Update the specific exercise's appearance
+            // Update exercise styling
             const exercises = document.querySelectorAll('.bg-slate-800.rounded-lg.p-5');
             exercises.forEach(exerciseEl => {
                 const titleEl = exerciseEl.querySelector('h3');
@@ -1087,71 +1101,152 @@
             }
             
             const suppKey = `${timeKey}-${suppName}`;
-            state.supplementLog[today][suppKey] = !state.supplementLog[today][suppKey];
+            const newState = !state.supplementLog[today][suppKey];
+            state.supplementLog[today][suppKey] = newState;
             
             saveState();
-            render();
+            
+            // Update ring in real-time
+            const suppProgress = getTotalSupplementProgress();
+            updateRingProgress('ring-supplement', suppProgress.percentage);
+            
+            // Update supplement styling
+            const suppElements = document.querySelectorAll('.bg-slate-900.rounded-lg');
+            suppElements.forEach(el => {
+                const nameEl = el.querySelector('.font-semibold');
+                if (nameEl && nameEl.textContent === suppName) {
+                    const button = el.querySelector('button');
+                    if (button) {
+                        button.textContent = newState ? '✔️' : '⭕';
+                    }
+                    if (newState) {
+                        nameEl.classList.add('text-green-400', 'line-through');
+                        nameEl.classList.remove('text-white');
+                    } else {
+                        nameEl.classList.remove('text-green-400', 'line-through');
+                        nameEl.classList.add('text-white');
+                    }
+                }
+            });
         }
 
         function startEdit(exerciseName, setIndex, currentWeight) {
+            const currentScrollPos = window.pageYOffset;
             state.editingSet = `${exerciseName}-${setIndex}`;
             state.tempWeight = currentWeight.toString();
-            render();
             
-            // Focus and place cursor at the end
-            setTimeout(() => {
-                const input = document.getElementById(`weight-input-${exerciseName}-${setIndex}`);
-                if (input) {
-                    input.focus();
-                    // Set cursor to the end by setting selection range
-                    const length = input.value.length;
-                    input.setSelectionRange(length, length);
-                    // For iOS, also try scrolling the input
-                    if (input.scrollLeft !== undefined) {
-                        input.scrollLeft = input.scrollWidth;
+            // Re-render only the exercise card
+            const schedule = getWorkoutSchedule(state.currentWeek);
+            const workout = schedule[state.selectedDay];
+            const exercise = workout.exercises.find(ex => ex.name === exerciseName);
+            
+            if (exercise) {
+                const exercises = document.querySelectorAll('.bg-slate-800.rounded-lg.p-5');
+                exercises.forEach(exerciseEl => {
+                    const titleEl = exerciseEl.querySelector('h3');
+                    if (titleEl && titleEl.textContent.includes(exerciseName)) {
+                        const weightGrid = exerciseEl.querySelector('.grid');
+                        if (weightGrid) {
+                            const setDivs = weightGrid.querySelectorAll('.text-center');
+                            if (setDivs[setIndex]) {
+                                const equipment = getEquipmentType(exerciseName);
+                                setDivs[setIndex].innerHTML = `
+                                    <div class="text-xs text-slate-500 mb-1">Set ${setIndex + 1}</div>
+                                    <input 
+                                        type="number" 
+                                        inputmode="decimal"
+                                        value="${currentWeight}"
+                                        onchange="saveWeight('${exerciseName}', ${setIndex}, this.value, ${exercise.sets})"
+                                        onblur="cancelEdit()"
+                                        class="w-full px-2 py-1 bg-slate-700 border border-blue-500 rounded text-center text-white"
+                                        autofocus
+                                        id="weight-input-${exerciseName}-${setIndex}"
+                                    />
+                                    <div class="text-xs text-slate-600">${equipment.type === 'box' ? 'in' : 'lbs'}</div>
+                                `;
+                                
+                                setTimeout(() => {
+                                    const input = document.getElementById(`weight-input-${exerciseName}-${setIndex}`);
+                                    if (input) {
+                                        input.focus();
+                                        const length = input.value.length;
+                                        input.setSelectionRange(length, length);
+                                        if (input.scrollLeft !== undefined) {
+                                            input.scrollLeft = input.scrollWidth;
+                                        }
+                                    }
+                                    window.scrollTo(0, currentScrollPos);
+                                }, 50);
+                            }
+                        }
                     }
-                }
-            }, 100);
+                });
+            }
         }
 
         function saveWeight(exerciseName, setIndex, value, totalSets) {
+            const currentScrollPos = window.pageYOffset;
             const newWeight = parseFloat(value);
             if (!isNaN(newWeight) && newWeight > 0) {
                 const key = `${state.currentWeek}-${exerciseName}-${setIndex}`;
                 state.exerciseWeights[key] = newWeight;
-                
-                // Update all future sets (not past sets)
                 updateFutureSets(exerciseName, setIndex, newWeight, state.currentWeek, totalSets);
-                
                 saveState();
             }
             
             state.editingSet = null;
             state.tempWeight = '';
-            render();
+            
+            // Update the display without full re-render
+            const exercises = document.querySelectorAll('.bg-slate-800.rounded-lg.p-5');
+            exercises.forEach(exerciseEl => {
+                const titleEl = exerciseEl.querySelector('h3');
+                if (titleEl && titleEl.textContent.includes(exerciseName)) {
+                    const weightGrid = exerciseEl.querySelector('.grid');
+                    if (weightGrid) {
+                        const setDivs = weightGrid.querySelectorAll('.text-center');
+                        for (let i = setIndex; i < totalSets; i++) {
+                            if (setDivs[i]) {
+                                const weight = getSmartRecommendation(exerciseName, i, state.currentWeek);
+                                const equipment = getEquipmentType(exerciseName);
+                                setDivs[i].innerHTML = `
+                                    <div class="text-xs text-slate-500 mb-1">Set ${i + 1}</div>
+                                    <div class="flex items-center justify-center gap-1">
+                                        <span class="text-lg font-bold text-blue-400">${weight}</span>
+                                        <button 
+                                            onclick="event.stopPropagation(); startEdit('${exerciseName}', ${i}, ${weight})"
+                                            class="text-slate-500 hover:text-blue-400 text-sm"
+                                        >✏️</button>
+                                    </div>
+                                    <div class="text-xs text-slate-600">${equipment.type === 'box' ? 'in' : 'lbs'}</div>
+                                `;
+                            }
+                        }
+                    }
+                }
+            });
+            
+            window.scrollTo(0, currentScrollPos);
         }
 
         function cancelEdit() {
             setTimeout(() => {
                 if (state.editingSet) {
+                    const currentScrollPos = window.pageYOffset;
                     state.editingSet = null;
                     state.tempWeight = '';
-                    render();
+                    window.scrollTo(0, currentScrollPos);
                 }
             }, 200);
         }
 
-        // Handle browser back button properly
         window.addEventListener('popstate', function(event) {
             if (state.view !== 'overview') {
                 backToOverview();
             }
         });
 
-        // Initialize with proper history state
         history.replaceState({ view: 'overview' }, '', '');
-
-        // Initialize
         render();
     </script>
 </body>
