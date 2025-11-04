@@ -343,7 +343,7 @@
             wednesday: { 
                 name: 'HIIT Conditioning', 
                 duration: '60 min',
-                location: 'track',
+                location: 'stadium',
                 equipmentNeeded: ['Jump rope', 'Sliders', 'Water'],
                 exercises: [
                     { name: 'Warm-up Jog', sets: 1, reps: '8 min' },
@@ -395,7 +395,7 @@
             saturday: { 
                 name: 'Athletic Power', 
                 duration: '70 min',
-                location: 'field',
+                location: 'stadium',
                 equipmentNeeded: ['Jump rope', 'Weighted vest', 'Water'],
                 exercises: [
                     { name: 'Dynamic Warm-up', sets: 1, reps: '12 min' },
@@ -427,7 +427,7 @@
             saturday: { 
                 name: 'Prep Power', 
                 duration: '55 min',
-                location: 'field',
+                location: 'stadium',
                 equipmentNeeded: ['Jump rope', 'Sliders', 'Water'],
                 exercises: [
                     { name: 'Dynamic Warm-up', sets: 1, reps: '12 min' },
@@ -470,19 +470,19 @@
             });
             
             if (phase === 2) {
-                schedule.monday.exercises[3] = { name: 'Bulgarian Split Squats', sets: 4, reps: '10 each leg', rest: '90s', hasWeight: true, defaultWeight: Math.round(30 * weightMultiplier) };
-                schedule.tuesday.exercises[1] = { name: 'Weighted Push-ups', sets: 4, reps: 10, rest: '90s', hasWeight: true, defaultWeight: Math.round(20 * weightMultiplier) };
-                schedule.thursday.exercises[2] = { name: 'KB Snatches', sets: 4, reps: '8 each arm', rest: '2m', hasWeight: true, defaultWeight: Math.round(35 * weightMultiplier) };
-                schedule.friday.exercises[1] = { name: 'Single-Arm Floor Press', sets: 4, reps: '10 each arm', rest: '90s', hasWeight: true, defaultWeight: Math.round(35 * weightMultiplier) };
+                schedule.monday.exercises[3] = { name: 'Bulgarian Split Squats', sets: 4, reps: '10 each leg', rest: '90s', hasWeight: true, defaultWeight: 30 };
+                schedule.tuesday.exercises[1] = { name: 'Weighted Push-ups', sets: 4, reps: 10, rest: '90s', hasWeight: true, defaultWeight: 20 };
+                schedule.thursday.exercises[2] = { name: 'KB Snatches', sets: 4, reps: '8 each arm', rest: '2m', hasWeight: true, defaultWeight: 35 };
+                schedule.friday.exercises[1] = { name: 'Single-Arm Floor Press', sets: 4, reps: '10 each arm', rest: '90s', hasWeight: true, defaultWeight: 35 };
             }
             
             if (phase === 3) {
                 schedule.monday.exercises[1] = { name: 'Depth Jumps', sets: 4, reps: 5, rest: '2m', hasWeight: true, defaultWeight: 20 };
-                schedule.monday.exercises[2] = { name: 'DB Front Squats', sets: 5, reps: 8, rest: '2m', hasWeight: true, defaultWeight: Math.round(40 * weightMultiplier) };
-                schedule.tuesday.exercises[1] = { name: 'Weighted Deficit Push-ups', sets: 4, reps: 8, rest: '2m', hasWeight: true, defaultWeight: Math.round(25 * weightMultiplier) };
-                schedule.thursday.exercises[2] = { name: 'DB Clean & Press', sets: 5, reps: 6, rest: '2m', hasWeight: true, defaultWeight: Math.round(35 * weightMultiplier) };
+                schedule.monday.exercises[2] = { name: 'DB Front Squats', sets: 5, reps: 8, rest: '2m', hasWeight: true, defaultWeight: 45 };
+                schedule.tuesday.exercises[1] = { name: 'Weighted Deficit Push-ups', sets: 4, reps: 8, rest: '2m', hasWeight: true, defaultWeight: 25 };
+                schedule.thursday.exercises[2] = { name: 'DB Clean & Press', sets: 5, reps: 6, rest: '2m', hasWeight: true, defaultWeight: 40 };
                 schedule.thursday.exercises[4] = { name: 'Box Jumps', sets: 4, reps: 8, rest: '90s', hasWeight: true, defaultWeight: 24 };
-                schedule.friday.exercises[1] = { name: 'DB Floor Press (tempo)', sets: 5, reps: 8, rest: '90s', hasWeight: true, defaultWeight: Math.round(40 * weightMultiplier) };
+                schedule.friday.exercises[1] = { name: 'DB Floor Press (tempo)', sets: 5, reps: 8, rest: '90s', hasWeight: true, defaultWeight: 45 };
             }
             
             if (phase === 4) {
@@ -650,7 +650,7 @@
             };
         }
 
-        function renderProgressRing(percentage, label, colorClass) {
+        function renderProgressRing(percentage, label, colorClass, isClickable) {
             const radius = 45;
             const stroke = 7;
             const normalizedRadius = radius - stroke / 2;
@@ -658,7 +658,7 @@
             const strokeDashoffset = circumference - (percentage / 100) * circumference;
             
             return `
-                <div class="progress-ring">
+                <div class="progress-ring ${isClickable ? 'hover:opacity-80 transition-opacity' : ''}">
                     <svg height="110" width="110" class="progress-ring-circle">
                         <defs>
                             <linearGradient id="gradient-program" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -699,7 +699,7 @@
             `;
         }
 
-        function updateRingProgress(ringClass, percentage) {
+        function updateRingProgress(ringClass, percentage, labelText) {
             const ring = document.querySelector(`.${ringClass}`);
             if (ring) {
                 const radius = 45;
@@ -712,7 +712,9 @@
                 const ringContainer = ring.closest('.progress-ring');
                 if (ringContainer) {
                     const percentText = ringContainer.querySelector('.text-xl');
+                    const label = ringContainer.querySelector('.text-xs');
                     if (percentText) percentText.textContent = `${percentage}%`;
+                    if (label && labelText) label.textContent = labelText;
                 }
             }
         }
@@ -747,34 +749,32 @@
                     <div class="p-5">
                         <h1 class="text-3xl font-bold text-center mb-2 gradient-text">« rba | fit »</h1>
                         
-                        <div class="flex items-center justify-between mb-4">
-                            <button onclick="changeWeek(-1)" class="px-4 py-2 border border-slate-600 hover:border-slate-400 hover:bg-slate-700/30 rounded-lg text-sm text-slate-300" ${state.currentWeek === 0 ? 'disabled style="opacity: 0.3"' : ''}>
+                        <div class="flex items-center justify-between mb-4 gap-2">
+                            <button onclick="changeWeek(-1)" class="w-24 py-2 text-slate-300 hover:text-white hover:bg-slate-700/30 rounded-lg text-sm" ${state.currentWeek === 0 ? 'disabled style="opacity: 0.3"' : ''}>
                                 ← Previous
                             </button>
-                            <div class="text-center flex-1 px-2">
+                            <div class="text-center flex-1">
                                 <div class="text-2xl font-bold">Week ${state.currentWeek}</div>
                                 <div class="text-xs text-slate-400">${dateRange}</div>
                                 <div class="text-xs text-blue-400">${phaseInfo.name}</div>
                             </div>
-                            <button onclick="changeWeek(1)" class="px-4 py-2 border border-slate-600 hover:border-slate-400 hover:bg-slate-700/30 rounded-lg text-sm text-slate-300" ${state.currentWeek === 16 ? 'disabled style="opacity: 0.3"' : ''}>
+                            <button onclick="changeWeek(1)" class="w-24 py-2 text-slate-300 hover:text-white hover:bg-slate-700/30 rounded-lg text-sm" ${state.currentWeek === 16 ? 'disabled style="opacity: 0.3"' : ''}>
                                 Next →
                             </button>
                         </div>
 
                         ${state.currentWeek !== currentWeek ? `
-                            <button onclick="jumpToCurrentWeek()" class="w-full mb-3 px-4 py-2 bg-green-600 hover:bg-green-500 rounded-lg text-sm font-medium">
+                            <button onclick="jumpToCurrentWeek()" class="w-full mb-3 px-4 py-2 text-green-400 hover:text-green-300 hover:bg-green-900/20 rounded-lg text-sm font-medium">
                                 Jump to Current Week (${currentWeek})
                             </button>
                         ` : ''}
 
-                        <button onclick="showSupplements()" class="w-full mb-4 px-4 py-2 bg-purple-600 hover:bg-purple-500 rounded-lg flex items-center justify-center gap-2 text-sm font-medium">
-                            💊 Daily Supplements
-                        </button>
-
                         <div class="flex justify-around items-center mb-2">
-                            ${renderProgressRing(programProgress.percentage, 'Program', 'ring-program')}
-                            ${renderProgressRing(weekProgress.percentage, 'Week', 'ring-week')}
-                            ${renderProgressRing(suppProgress.percentage, 'Daily', 'ring-supplement')}
+                            ${renderProgressRing(programProgress.percentage, 'Program', 'ring-program', false)}
+                            ${renderProgressRing(weekProgress.percentage, 'Week', 'ring-week', false)}
+                            <div onclick="showSupplements()" class="cursor-pointer">
+                                ${renderProgressRing(suppProgress.percentage, '💊 Daily', 'ring-supplement', true)}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -833,21 +833,24 @@
             app.innerHTML = `
                 <div class="sticky-header shadow-xl">
                     <div class="p-4">
-                        <button onclick="backToOverview()" class="mb-3 px-4 py-2 border border-slate-600 hover:border-slate-400 hover:bg-slate-700/30 rounded-lg text-sm text-slate-300">
+                        <button onclick="backToOverview()" class="mb-3 px-4 py-2 text-slate-300 hover:text-white hover:bg-slate-700/30 rounded-lg text-sm">
                             ← Back
                         </button>
-                        <div class="flex justify-between items-start">
-                            <div class="flex-1">
-                                <h2 class="text-2xl font-bold capitalize">${state.selectedDay} <span class="text-sm text-slate-400 font-normal">${dayDate}</span></h2>
-                                <p class="text-lg text-blue-400">${workout.name}</p>
-                                <p class="text-xs text-slate-400">${workout.duration} • ${workout.location}</p>
+                        <div class="flex justify-between items-center gap-3">
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-baseline gap-2 mb-1">
+                                    <h2 class="text-xl font-bold capitalize">${state.selectedDay}</h2>
+                                    <span class="text-sm text-slate-400">${dayDate}</span>
+                                </div>
+                                <p class="text-base text-blue-400 font-medium">${workout.name}</p>
+                                <p class="text-xs text-slate-400 mt-1">${workout.duration} • ${workout.location}</p>
                                 ${workout.note ? `<p class="text-xs text-yellow-400 mt-1">⚠️ ${workout.note}</p>` : ''}
                                 ${workout.equipmentNeeded ? `
-                                    <p class="text-xs text-yellow-400 mt-1">📦 Bring: ${workout.equipmentNeeded.join(', ')}</p>
+                                    <p class="text-xs text-yellow-400 mt-1">📦 ${workout.equipmentNeeded.join(', ')}</p>
                                 ` : ''}
                             </div>
-                            <div class="ml-4">
-                                ${renderProgressRing(Math.round(progress), `${completedCount}/${totalExercises}`, 'ring-week')}
+                            <div class="flex-shrink-0">
+                                ${renderProgressRing(Math.round(progress), `${completedCount}/${totalExercises}`, 'ring-week', false)}
                             </div>
                         </div>
                     </div>
@@ -862,7 +865,7 @@
                             <div class="bg-slate-800 rounded-lg p-5 border border-slate-700 shadow-md">
                                 <div class="flex justify-between items-start mb-3">
                                     <div class="flex-1">
-                                        <h3 class="text-lg font-bold ${isCompleted ? 'text-green-400 line-through' : 'text-white'}">
+                                        <h3 class="text-lg font-bold ${isCompleted ? 'text-green-400' : 'text-white'}">
                                             ${exercise.name}
                                             ${muscles.primary.length > 0 ? muscles.primary.map(m => 
                                                 `<span class="muscle-tag primary-muscle">${m}</span>`
@@ -883,7 +886,7 @@
                                 
                                 ${exercise.hasWeight ? `
                                     <div class="mt-3 pt-3 border-t border-slate-700">
-                                        <div class="grid grid-cols-${Math.min(exercise.sets, 4)} gap-2">
+                                        <div class="grid grid-cols-${exercise.sets === 5 ? '5' : Math.min(exercise.sets, 4)} gap-2">
                                             ${Array.from({ length: exercise.sets }, (_, i) => {
                                                 const weight = getSmartRecommendation(exercise.name, i, state.currentWeek);
                                                 const equipment = getEquipmentType(exercise.name);
@@ -935,16 +938,16 @@
             app.innerHTML = `
                 <div class="sticky-header shadow-xl">
                     <div class="p-4">
-                        <button onclick="backToOverview()" class="mb-3 px-4 py-2 border border-slate-600 hover:border-slate-400 hover:bg-slate-700/30 rounded-lg text-sm text-slate-300">
+                        <button onclick="backToOverview()" class="mb-3 px-4 py-2 text-slate-300 hover:text-white hover:bg-slate-700/30 rounded-lg text-sm">
                             ← Back
                         </button>
-                        <div class="flex justify-between items-start">
-                            <div class="flex-1">
-                                <h2 class="text-2xl font-bold">💊 Daily Supplements</h2>
-                                <p class="text-xs text-slate-400">${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
+                        <div class="flex justify-between items-center gap-3">
+                            <div class="flex-1 min-w-0">
+                                <h2 class="text-xl font-bold">💊 Daily Supplements</h2>
+                                <p class="text-xs text-slate-400 mt-1">${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
                             </div>
-                            <div class="ml-4">
-                                ${renderProgressRing(suppProgress.percentage, `${suppProgress.completed}/${suppProgress.total}`, 'ring-supplement')}
+                            <div class="flex-shrink-0">
+                                ${renderProgressRing(suppProgress.percentage, `${suppProgress.completed}/${suppProgress.total}`, 'ring-supplement', false)}
                             </div>
                         </div>
                     </div>
@@ -985,7 +988,7 @@
                                                 <div class="flex items-center gap-3">
                                                     <span class="text-xl">${supp.icon}</span>
                                                     <div>
-                                                        <p class="font-semibold ${taken ? 'text-green-400 line-through' : 'text-white'}">${supp.name}</p>
+                                                        <p class="font-semibold ${taken ? 'text-green-400' : 'text-white'}">${supp.name}</p>
                                                         <p class="text-xs text-slate-400">${supp.dose}</p>
                                                     </div>
                                                 </div>
@@ -1018,6 +1021,7 @@
                 state.currentWeek = newWeek;
                 saveState();
                 render();
+                window.scrollTo(0, 0);
             }
         }
 
@@ -1072,7 +1076,7 @@
             const progress = Math.round((completed / total) * 100);
             
             // Update ring
-            updateRingProgress('ring-week', progress);
+            updateRingProgress('ring-week', progress, `${completed}/${total}`);
             
             // Update exercise styling
             const exercises = document.querySelectorAll('.bg-slate-800.rounded-lg.p-5');
@@ -1084,10 +1088,10 @@
                         button.textContent = isNowCompleted ? '✔️' : '⭕';
                     }
                     if (isNowCompleted) {
-                        titleEl.classList.add('text-green-400', 'line-through');
+                        titleEl.classList.add('text-green-400');
                         titleEl.classList.remove('text-white');
                     } else {
-                        titleEl.classList.remove('text-green-400', 'line-through');
+                        titleEl.classList.remove('text-green-400');
                         titleEl.classList.add('text-white');
                     }
                 }
@@ -1108,7 +1112,7 @@
             
             // Update ring in real-time
             const suppProgress = getTotalSupplementProgress();
-            updateRingProgress('ring-supplement', suppProgress.percentage);
+            updateRingProgress('ring-supplement', suppProgress.percentage, `${suppProgress.completed}/${suppProgress.total}`);
             
             // Update supplement styling
             const suppElements = document.querySelectorAll('.bg-slate-900.rounded-lg');
@@ -1120,10 +1124,10 @@
                         button.textContent = newState ? '✔️' : '⭕';
                     }
                     if (newState) {
-                        nameEl.classList.add('text-green-400', 'line-through');
+                        nameEl.classList.add('text-green-400');
                         nameEl.classList.remove('text-white');
                     } else {
-                        nameEl.classList.remove('text-green-400', 'line-through');
+                        nameEl.classList.remove('text-green-400');
                         nameEl.classList.add('text-white');
                     }
                 }
