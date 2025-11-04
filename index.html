@@ -138,43 +138,9 @@
             exerciseWeights: JSON.parse(localStorage.getItem('exerciseWeights') || '{}'),
             supplementLog: JSON.parse(localStorage.getItem('supplementLog') || '{}'),
             editingSet: null,
-            tempWeight: '',
-            expandedItems: {}
+            tempWeight: ''
         };
-        
-        // ADD THIS: Toggle expand function (after state object functions)
-        function toggleExpand(itemId) {
-            const content = document.getElementById(`expand-${itemId}`);
-            const icon = document.getElementById(`icon-${itemId}`);
-            
-            if (content && icon) {
-                content.classList.toggle('expanded');
-                icon.classList.toggle('rotated');
-                state.expandedItems[itemId] = content.classList.contains('expanded');
-            }
-        }
-        
-        // ADD THIS: Clean old supplement logs function
-        function cleanOldSupplementLogs() {
-            const today = new Date().toISOString().split('T')[0];
-            const logDates = Object.keys(state.supplementLog);
-            
-            logDates.forEach(date => {
-                if (date !== today) {
-                    const logDate = new Date(date);
-                    const daysDiff = Math.floor((new Date(today) - logDate) / (1000 * 60 * 60 * 24));
-                    if (daysDiff > 7) {
-                        delete state.supplementLog[date];
-                    }
-                }
-            });
-            
-            saveState();
-        }
-        
-        // CALL IT: Add this line right after the state object definition
-        cleanOldSupplementLogs();
-        
+
         function saveState() {
             localStorage.setItem('workoutProgress', JSON.stringify(state.completedExercises));
             localStorage.setItem('exerciseWeights', JSON.stringify(state.exerciseWeights));
@@ -269,106 +235,6 @@
             }
         };
 
-        // ADD THIS: Warm-up guides data (after supplementSchedule, around line 270)
-        const warmupGuides = {
-            monday: {
-                additions: [
-                    'Bodyweight Squats × 10',
-                    'Leg Swings (front/back) × 10 each',
-                    'Leg Swings (side/side) × 10 each',
-                    'Walking Lunges × 10 total'
-                ],
-                why: 'Lower body needs hip mobility and glute activation before heavy squats/lunges',
-                totalTime: '10 min'
-            },
-            tuesday: {
-                additions: [
-                    'Arm Circles (forward/backward) × 10 each',
-                    'Band Pull-Aparts × 15',
-                    'Wall Slides × 10',
-                    'Light DB Shoulder Press × 10 (10-15 lbs)'
-                ],
-                why: 'Upper body needs shoulder mobility and scapular activation before pressing/pulling',
-                totalTime: '8-10 min'
-            },
-            wednesday: {
-                additions: [],
-                why: 'Standard warm-up is perfect for HIIT - no additions needed',
-                totalTime: '8 min'
-            },
-            thursday: {
-                additions: [
-                    'Bodyweight Squats × 10',
-                    'Push-ups × 10',
-                    'Light KB Swings × 10 (20-25 lbs)',
-                    'Broad Jump × 3'
-                ],
-                why: 'Full body needs general activation, power work needs CNS priming',
-                totalTime: '10 min'
-            },
-            friday: {
-                additions: [
-                    'Arm Circles (forward/backward) × 10 each',
-                    'Band Pull-Aparts × 15',
-                    'Wall Slides × 10'
-                ],
-                why: 'Upper body needs shoulder mobility and scapular activation',
-                totalTime: '8-10 min'
-            },
-            saturday: {
-                additions: [
-                    'A-Skips × 20 yards',
-                    'High Knees (exaggerated) × 20 yards',
-                    'Butt Kicks (fast) × 20 yards',
-                    'Light Sprint × 50 yards @ 60%'
-                ],
-                why: 'Power/sprint work needs progressive speed buildup',
-                totalTime: '12 min'
-            },
-            sunday: {
-                additions: [],
-                why: 'Recovery day - minimal warm-up needed',
-                totalTime: '5 min'
-            }
-        };
-
-        // ADD THIS: Finisher guides data (after warmupGuides)
-        const finisherGuides = {
-            'Finisher: Ladder Sprint + Burpees': {
-                duration: '8 min EMOM',
-                protocol: [
-                    'Every minute: Agility ladder (fast feet down and back) + 3 burpees',
-                    'Rest = whatever time is left in that minute',
-                    'Repeat for 8 rounds'
-                ],
-                tips: [
-                    'Focus on SPEED through ladder, not perfection',
-                    'Burpees can be modified (step back vs jump)',
-                    'If you finish in 30s, you get 30s rest'
-                ],
-                why: 'Total body conditioning without taxing chest/back/shoulders. Perfect after upper volume day.'
-            },
-            'Finisher: Ball Slams Circuit': {
-                duration: '10 min (2 rounds × 5 min)',
-                protocol: [
-                    'Med Ball Slams × 10',
-                    'Exercise Ball Mountain Climbers × 20',
-                    'Med Ball Overhead Squats × 10',
-                    'Exercise Ball Plank Hold × 30s',
-                    'Med Ball Russian Twists × 20',
-                    'Rest 1 min, then repeat'
-                ],
-                tips: [
-                    'Move FAST between exercises',
-                    'Quality over speed on ball work',
-                    'Medicine ball: 15-20 lbs',
-                    'Don\'t worry if you can\'t finish in 5 min - keep moving'
-                ],
-                why: 'Core + conditioning focus. Upper body is already smoked from the week - this gives you a metabolic finish without overtaxing.'
-            }
-        };
-
-        
         const muscleMappings = {
             'Box Jumps': { primary: ['Quads'], secondary: ['Glutes', 'Calves'] },
             'Goblet Squats': { primary: ['Quads', 'Glutes'], secondary: ['Core'] },
@@ -1245,85 +1111,16 @@
                                             ${muscles.secondary.length > 0 ? `<div class="inline-flex gap-1 items-center">${muscles.secondary.slice(0, 2).map(m => 
                                                 `<span class="muscle-tag secondary-muscle">${m}</span>`
                                             ).join('')}</div>` : ''}
-</div>
-                        <p class="text-sm text-slate-400 mt-1">
-                            ${exercise.sets} sets × ${exercise.reps}
-                            ${exercise.rest ? ` • ${exercise.rest} rest` : ''}
-                        </p>
-                        ${(() => {
-                            const isDynamicWarmup = exercise.name === 'Dynamic Warm-up';
-                            const isFinisher = exercise.name.startsWith('Finisher:');
-                            const warmupGuide = isDynamicWarmup ? warmupGuides[state.selectedDay] : null;
-                            const finisherGuide = isFinisher ? finisherGuides[exercise.name] : null;
-                            const expandId = `${state.currentWeek}-${state.selectedDay}-${exIndex}`;
-                            const isExpanded = state.expandedItems[expandId] || false;
-                            
-                            if (!isDynamicWarmup && !isFinisher) return '';
-                            
-                            return `
-                                <button 
-                                    onclick="event.stopPropagation(); toggleExpand('${expandId}')"
-                                    class="mt-2 text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1"
-                                >
-                                    <span id="icon-${expandId}" class="expand-icon ${isExpanded ? 'rotated' : ''}">▼</span>
-                                    ${isDynamicWarmup ? 'View Warm-up Guide' : 'View Finisher Details'}
-                                </button>
-                                ${isDynamicWarmup && warmupGuide ? `
-                                    <div id="expand-${expandId}" class="expandable-content ${isExpanded ? 'expanded' : ''} mt-3 pt-3 border-t border-slate-700">
-                                        <div class="bg-slate-900 rounded-lg p-4 space-y-3">
-                                            <div>
-                                                <p class="text-xs text-blue-400 font-semibold mb-2">BASE ROUTINE (All Days):</p>
-                                                <ul class="text-xs text-slate-300 space-y-1 ml-4">
-                                                    <li>• World's Greatest Stretch × 5 each side</li>
-                                                    <li>• Downward Dog → Cobra × 5</li>
-                                                    <li>• Cat-Cow × 10</li>
-                                                    <li>• Child's Pose × 30s</li>
-                                                    <li>• High Knees × 20s</li>
-                                                    <li>• Butt Kicks × 20s</li>
-                                                    <li>• Jumping Jacks × 20s</li>
-                                                </ul>
-                                            </div>
-                                            ${warmupGuide.additions.length > 0 ? `
-                                                <div>
-                                                    <p class="text-xs text-green-400 font-semibold mb-2">TODAY'S ADDITIONS:</p>
-                                                    <ul class="text-xs text-slate-300 space-y-1 ml-4">
-                                                        ${warmupGuide.additions.map(add => `<li>• ${add}</li>`).join('')}
-                                                    </ul>
-                                                </div>
-                                            ` : ''}
-                                            <div class="pt-2 border-t border-slate-700">
-                                                <p class="text-xs text-slate-400 italic">${warmupGuide.why}</p>
-                                                <p class="text-xs text-yellow-400 mt-1">⏱️ Total time: ${warmupGuide.totalTime}</p>
-                                            </div>
                                         </div>
+                                        <p class="text-sm text-slate-400 mt-1">
+                                            ${exercise.sets} sets × ${exercise.reps}
+                                            ${exercise.rest ? ` • ${exercise.rest} rest` : ''}
+                                        </p>
                                     </div>
-                                ` : ''}
-                                ${isFinisher && finisherGuide ? `
-                                    <div id="expand-${expandId}" class="expandable-content ${isExpanded ? 'expanded' : ''} mt-3 pt-3 border-t border-slate-700">
-                                        <div class="bg-slate-900 rounded-lg p-4 space-y-3">
-                                            <div>
-                                                <p class="text-xs text-purple-400 font-semibold mb-1">Duration: ${finisherGuide.duration}</p>
-                                            </div>
-                                            <div>
-                                                <p class="text-xs text-blue-400 font-semibold mb-2">PROTOCOL:</p>
-                                                <ul class="text-xs text-slate-300 space-y-1 ml-4">
-                                                    ${finisherGuide.protocol.map(step => `<li>• ${step}</li>`).join('')}
-                                                </ul>
-                                            </div>
-                                            <div>
-                                                <p class="text-xs text-green-400 font-semibold mb-2">TIPS:</p>
-                                                <ul class="text-xs text-slate-300 space-y-1 ml-4">
-                                                    ${finisherGuide.tips.map(tip => `<li>• ${tip}</li>`).join('')}
-                                                </ul>
-                                            </div>
-                                            <div class="pt-2 border-t border-slate-700">
-                                                <p class="text-xs text-slate-400 italic">${finisherGuide.why}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ` : ''}
-                            `;
-                        })()}
+                                    <button onclick="toggleExercise('${exercise.name}')" class="ml-2 text-2xl flex-shrink-0">
+                                        ${isCompleted ? '✔️' : '⭕'}
+                                    </button>
+                                </div>
                                 
                                 ${exercise.hasWeight ? `
                                     <div class="mt-3 pt-3 border-t border-slate-700">
