@@ -929,6 +929,7 @@
             }
             saveState();
         }
+        }
 
         function getTotalSupplementProgress() {
             const today = new Date().toISOString().split('T')[0];
@@ -1595,7 +1596,7 @@
             });
         }
 
-        function startEdit(exerciseName, setIndex, currentWeight) {
+       function startEdit(exerciseName, setIndex, currentWeight) {
             const currentScrollPos = window.pageYOffset;
             state.editingSet = `${exerciseName}-${setIndex}`;
             state.tempWeight = currentWeight.toString();
@@ -1634,8 +1635,10 @@
                                     const input = document.getElementById(`weight-input-${exerciseName}-${setIndex}`);
                                     if (input) {
                                         input.focus();
+                                        // FIX #1: Move cursor to the end of the text
                                         const length = input.value.length;
                                         input.setSelectionRange(length, length);
+                                        // Also scroll input to show the end
                                         if (input.scrollLeft !== undefined) {
                                             input.scrollLeft = input.scrollWidth;
                                         }
@@ -1655,6 +1658,7 @@
             if (!isNaN(newWeight) && newWeight > 0) {
                 const key = `${state.currentWeek}-${exerciseName}-${setIndex}`;
                 state.exerciseWeights[key] = newWeight;
+                // This should update ALL future sets
                 updateFutureSets(exerciseName, setIndex, newWeight, state.currentWeek, totalSets);
                 saveState();
             }
@@ -1670,6 +1674,7 @@
                     const weightGrid = exerciseEl.querySelector('.grid');
                     if (weightGrid) {
                         const setDivs = weightGrid.querySelectorAll('.text-center');
+                        // FIX #2 PART B: Update ALL sets from current forward
                         for (let i = setIndex; i < totalSets; i++) {
                             if (setDivs[i]) {
                                 const weight = getSmartRecommendation(exerciseName, i, state.currentWeek);
@@ -1690,9 +1695,9 @@
                     }
                 }
             });
-            
-            window.scrollTo(0, currentScrollPos);
-        }
+    
+    window.scrollTo(0, currentScrollPos);
+}
 
         function cancelEdit() {
             setTimeout(() => {
