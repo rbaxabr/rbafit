@@ -930,14 +930,19 @@
             saveState();
         }
 
-        function getTotalSupplementProgress() {
-            const today = new Date().toISOString().split('T')[0];
-            const dayLog = state.supplementLog[today] || {};
+       function getTotalSupplementProgress() {
+    // Force fresh date calculation every time
+            const today = new Date();
+            const dateString = today.getFullYear() + '-' + 
+                              String(today.getMonth() + 1).padStart(2, '0') + '-' + 
+                              String(today.getDate()).padStart(2, '0');
+            
+            const dayLog = state.supplementLog[dateString] || {};
             
             let total = 0;
             let completed = 0;
             
-            const dayOfWeek = new Date().getDay();
+            const dayOfWeek = today.getDay();
             const includePreworkout = dayOfWeek !== 0;
             
             Object.entries(supplementSchedule).forEach(([timeKey, timeData]) => {
@@ -959,7 +964,7 @@
             
             return { completed, total, percentage: total > 0 ? Math.round((completed / total) * 100) : 0 };
         }
-
+        
         function getWeekProgress() {
             const schedule = getWorkoutSchedule(state.currentWeek);
             const days = state.currentWeek === 0 ? ['saturday', 'sunday'] : 
@@ -1390,8 +1395,11 @@
         }
 
         function renderSupplements(app) {
-            const today = new Date().toISOString().split('T')[0];
-            const dayLog = state.supplementLog[today] || {};
+            const today = new Date();
+            const dateString = today.getFullYear() + '-' + 
+                          String(today.getMonth() + 1).padStart(2, '0') + '-' + 
+                          String(today.getDate()).padStart(2, '0');
+            const dayLog = state.supplementLog[dateString] || {};
             const suppProgress = getTotalSupplementProgress();
             
             setTimeout(() => window.scrollTo(0, 0), 0);
@@ -1560,14 +1568,19 @@
         }
 
         function toggleSupplement(timeKey, suppName) {
-            const today = new Date().toISOString().split('T')[0];
-            if (!state.supplementLog[today]) {
-                state.supplementLog[today] = {};
+            // Force fresh date calculation
+            const today = new Date();
+            const dateString = today.getFullYear() + '-' + 
+                              String(today.getMonth() + 1).padStart(2, '0') + '-' + 
+                              String(today.getDate()).padStart(2, '0');
+            
+            if (!state.supplementLog[dateString]) {
+                state.supplementLog[dateString] = {};
             }
             
             const suppKey = `${timeKey}-${suppName}`;
-            const newState = !state.supplementLog[today][suppKey];
-            state.supplementLog[today][suppKey] = newState;
+            const newState = !state.supplementLog[dateString][suppKey];
+            state.supplementLog[dateString][suppKey] = newState;
             
             saveState();
             
