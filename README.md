@@ -107,7 +107,7 @@ const state = {
 
 ### As a Web App
 
-1. **Visit the live site:** [rbaxabr.github.io/rba-fit](https://rbaxabr.github.io/rba-fit)
+1. **Visit the live site:** [rbaxabr.github.io/rbafit](https://rbaxabr.github.io/rbafit/)
 2. **Install as app:**
    - **iOS:** Safari → Share → Add to Home Screen
    - **Android:** Chrome → Menu → Add to Home Screen
