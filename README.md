@@ -286,29 +286,6 @@ function getPhase(week) {
 
 ---
 
-## 🚧 Future Enhancements
-
-### Planned Features
-
-- [ ] **Service Worker** - True offline caching
-- [ ] **Data Export** - Download workout history as JSON/CSV
-- [ ] **Charts & Analytics** - Weight progression graphs
-- [ ] **Exercise Library View** - Searchable exercise database
-- [ ] **Custom Workouts** - User-created workout builder
-- [ ] **Rest Timer** - Built-in countdown timer between sets
-- [ ] **Video Demos** - Embedded exercise demonstration videos
-- [ ] **1RM Calculator** - Estimate max lifts from working sets
-
----
-
-## 📄 License
-
-MIT License - feel free to use, modify, and distribute.
-
-See [LICENSE](LICENSE) file for details.
-
----
-
 ## 🙏 Acknowledgments
 
 - **Program Design:** Based on evidence-based strength and power development principles
