@@ -127,7 +127,7 @@
             const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
             const weekNum = Math.floor(diffDays / 7) + 1;
             
-            return Math.max(1, Math.min(16, weekNum));
+            return Math.max(1, Math.min(18, weekNum));
         }
 
        const state = {
@@ -269,7 +269,7 @@
                 time: '3:00 PM',
                 note: 'Mid-day (every other day)',
                 supplements: [
-                    { name: 'Collagen', dose: '1 scoop', icon: '🦴', conditional: true, checkFunction: shouldTakeCollagenToday }
+                    { name: 'Collagen', dose: '1 scoop (10g)', icon: '🦴', conditional: true, checkFunction: shouldTakeCollagenToday }
                 ]
             },
             evening: {
@@ -305,9 +305,14 @@
                 totalTime: '8-10 min'
             },
             wednesday: {
-                additions: [],
-                why: 'Standard warm-up is perfect for HIIT - no additions needed',
-                totalTime: '8 min'
+                additions: [
+                    'Box Step-ups × 10 each leg',
+                    'Lateral Leg Swings × 10 each',
+                    'Broad Jump × 3 (submaximal)',
+                    'Fast Feet in Place × 20s'
+                ],
+                why: 'Explosive work needs CNS priming and fast-twitch muscle activation',
+                totalTime: '10 min'
             },
             thursday: {
                 additions: [
@@ -379,6 +384,108 @@
                 why: 'Core + conditioning focus. Upper body is already smoked from the week - this gives you a metabolic finish without overtaxing.'
             }
         };
+
+        const exerciseGuides = {
+            'Band Sprint Drives': {
+                setup: [
+                    'Option 1: Band around ANKLES (harder, recommended)',
+                    'Option 2: Band around KNEES (easier, start here)',
+                    'Stand with feet hip-width apart, slight tension in band'
+                ],
+                execution: [
+                    'Slight forward lean (like starting a sprint)',
+                    'Drive knee EXPLOSIVELY to hip height',
+                    'Alternate rapidly - "DRIVE! DRIVE! DRIVE!"',
+                    'Pump arms in sprint motion (opposite arm/leg)',
+                    'Stay on balls of feet throughout',
+                    'Duration: 20 seconds per set'
+                ],
+                cues: [
+                    'Knee to HIP HEIGHT (thigh parallel)',
+                    'EXPLODE up, control down',
+                    'Quick ground contact',
+                    'Arms pump fast - elbows back'
+                ],
+                progression: 'Week 8: Knees (6×20s) → Weeks 10-13: Ankles (8×20s) → Weeks 15-18: Ankles (10×25s)'
+            },
+            'Fast Feet Drills': {
+                variations: [
+                    '1. Fast Feet in Place: Rapid alternating taps (30s)',
+                    '2. Fast Feet Forward/Back: Small rapid steps forward 3, back 3 (30s)',
+                    '3. Fast Feet Lateral: Side-to-side rapid steps (30s)'
+                ],
+                execution: [
+                    'Stay on balls of feet (NOT flat-footed)',
+                    'Rapid cadence - minimal ground contact',
+                    'Maintain tall posture throughout',
+                    'Athletic stance, slight knee bend'
+                ],
+                cues: [
+                    'Light on your feet!',
+                    'Maximum cadence!',
+                    'Quick! Quick! Quick!',
+                    'If heels touch, too slow'
+                ],
+                format: '4 sets × 30s, cycling through all 3 variations'
+            },
+            'Ladder Drills': {
+                patterns: [
+                    '1. IN-IN-OUT-OUT: Both feet in square, both out to sides, repeat',
+                    '2. ICKEY SHUFFLE: Right in, left out (left), right out (right), left in, repeat',
+                    '3. SINGLE-LEG HOPS (Phase 3+): Hop on one leg per square',
+                    '4. 180° TURNS (Phase 4): Run through, jump 180° every 3 squares'
+                ],
+                cues: [
+                    'SPEED over perfection',
+                    'Eyes UP, not down at ladder',
+                    'Quick ground contact',
+                    'No ladder? Use tape (18" squares)'
+                ],
+                progression: 'Week 8: Patterns 1-2 → Weeks 10-13: Add Pattern 3 → Weeks 15-18: All 4 patterns'
+            },
+            'Copenhagen Plank': {
+                setup: [
+                    'Side plank position on elbow',
+                    'Top leg on bench/box (knee or ankle)',
+                    'Bottom leg hovering off ground',
+                    'Body in straight line'
+                ],
+                execution: [
+                    'Lift bottom leg up toward top leg (adductor squeeze)',
+                    'Hold at top for 20-45 seconds',
+                    'Keep hips elevated - no sagging',
+                    'Switch sides'
+                ],
+                cues: [
+                    'Squeeze inner thighs together',
+                    'Drive top hip toward ceiling',
+                    'Core tight throughout',
+                    'Breathe - don\'t hold breath'
+                ],
+                modification: 'Too hard? Keep bottom knee on ground'
+            },
+            'KB Windmill': {
+                setup: [
+                    'Hold KB overhead in right hand',
+                    'Left foot forward, right foot back 45°',
+                    'Eyes on the kettlebell throughout'
+                ],
+                execution: [
+                    'Push hips to the RIGHT (opposite of KB)',
+                    'Slide left hand down left leg',
+                    'Keep KB vertical and arm locked',
+                    'Return to start, repeat'
+                ],
+                cues: [
+                    'Hips push OPPOSITE direction',
+                    'Never take eyes off KB',
+                    'Arm stays locked overhead',
+                    'This is a HIP hinge, not a side bend'
+                ],
+                safety: 'Start with light weight (10-15 lbs) to learn pattern'
+            }
+        };
+        
 
 
         
@@ -479,8 +586,66 @@
             'High Knees': { primary: ['Cardio'], secondary: ['Hip Flexors'] },
             'V-ups': { primary: ['Core'], secondary: [] },
             'Bicycle Crunches': { primary: ['Abs', 'Obliques'], secondary: [] },
+            'Band Sprint Drives': { primary: ['Hip Flexors', 'Quads'], secondary: ['Cardio'] },
+            'Fast Feet Drills': { primary: ['Speed', 'Coordination'], secondary: ['Calves'] },
+            'Banded Hip Rotations': { primary: ['Hip Mobility', 'Glutes'], secondary: [] },
             'Finisher: Ladder Sprint + Burpees': { primary: ['Cardio', 'Full Body'], secondary: [] },
-            'Finisher: Ball Slams Circuit': { primary: ['Cardio', 'Core'], secondary: ['Shoulders'] }
+            'Finisher: Ball Slams Circuit': { primary: ['Cardio', 'Core'], secondary: ['Shoulders'] },
+            'Copenhagen Plank': { primary: ['Adductors', 'Core'], secondary: ['Obliques'] },
+            'KB Plank Pull-Through': { primary: ['Core', 'Obliques'], secondary: ['Shoulders'] },
+            'KB Windmill': { primary: ['Core', 'Obliques'], secondary: ['Shoulders'] },
+            'Slider Body Saw': { primary: ['Core'], secondary: ['Shoulders'] },
+            'Band Pallof Press': { primary: ['Core', 'Anti-Rotation'], secondary: [] },
+            'Hollow Body Hold': { primary: ['Core'], secondary: [] },
+            'L-Sit Hold': { primary: ['Core', 'Hip Flexors'], secondary: [] },
+            '180° Box Jumps': { primary: ['Power', 'Rotation'], secondary: ['Core'] },
+            'Ladder Drills': { primary: ['Agility', 'Footwork'], secondary: ['Cardio'] },
+            'Depth Jumps': { primary: ['Power', 'Reactive'], secondary: ['Legs'] },
+            'Lateral Box Shuffles': { primary: ['Agility', 'Lateral Power'], secondary: ['Legs'] },
+            'Band Resisted Sprints': { primary: ['Speed', 'Power'], secondary: ['Legs'] },
+            'Burpee Box Jumps': { primary: ['Full Body', 'Power'], secondary: ['Cardio'] },
+            'Banded Hip Rotations': { primary: ['Hip Mobility'], secondary: ['Glutes'] },
+            'Slider Lateral Lunges': { primary: ['Hip Mobility', 'Glutes'], secondary: ['Adductors'] },
+            'Reactive Box Jumps': { primary: ['Power', 'Reactive'], secondary: ['Legs'] },
+            'Sprint Mechanics Drills': { primary: ['Speed', 'Technique'], secondary: [] },
+            'Depth Jump to Box Jump': { primary: ['Power', 'Legs'], secondary: [] },
+            '50-Yard Sprints': { primary: ['Speed', 'Power'], secondary: ['Legs'] },
+            '100-Yard Sprints': { primary: ['Speed Endurance'], secondary: ['Cardio'] },
+            'Relay Sprints': { primary: ['Speed Endurance'], secondary: ['Cardio'] },
+            'Broad Jump for Distance': { primary: ['Power', 'Legs'], secondary: [] },
+            'Stadium Stairs (explosive)': { primary: ['Power', 'Quads'], secondary: ['Glutes'] },
+            'T-Drill': { primary: ['Agility'], secondary: ['Speed'] },
+            'Cone Weave': { primary: ['Agility'], secondary: ['Coordination'] },
+            'Gassers': { primary: ['Cardio', 'Speed Endurance'], secondary: ['Mental Toughness'] },
+            'Hollow Body Rock': { primary: ['Core'], secondary: [] },
+            'Hip Mobility & Stretching': { primary: ['Mobility'], secondary: [] },
+            'Shoulder Mobility': { primary: ['Mobility'], secondary: [] },
+            'Animal Flow Warm-up': { primary: ['Mobility', 'Coordination'], secondary: [] },
+            'YTW Raises': { primary: ['Shoulders', 'Upper Back'], secondary: [] },
+            'Cossack Squats': { primary: ['Hip Mobility', 'Glutes'], secondary: ['Adductors'] },
+            'Single-Leg Balance': { primary: ['Balance'], secondary: ['Stabilizers'] },
+            'Med Ball Chest Pass': { primary: ['Chest', 'Power'], secondary: ['Triceps'] },
+            'Bird Dogs': { primary: ['Core'], secondary: ['Back'] },
+            'Side Plank': { primary: ['Obliques'], secondary: ['Core'] },
+            'Easy Walk or Light Activity': { primary: ['Recovery'], secondary: [] },
+            'Foam Rolling': { primary: ['Recovery'], secondary: [] },
+            'Easy Jog Warm-up': { primary: ['Warm-up'], secondary: [] },
+            'Build-up Sprints': { primary: ['Speed'], secondary: ['Warm-up'] },
+            'Backpedaling': { primary: ['Speed', 'Agility'], secondary: ['Legs'] },
+            'Lateral Shuffles': { primary: ['Agility'], secondary: ['Hip Abductors'] },
+            'Easy Stairs': { primary: ['Cardio'], secondary: ['Legs'] },
+            'Cool-down Jog': { primary: ['Cool-down'], secondary: [] },
+            'Easy Walk': { primary: ['Recovery'], secondary: [] },
+            'Stretching': { primary: ['Recovery', 'Mobility'], secondary: [] },
+            'Deep Stretching': { primary: ['Recovery', 'Mobility'], secondary: [] },
+            '40-Yard Dashes': { primary: ['Speed', 'Power'], secondary: ['Legs'] },
+            '60-Yard Sprints': { primary: ['Speed', 'Power'], secondary: ['Legs'] },
+            'Flying 20s': { primary: ['Max Speed'], secondary: ['Power'] },
+            'Stadium Stairs (2-step)': { primary: ['Power', 'Legs'], secondary: ['Cardio'] },
+            'Pro Agility Shuttle': { primary: ['Agility'], secondary: ['Speed'] },
+            'Backpedal + Sprint': { primary: ['Speed', 'Agility'], secondary: ['Legs'] },
+            'Russian Twists': { primary: ['Obliques'], secondary: ['Core'] },
+            'Extended Dynamic Warm-up': { primary: ['Warm-up'], secondary: [] },
         };
 
         function getMuscleGroups(exerciseName) {
@@ -494,14 +659,18 @@
             if (week <= 12) return 3;
             return 4;
         }
+        function isDeloadWeek(week) {
+            return week === 9 || week === 14;
+        }
+
 
         function getPhaseInfo(phase) {
             const phases = {
                 0: { name: 'Prep Week', focus: 'Movement prep' },
                 1: { name: 'Foundation', focus: 'Work capacity' },
                 2: { name: 'Strength Building', focus: 'Progressive overload' },
-                3: { name: 'Power & Hypertrophy', focus: 'Peak building' },
-                4: { name: 'Peak Performance', focus: 'Max strength' }
+                3: { name: 'Hypertrophy Peak', focus: 'Maximum muscle growth' },
+                4: { name: 'Peak Performance', focus: 'Elite strength & power' }
             };
             return phases[phase];
         }
@@ -520,7 +689,7 @@
                     { name: 'Walking Lunges', sets: 3, reps: '20 steps', rest: '75s', hasWeight: true, defaultWeight: 20 },
                     { name: 'Slider Leg Curls', sets: 3, reps: 12, rest: '60s' },
                     { name: 'Med Ball Slams', sets: 3, reps: 15, rest: '45s', hasWeight: true, defaultWeight: 15 },
-                    { name: 'Plank Hold', sets: 3, reps: '45s', rest: '30s' },
+                    { name: 'Copenhagen Plank', sets: 3, reps: '20s each side', rest: '30s' },
                     { name: 'Mobility Cool-down', sets: 1, reps: '5 min' }
                 ]
             },
@@ -537,25 +706,26 @@
                     { name: 'KB Upright Rows', sets: 3, reps: 15, rest: '60s', hasWeight: true, defaultWeight: 25 },
                     { name: 'Hammer Curls', sets: 3, reps: 15, rest: '60s', hasWeight: true, defaultWeight: 20 },
                     { name: 'Tricep Extensions', sets: 3, reps: 15, rest: '60s', hasWeight: true, defaultWeight: 25 },
-                    { name: 'Med Ball Twists', sets: 3, reps: 20, rest: '45s', hasWeight: true, defaultWeight: 15 },
+                    { name: 'KB Plank Pull-Through', sets: 3, reps: '10 each side', rest: '45s', hasWeight: true, defaultWeight: 15 },
                     { name: 'Dead Bugs', sets: 3, reps: '12 each side', rest: '30s' },
                     { name: 'Stretch', sets: 1, reps: '5 min' }
                 ]
             },
             wednesday: { 
-                name: 'HIIT Conditioning', 
-                duration: '60 min',
-                location: 'stadium',
-                equipmentNeeded: ['Jump rope', 'Sliders', 'Water'],
+                name: 'Explosive Training', 
+                duration: '55 min',
+                location: 'home',
+                equipmentNeeded: [],
                 exercises: [
-                    { name: 'Warm-up Jog', sets: 1, reps: '8 min' },
-                    { name: 'Sprint Intervals', sets: 8, reps: '200m @ 80%', rest: '90s' },
-                    { name: 'Stadium Stairs', sets: 6, reps: 'full climb', rest: '90s' },
-                    { name: 'Jump Rope HIIT', sets: 8, reps: '45s on/45s off' },
-                    { name: 'Slider Mt Climbers', sets: 3, reps: 20, rest: '45s' },
-                    { name: 'Burpees', sets: 3, reps: 10, rest: '60s' },
-                    { name: 'High Plank Hold', sets: 3, reps: '45s', rest: '30s' },
-                    { name: 'Cool-down', sets: 1, reps: '8 min' }
+                    { name: 'Dynamic Warm-up', sets: 1, reps: '8 min' },
+                    { name: 'Box Jumps', sets: 3, reps: 6, rest: '2m', hasWeight: true, defaultWeight: 18 },
+                    { name: 'Broad Jumps', sets: 3, reps: 5, rest: '90s' },
+                    { name: 'Ladder Drills', sets: 5, reps: '2 patterns', rest: '60s' },
+                    { name: 'Band Sprint Drives', sets: 6, reps: '20s', rest: '90s' },
+                    { name: 'Burpee Box Jumps', sets: 3, reps: 6, rest: '75s', hasWeight: true, defaultWeight: 18 },
+                    { name: 'Slider Lateral Lunges', sets: 3, reps: '8 each side', rest: '60s' },
+                    { name: 'Hollow Body Hold', sets: 3, reps: '30s', rest: '45s' },
+                    { name: 'Mobility Cool-down', sets: 1, reps: '5 min' }
                 ]
             },
             thursday: { 
@@ -570,9 +740,9 @@
                     { name: 'Box Jumps', sets: 4, reps: 8, rest: '90s', hasWeight: true, defaultWeight: 20 },
                     { name: 'KB Swings', sets: 4, reps: 25, rest: '90s', hasWeight: true, defaultWeight: 35 },
                     { name: 'Lateral Bounds', sets: 3, reps: '10 each side', rest: '60s' },
-                    { name: 'Weighted Carries', sets: 3, reps: '150 steps', rest: '75s', hasWeight: true, defaultWeight: 35 },
+                    { name: 'Weighted Carries', sets: 3, reps: '75 steps', rest: '75s', hasWeight: true, defaultWeight: 35 },
                     { name: 'Med Ball Slams', sets: 3, reps: 15, rest: '45s', hasWeight: true, defaultWeight: 15 },
-                    { name: 'Ball Pikes', sets: 3, reps: 10, rest: '45s' },
+                    { name: 'KB Windmill', sets: 3, reps: '8 each side', rest: '45s', hasWeight: true, defaultWeight: 15 },
                     { name: 'Mobility', sets: 1, reps: '5 min' }
                 ]
             },
@@ -589,8 +759,8 @@
                     { name: 'KB Curls', sets: 3, reps: 15, rest: '60s', hasWeight: true, defaultWeight: 20 },
                     { name: 'Skull Crushers', sets: 3, reps: 15, rest: '60s', hasWeight: true, defaultWeight: 20 },
                     { name: 'Face Pulls', sets: 3, reps: 20, rest: '60s', hasWeight: true, defaultWeight: 15 },
-                    { name: 'Side Throws', sets: 3, reps: '12 each side', rest: '45s', hasWeight: true, defaultWeight: 15 },
-                    { name: 'Ball Rollouts', sets: 3, reps: 10, rest: '45s' },
+                    { name: 'Slider Body Saw', sets: 3, reps: 12, rest: '45s' },
+                    { name: 'Band Pallof Press', sets: 3, reps: '15 each side', rest: '45s' },
                     { name: 'Stretch', sets: 1, reps: '5 min' }
                 ]
             },
@@ -655,6 +825,107 @@
         };
 
         function getWorkoutSchedule(week) {
+            // DELOAD WEEKS: Special recovery programming
+            if (isDeloadWeek(week)) {
+                return {
+                    monday: {
+                        name: 'Mobility & Light Lower',
+                        duration: '45 min',
+                        location: 'home',
+                        exercises: [
+                            { name: 'Hip Mobility & Stretching', sets: 1, reps: '15 min' },
+                            { name: 'Goblet Squats', sets: 3, reps: 8, rest: '2m', hasWeight: true, defaultWeight: 17.5 },
+                            { name: 'Slider Lateral Lunges', sets: 3, reps: '10 each side', rest: '90s' },
+                            { name: 'Single-Leg Balance', sets: 3, reps: '30s each', rest: '60s' },
+                            { name: 'Cossack Squats', sets: 3, reps: '8 each side', rest: '60s' },
+                            { name: 'Deep Stretching', sets: 1, reps: '10 min' }
+                        ]
+                    },
+                    tuesday: {
+                        name: 'Upper Movement Quality',
+                        duration: '45 min',
+                        location: 'home',
+                        exercises: [
+                            { name: 'Shoulder Mobility', sets: 1, reps: '15 min' },
+                            { name: 'DB Floor Press', sets: 3, reps: 8, rest: '2m', hasWeight: true, defaultWeight: 17.5 },
+                            { name: 'KB Rows', sets: 3, reps: '8 each arm', rest: '90s', hasWeight: true, defaultWeight: 17.5 },
+                            { name: 'YTW Raises', sets: 3, reps: 10, rest: '60s', hasWeight: true, defaultWeight: 7.5 },
+                            { name: 'Push-ups', sets: 2, reps: 8, rest: '75s' },
+                            { name: 'Stretching', sets: 1, reps: '10 min' }
+                        ]
+                    },
+                    wednesday: {
+                        name: 'Agility & Athletic Movement',
+                        duration: '50 min',
+                        location: 'home',
+                        equipmentNeeded: ['Agility ladder', 'Cones', 'Sliders'],
+                        exercises: [
+                            { name: 'Dynamic Warm-up', sets: 1, reps: '12 min' },
+                            { name: 'Ladder Drills', sets: 8, reps: 'various @ 70%', rest: '60s' },
+                            { name: 'Cone Weave', sets: 6, reps: '1 @ 75%', rest: '60s' },
+                            { name: 'Box Step-ups', sets: 3, reps: '12 each leg', rest: '60s', hasWeight: true, defaultWeight: 18 },
+                            { name: 'Lateral Bounds', sets: 3, reps: '8 each side @ 75%', rest: '60s' },
+                            { name: 'Dead Bugs', sets: 3, reps: '10 each side', rest: '30s' },
+                            { name: 'Bird Dogs', sets: 3, reps: '10 each side', rest: '30s' },
+                            { name: 'Side Plank', sets: 2, reps: '30s each', rest: '30s' },
+                            { name: 'Cool-down', sets: 1, reps: '5 min' }
+                        ]
+                    },
+                    thursday: {
+                        name: 'Full Rest / Gentle Activity',
+                        duration: '30 min',
+                        location: 'home or outdoors',
+                        exercises: [
+                            { name: 'Easy Walk or Light Activity', sets: 1, reps: '20-30 min' },
+                            { name: 'Foam Rolling', sets: 1, reps: '10 min' }
+                        ]
+                    },
+                    friday: {
+                        name: 'Movement Exploration',
+                        duration: '45 min',
+                        location: 'home',
+                        exercises: [
+                            { name: 'Animal Flow Warm-up', sets: 1, reps: '12 min' },
+                            { name: 'Box Jumps', sets: 4, reps: '4 (soft landing)', rest: '90s', hasWeight: true, defaultWeight: 18 },
+                            { name: 'Broad Jumps', sets: 4, reps: '3 @ 70%', rest: '90s' },
+                            { name: 'Med Ball Chest Pass', sets: 3, reps: 8, rest: '60s', hasWeight: true, defaultWeight: 15 },
+                            { name: 'Copenhagen Plank', sets: 3, reps: '15s each side', rest: '45s' },
+                            { name: 'Band Pallof Press', sets: 3, reps: '10 each side', rest: '45s' },
+                            { name: 'KB Windmill', sets: 3, reps: '6 each side', rest: '45s', hasWeight: true, defaultWeight: 10 },
+                            { name: 'Hollow Body Hold', sets: 3, reps: '20s', rest: '45s' },
+                            { name: 'Stretching', sets: 1, reps: '6 min' }
+                        ]
+                    },
+                    saturday: {
+                        name: 'Light Field Conditioning',
+                        duration: '45 min',
+                        location: 'stadium',
+                        equipmentNeeded: ['Jump rope', 'Water'],
+                        exercises: [
+                            { name: 'Easy Jog Warm-up', sets: 1, reps: '2 laps' },
+                            { name: 'Build-up Sprints', sets: 4, reps: '40 yds @ 70-75%', rest: '90s' },
+                            { name: 'Backpedaling', sets: 4, reps: '30 yards', rest: '60s' },
+                            { name: 'Lateral Shuffles', sets: 4, reps: '30 yds each', rest: '60s' },
+                            { name: 'Easy Stairs', sets: 4, reps: 'walk up/down', rest: '90s' },
+                            { name: 'Jump Rope', sets: 3, reps: '45s easy', rest: '60s' },
+                            { name: 'Cool-down Jog', sets: 1, reps: '1 lap' },
+                            { name: 'Stretching', sets: 1, reps: '10 min' }
+                        ]
+                    },
+                    sunday: {
+                        name: 'Active Recovery',
+                        duration: '30 min',
+                        location: 'neighborhood',
+                        exercises: [
+                            { name: 'Easy Walk', sets: 1, reps: '20-30 min' },
+                            { name: 'Foam Rolling', sets: 1, reps: '15 min' },
+                            { name: 'Stretching', sets: 1, reps: '15 min' }
+                        ]
+                    }
+                };
+            }
+            
+            
             if (week === 0) return prepWorkouts;
             
             const phase = getPhase(week);
@@ -698,9 +969,28 @@
                     { name: 'Stretch', sets: 1, reps: '5 min' }
                 ];
                 
+                // PHASE 2 WEDNESDAY - Intro to explosive work
+                schedule.wednesday.name = 'Explosive Training';
+                schedule.wednesday.duration = '60 min';
+                schedule.wednesday.location = 'home';
+                schedule.wednesday.equipmentNeeded = [];
+                schedule.wednesday.exercises = [
+                    { name: 'Dynamic Warm-up', sets: 1, reps: '10 min' },
+                    { name: 'Box Jumps', sets: 4, reps: 6, rest: '2m', hasWeight: true, defaultWeight: 20 },
+                    { name: 'Ladder Drills', sets: 6, reps: '2 patterns', rest: '60s' },
+                    { name: 'Broad Jumps', sets: 4, reps: 5, rest: '90s' },
+                    { name: 'Band Sprint Drives', sets: 6, reps: '20s', rest: '90s' },
+                    { name: 'Fast Feet Drills', sets: 4, reps: '30s', rest: '60s' },
+                    { name: 'Burpee Box Jumps', sets: 3, reps: 8, rest: '75s', hasWeight: true, defaultWeight: 18 },
+                    { name: 'Slider Lateral Lunges', sets: 3, reps: '10 each side', rest: '60s' },
+                    { name: 'Hollow Body Hold', sets: 3, reps: '30s', rest: '45s' },
+                    { name: 'Mobility Cool-down', sets: 1, reps: '5 min' }
+                ];
+                
+                
                 // THURSDAY - Full body with upper emphasis
                 schedule.thursday.exercises[2] = { name: 'KB Snatches', sets: 4, reps: '8 each arm', rest: '2m', hasWeight: true, defaultWeight: 35 };
-                schedule.thursday.exercises[7] = { name: 'Weighted Carries', sets: 3, reps: '200 steps', rest: '75s', hasWeight: true, defaultWeight: 40 };
+                schedule.thursday.exercises[7] = { name: 'Weighted Carries', sets: 3, reps: '75 steps', rest: '75s', hasWeight: true, defaultWeight: 40 };
                 
                 // FRIDAY - Volume upper day
                 schedule.friday.exercises = [
@@ -735,7 +1025,7 @@
                     { name: 'Slider Leg Curls', sets: 4, reps: 15, rest: '60s' },
                     { name: 'Goblet Squat Pulses', sets: 3, reps: 20, rest: '60s', hasWeight: true, defaultWeight: 40 },
                     { name: 'Med Ball Slams', sets: 3, reps: 20, rest: '45s', hasWeight: true, defaultWeight: 20 },
-                    { name: 'Plank Hold', sets: 3, reps: '75s', rest: '30s' },
+                    { name: 'Copenhagen Plank', sets: 3, reps: '40s each side', rest: '30s' },
                     { name: 'Mobility Cool-down', sets: 1, reps: '5 min' }
                 ];
                 
@@ -755,8 +1045,24 @@
                     { name: 'Finisher: Ladder Sprint + Burpees', sets: 1, reps: '8 min EMOM' }
                 ];
                 
-                // WEDNESDAY - Keep HIIT for fat loss
-                // No changes needed
+                // PHASE 3 WEDNESDAY - Full plyometric program
+                schedule.wednesday.name = 'Explosive Plyometrics';
+                schedule.wednesday.duration = '65 min';
+                schedule.wednesday.location = 'home';
+                schedule.wednesday.equipmentNeeded = [];
+                schedule.wednesday.exercises = [
+                    { name: 'Dynamic Warm-up', sets: 1, reps: '12 min' },
+                    { name: '180° Box Jumps', sets: 5, reps: 6, rest: '2m', hasWeight: true, defaultWeight: 24 },
+                    { name: 'Ladder Drills', sets: 10, reps: '3 patterns', rest: '45s' },
+                    { name: 'Depth Jumps', sets: 4, reps: 5, rest: '2m', hasWeight: true, defaultWeight: 24 },
+                    { name: 'Lateral Box Shuffles', sets: 4, reps: '12 each side', rest: '75s', hasWeight: true, defaultWeight: 20 },
+                    { name: 'Band Sprint Drives', sets: 8, reps: '20s', rest: '90s' },
+                    { name: 'Burpee Box Jumps', sets: 4, reps: 10, rest: '60s', hasWeight: true, defaultWeight: 20 },
+                    { name: 'Banded Hip Rotations', sets: 3, reps: '15 each side', rest: '45s' },
+                    { name: 'Slider Lateral Lunges', sets: 3, reps: '12 each side', rest: '60s' },
+                    { name: 'Hollow Body Hold', sets: 4, reps: '45s', rest: '30s' },
+                    { name: 'Mobility Cool-down', sets: 1, reps: '5 min' }
+                ];
                 
                 // THURSDAY - Upper emphasis full body
                 schedule.thursday.exercises = [
@@ -767,9 +1073,9 @@
                     { name: 'DB Floor Press', sets: 4, reps: 12, rest: '75s', hasWeight: true, defaultWeight: 42.5 },
                     { name: 'Box Jumps', sets: 3, reps: 10, rest: '90s', hasWeight: true, defaultWeight: 24 },
                     { name: 'Face Pulls', sets: 4, reps: 20, rest: '60s', hasWeight: true, defaultWeight: 15 },
-                    { name: 'Weighted Carries', sets: 3, reps: '200 steps', rest: '75s', hasWeight: true, defaultWeight: 44 },
+                    { name: 'Weighted Carries', sets: 3, reps: '75 steps', rest: '75s', hasWeight: true, defaultWeight: 44 },
                     { name: 'Med Ball Slams', sets: 3, reps: 20, rest: '45s', hasWeight: true, defaultWeight: 20 },
-                    { name: 'Ball Pikes', sets: 3, reps: 15, rest: '45s' },
+                    { name: 'KB Windmill', sets: 3, reps: '12 each side', rest: '45s', hasWeight: true, defaultWeight: 20 },
                     { name: 'Mobility', sets: 1, reps: '5 min' }
                 ];
                 
@@ -785,13 +1091,13 @@
                     { name: 'Overhead Tricep Extension', sets: 4, reps: 15, rest: '60s', hasWeight: true, defaultWeight: 30 },
                     { name: 'Hammer Curls', sets: 3, reps: 15, rest: '60s', hasWeight: true, defaultWeight: 22.5 },
                     { name: 'Tricep Kickbacks', sets: 3, reps: '15 each arm', rest: '60s', hasWeight: true, defaultWeight: 15 },
-                    { name: 'Side Throws', sets: 3, reps: '20 each side', rest: '30s', hasWeight: true, defaultWeight: 15 },
+                    { name: 'Band Pallof Press', sets: 3, reps: '20 each side', rest: '30s' },
                     { name: 'Finisher: Ball Slams Circuit', sets: 1, reps: '10 min' }
                 ];
             }
             
             if (phase === 4) {
-                // PHASE 4: PEAK PERFORMANCE (Weeks 13-16)
+                // PHASE 4: PEAK PERFORMANCE (Weeks 15-18)
                 // Goal: Peak strength while maintaining muscle size
                 // Rep range: 6-10, Rest: 2-3m for compounds, still volume for accessories
                 // Keep muscle while showcasing strength gains
@@ -809,6 +1115,26 @@
                     { name: 'Weighted Plank', sets: 3, reps: '60s', rest: '30s', hasWeight: true, defaultWeight: 20 },
                     { name: 'Mobility Cool-down', sets: 1, reps: '5 min' }
                 ];
+                
+                // PHASE 4 WEDNESDAY - Elite explosive training
+                schedule.wednesday.name = 'Elite Explosiveness';
+                schedule.wednesday.duration = '70 min';
+                schedule.wednesday.location = 'home';
+                schedule.wednesday.equipmentNeeded = [];
+                schedule.wednesday.exercises = [
+                    { name: 'Dynamic Warm-up', sets: 1, reps: '12 min' },
+                    { name: 'Reactive Box Jumps', sets: 6, reps: 5, rest: '2.5m', hasWeight: true, defaultWeight: 24 },
+                    { name: 'Sprint Mechanics Drills', sets: 1, reps: '12 min' },
+                    { name: 'Depth Jump to Box Jump', sets: 5, reps: 5, rest: '2.5m', hasWeight: true, defaultWeight: 24 },
+                    { name: 'Ladder Drills', sets: 12, reps: '4 patterns', rest: '45s' },
+                    { name: 'Band Sprint Drives', sets: 10, reps: '25s', rest: '90s' },
+                    { name: '180° Box Jumps', sets: 4, reps: 6, rest: '2m', hasWeight: true, defaultWeight: 24 },
+                    { name: 'L-Sit Hold', sets: 4, reps: '30s', rest: '60s' },
+                    { name: 'Hollow Body Hold', sets: 3, reps: '60s', rest: '45s' },
+                    { name: 'Mobility Cool-down', sets: 1, reps: '8 min' }
+                ];
+                
+                
                 
                 // TUESDAY - Heavy upper with volume accessories
                 schedule.tuesday.exercises = [
@@ -834,9 +1160,9 @@
                     { name: 'DB Floor Press', sets: 4, reps: 8, rest: '90s', hasWeight: true, defaultWeight: 45 },
                     { name: 'Box Jumps (max height)', sets: 4, reps: 6, rest: '2m', hasWeight: true, defaultWeight: 30 },
                     { name: 'Face Pulls', sets: 3, reps: 15, rest: '60s', hasWeight: true, defaultWeight: 15 },
-                    { name: 'Heavy Carries', sets: 3, reps: '250 steps', rest: '90s', hasWeight: true, defaultWeight: 53 },
+                    { name: 'Heavy Carries', sets: 3, reps: '75 steps', rest: '90s', hasWeight: true, defaultWeight: 53 },
                     { name: 'Med Ball Slams', sets: 3, reps: 15, rest: '45s', hasWeight: true, defaultWeight: 20 },
-                    { name: 'Ball Pikes', sets: 3, reps: 12, rest: '45s' },
+                    { name: 'KB Windmill', sets: 3, reps: '15 each side', rest: '45s', hasWeight: true, defaultWeight: 25 },
                     { name: 'Mobility', sets: 1, reps: '5 min' }
                 ];
                 
@@ -852,7 +1178,7 @@
                     { name: 'Overhead Tricep Extension', sets: 4, reps: 10, rest: '60s', hasWeight: true, defaultWeight: 35 },
                     { name: 'Concentration Curls', sets: 3, reps: '12 each arm', rest: '60s', hasWeight: true, defaultWeight: 22.5 },
                     { name: 'Tricep Kickbacks', sets: 3, reps: '12 each arm', rest: '60s', hasWeight: true, defaultWeight: 17.5 },
-                    { name: 'Side Throws', sets: 3, reps: '15 each side', rest: '30s', hasWeight: true, defaultWeight: 20 }
+                    { name: 'Slider Body Saw', sets: 3, reps: '15', rest: '30s' }
                 ];
             }
             
@@ -898,6 +1224,21 @@
             
             if (stored) return stored;
             
+            // BUG FIX: Check if any set for this exercise in this week has been logged
+            let hasAnyWeight = false;
+            let maxWeightLogged = 0;
+            for (let i = 0; i < 10; i++) {
+                const checkKey = `${week}-${exerciseName}-${i}`;
+                if (state.exerciseWeights[checkKey]) {
+                    hasAnyWeight = true;
+                    maxWeightLogged = Math.max(maxWeightLogged, state.exerciseWeights[checkKey]);
+                }
+            }
+            
+            if (hasAnyWeight) {
+                return maxWeightLogged;
+            }
+            
             if (setIndex > 0) {
                 const prevKey = `${week}-${exerciseName}-${setIndex - 1}`;
                 const prevWeight = state.exerciseWeights[prevKey];
@@ -923,7 +1264,7 @@
         }
 
         function updateFutureSets(exerciseName, currentSetIndex, newWeight, week, totalSets) {
-            for (let i = currentSetIndex + 1; i < totalSets; i++) {
+            for (let i = currentSetIndex; i < totalSets; i++) {
                 const futureKey = `${week}-${exerciseName}-${i}`;
                 state.exerciseWeights[futureKey] = newWeight;
             }
@@ -1005,7 +1346,7 @@
             let totalExercises = 0;
             let completedExercises = 0;
             
-            for (let week = 0; week <= 16; week++) {
+            for (let week = 0; week <= 18; week++) {
                 const schedule = getWorkoutSchedule(week);
                 const days = week === 0 ? ['saturday', 'sunday'] : 
                     ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
@@ -1097,6 +1438,76 @@
             }
         }
 
+        
+        function renderExerciseGuide(exerciseName) {
+            const guide = exerciseGuides[exerciseName];
+            if (!guide) return '';
+            
+            let html = '<div class="bg-slate-900 rounded-lg p-4 mt-3 space-y-3">';
+            
+            if (guide.setup) {
+                html += '<div><p class="text-xs text-blue-400 font-semibold mb-2">SETUP:</p>';
+                html += '<ul class="text-xs text-slate-300 space-y-1 ml-4">';
+                guide.setup.forEach(item => html += `<li>• ${item}</li>`);
+                html += '</ul></div>';
+            }
+            
+            if (guide.variations) {
+                html += '<div><p class="text-xs text-green-400 font-semibold mb-2">VARIATIONS:</p>';
+                html += '<ul class="text-xs text-slate-300 space-y-1 ml-4">';
+                guide.variations.forEach(item => html += `<li>${item}</li>`);
+                html += '</ul></div>';
+            }
+            
+            if (guide.patterns) {
+                html += '<div><p class="text-xs text-purple-400 font-semibold mb-2">PATTERNS:</p>';
+                html += '<ul class="text-xs text-slate-300 space-y-1 ml-4">';
+                guide.patterns.forEach(item => html += `<li>${item}</li>`);
+                html += '</ul></div>';
+            }
+            
+            if (guide.execution) {
+                html += '<div><p class="text-xs text-green-400 font-semibold mb-2">EXECUTION:</p>';
+                html += '<ul class="text-xs text-slate-300 space-y-1 ml-4">';
+                guide.execution.forEach(item => html += `<li>• ${item}</li>`);
+                html += '</ul></div>';
+            }
+            
+            if (guide.cues) {
+                html += '<div><p class="text-xs text-yellow-400 font-semibold mb-2">COACHING CUES:</p>';
+                html += '<ul class="text-xs text-slate-300 space-y-1 ml-4">';
+                guide.cues.forEach(item => html += `<li>💡 ${item}</li>`);
+                html += '</ul></div>';
+            }
+            
+            if (guide.progression) {
+                html += '<div class="pt-2 border-t border-slate-700">';
+                html += `<p class="text-xs text-slate-400 italic">📈 ${guide.progression}</p>`;
+                html += '</div>';
+            }
+            
+            if (guide.format) {
+                html += '<div class="pt-2 border-t border-slate-700">';
+                html += `<p class="text-xs text-blue-300">📋 ${guide.format}</p>`;
+                html += '</div>';
+            }
+            
+            if (guide.modification) {
+                html += '<div class="pt-2 border-t border-slate-700">';
+                html += `<p class="text-xs text-orange-400">⚡ ${guide.modification}</p>`;
+                html += '</div>';
+            }
+            
+            if (guide.safety) {
+                html += '<div class="pt-2 border-t border-slate-700">';
+                html += `<p class="text-xs text-red-400">⚠️ ${guide.safety}</p>`;
+                html += '</div>';
+            }
+            
+            html += '</div>';
+            return html;
+        }
+        
         function render() {
             const app = document.getElementById('app');
             
@@ -1112,7 +1523,9 @@
         function renderOverview(app) {
             const schedule = getWorkoutSchedule(state.currentWeek);
             const phase = getPhase(state.currentWeek);
-            const phaseInfo = getPhaseInfo(phase);
+            const phaseInfo = isDeloadWeek(state.currentWeek) 
+                ? { name: 'DELOAD WEEK', focus: 'Recovery & mobility' }
+                : getPhaseInfo(phase);
             const dateRange = getWeekDateRange(state.currentWeek);
             const currentWeek = getCurrentWeek();
             const weekProgress = getWeekProgress();
@@ -1136,7 +1549,7 @@
                                 <div class="text-xs text-slate-400">${dateRange}</div>
                                 <div class="text-xs text-blue-400">${phaseInfo.name}</div>
                             </div>
-                            <button onclick="changeWeek(1)" class="w-24 py-2 text-slate-300 hover:text-white hover:bg-slate-700/30 rounded-lg text-sm" ${state.currentWeek === 16 ? 'disabled style="opacity: 0.3"' : ''}>
+                            <button onclick="changeWeek(1)" class="w-24 py-2 text-slate-300 hover:text-white hover:bg-slate-700/30 rounded-lg text-sm" ${state.currentWeek === 18 ? 'disabled style="opacity: 0.3"' : ''}>
                                 Next →
                             </button>
                         </div>
@@ -1271,12 +1684,13 @@
                                         ${(() => {
                                             const isDynamicWarmup = exercise.name === 'Dynamic Warm-up';
                                             const isFinisher = exercise.name.startsWith('Finisher:');
+                                            const hasExerciseGuide = exerciseGuides[exercise.name];
                                             const warmupGuide = isDynamicWarmup ? warmupGuides[state.selectedDay] : null;
                                             const finisherGuide = isFinisher ? finisherGuides[exercise.name] : null;
                                             const expandId = `${state.currentWeek}-${state.selectedDay}-${exIndex}`;
                                             const isExpanded = state.expandedItems[expandId] || false;
                                             
-                                            if (!isDynamicWarmup && !isFinisher) return '';
+                                            if (!isDynamicWarmup && !isFinisher && !hasExerciseGuide) return '';
                                             
                                             return `
                                                 <button 
@@ -1284,7 +1698,7 @@
                                                     class="mt-2 text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1"
                                                 >
                                                     <span id="icon-${expandId}" class="expand-icon ${isExpanded ? 'rotated' : ''}">▼</span>
-                                                    ${isDynamicWarmup ? 'View Warm-up Guide' : 'View Finisher Details'}
+                                                    ${isDynamicWarmup ? 'View Warm-up Guide' : isFinisher ? 'View Finisher Details' : 'How to Perform'}
                                                 </button>
                                                 ${isDynamicWarmup && warmupGuide ? `
                                                     <div id="expand-${expandId}" class="expandable-content ${isExpanded ? 'expanded' : ''} mt-3 pt-3 border-t border-slate-700">
@@ -1314,6 +1728,11 @@
                                                                 <p class="text-xs text-yellow-400 mt-1">⏱️ Total time: ${warmupGuide.totalTime}</p>
                                                             </div>
                                                         </div>
+                                                    </div>
+                                                ` : ''}
+                                                ${hasExerciseGuide && !isDynamicWarmup && !isFinisher ? `
+                                                    <div id="expand-${expandId}" class="expandable-content ${isExpanded ? 'expanded' : ''} mt-3 pt-3 border-t border-slate-700">
+                                                        ${renderExerciseGuide(exercise.name)}
                                                     </div>
                                                 ` : ''}
                                                 ${isFinisher && finisherGuide ? `
@@ -1486,7 +1905,7 @@
 
         function changeWeek(delta) {
             const newWeek = state.currentWeek + delta;
-            if (newWeek >= 0 && newWeek <= 16) {
+            if (newWeek >= 0 && newWeek <= 18) {
                 state.currentWeek = newWeek;
                 saveState();
                 render();
@@ -1636,6 +2055,7 @@
                                         value="${currentWeight}"
                                         onchange="saveWeight('${exerciseName}', ${setIndex}, this.value, ${exercise.sets})"
                                         onblur="cancelEdit()"
+                                        onkeydown="handleWeightInputKeydown(event, '${exerciseName}', ${setIndex}, ${exercise.sets})"
                                         class="w-full px-2 py-1 bg-slate-700 border border-blue-500 rounded text-center text-white"
                                         autofocus
                                         id="weight-input-${exerciseName}-${setIndex}"
@@ -1664,17 +2084,38 @@
             }
         }
 
+        
+        function handleWeightInputKeydown(event, exerciseName, setIndex, totalSets) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                const input = event.target;
+                saveWeight(exerciseName, setIndex, input.value, totalSets);
+            } else if (event.key === 'Escape') {
+                event.preventDefault();
+                state.editingSet = null;
+                state.tempWeight = '';
+                render();
+            }
+        }
+        
         function saveWeight(exerciseName, setIndex, value, totalSets) {
             const currentScrollPos = window.pageYOffset;
             const newWeight = parseFloat(value);
+            
+            // Allow exit even if no change or invalid value
             if (!isNaN(newWeight) && newWeight > 0) {
                 const key = `${state.currentWeek}-${exerciseName}-${setIndex}`;
-                state.exerciseWeights[key] = newWeight;
-                // This should update ALL future sets
-                updateFutureSets(exerciseName, setIndex, newWeight, state.currentWeek, totalSets);
-                saveState();
+                const oldWeight = state.exerciseWeights[key];
+                
+                // Only update if value actually changed
+                if (oldWeight !== newWeight) {
+                    state.exerciseWeights[key] = newWeight;
+                    updateFutureSets(exerciseName, setIndex, newWeight, state.currentWeek, totalSets);
+                    saveState();
+                }
             }
             
+            // Always exit edit mode, regardless of whether value changed
             state.editingSet = null;
             state.tempWeight = '';
             
