@@ -5,2172 +5,634 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>« rba | fit »</title>
+    <title>rba | fit</title>
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#1e293b">
+    <meta name="theme-color" content="#0a0a0a">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E💪%3C/text%3E%3C/svg%3E">
-    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .sticky-header {
-            position: sticky;
-            top: 0;
-            z-index: 50;
-            background: linear-gradient(to bottom right, rgb(15, 23, 42), rgb(30, 41, 59));
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        :root {
+            --bg: #0a0a0a;
+            --bg2: #141414;
+            --bg3: #1a1a1a;
+            --border: #252525;
+            --border2: #333;
+            --text: #e0ddd8;
+            --text2: #b0b0b0;
+            --text3: #777;
+            --accent: #d4a43a;
+            --accent2: #e8b84a;
+            --green: #4ade80;
+            --green2: #22c55e;
+            --red: #f87171;
+            --blue: #60a5fa;
+            --orange: #fb923c;
+            --purple: #a78bfa;
         }
-        .muscle-tag {
-            display: inline-block;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 0.7rem;
-            margin-left: 4px;
-            opacity: 0.8;
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
         }
-        .primary-muscle {
-            background-color: rgba(59, 130, 246, 0.3);
-            border: 1px solid rgba(59, 130, 246, 0.5);
-        }
-        .secondary-muscle {
-            background-color: rgba(156, 163, 175, 0.2);
-            border: 1px solid rgba(156, 163, 175, 0.3);
-        }
-        .gradient-text {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        /* Smooth transitions */
-        button {
-            transition: all 0.2s ease;
-        }
-        button:active {
-            transform: scale(0.95);
-        }
-        .workout-card {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .workout-card:active {
-            transform: scale(0.98);
-        }
-        .progress-bar {
-            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        input:focus {
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
-        }
-        html {
-            scroll-behavior: smooth;
-        }
-        /* Progress Rings - Apple Watch Style */
-        .progress-ring {
-            position: relative;
-            width: 110px;
-            height: 110px;
-        }
-        .progress-ring-circle {
-            transform: rotate(-90deg);
-            transform-origin: 50% 50%;
-        }
-        .progress-ring-bg {
-            fill: none;
-            stroke: rgba(71, 85, 105, 0.3);
-        }
-        .progress-ring-fill {
-            fill: none;
-            stroke-linecap: round;
-            transition: stroke-dashoffset 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .ring-program { stroke: url(#gradient-program); }
-        .ring-week { stroke: url(#gradient-week); }
-        .ring-supplement { stroke: url(#gradient-supplement); }
-        .progress-ring-text {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-        }
-        .expandable-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease-in-out;
-        }
-        .expandable-content.expanded {
-            max-height: 2000px;
-        }
-        .expand-icon {
-            transition: transform 0.3s ease;
-        }
-        .expand-icon.rotated {
-            transform: rotate(180deg);
-        }
+        #app { max-width: 520px; margin: 0 auto; padding: 12px 16px 60px; }
+        button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+        input { font-family: inherit; }
+        .header { display: flex; align-items: center; justify-content: space-between; padding-bottom: 16px; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
+        .logo-row { display: flex; align-items: center; gap: 10px; }
+        .logo { width: 36px; height: 36px; border-radius: 8px; background: linear-gradient(135deg, var(--accent), var(--orange)); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; color: #000; letter-spacing: -0.3px; text-transform: lowercase; }
+        .header-title { font-size: 17px; font-weight: 700; letter-spacing: -0.02em; }
+        .header-sub { font-size: 10px; color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; }
+        .top-btn { background: var(--bg3); border: 1px solid var(--border); color: var(--accent); padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; }
+        /* Progress */
+        .prog-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+        .prog-label { font-size: 11px; color: var(--text3); width: 58px; flex-shrink: 0; text-transform: uppercase; letter-spacing: 0.05em; }
+        .prog-track { flex: 1; height: 5px; border-radius: 3px; background: var(--bg3); }
+        .prog-fill { height: 100%; border-radius: 3px; transition: width 0.4s ease; }
+        .prog-pct { font-size: 12px; font-weight: 700; width: 34px; text-align: right; font-variant-numeric: tabular-nums; }
+        /* Week nav */
+        .week-nav { display: flex; align-items: center; justify-content: space-between; padding: 14px 0 8px; }
+        .nav-btn { background: var(--bg3); border: 1px solid var(--border); width: 36px; height: 36px; border-radius: 8px; font-size: 20px; display: flex; align-items: center; justify-content: center; color: var(--text); }
+        .nav-btn:disabled { opacity: 0.3; }
+        .week-center { text-align: center; }
+        .week-label { font-size: 22px; font-weight: 700; letter-spacing: -0.03em; }
+        .phase-label { font-size: 11px; color: var(--text3); margin-top: 2px; }
+        .date-range { font-size: 11px; color: var(--text2); margin-top: 1px; }
+        /* Pills */
+        .pills { display: flex; gap: 3px; margin-bottom: 14px; justify-content: center; flex-wrap: wrap; }
+        .pill { width: 28px; height: 26px; border-radius: 6px; font-size: 11px; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+        .pill-active { background: var(--text); color: var(--bg); font-weight: 700; }
+        .pill-inactive { color: var(--text3); }
+        /* Intensity map */
+        .int-map { margin-bottom: 14px; padding: 8px 12px; background: var(--bg2); border-radius: 8px; border: 1px solid var(--border); }
+        .int-title { font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 5px; }
+        .int-row { display: flex; justify-content: space-between; }
+        .int-cell { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+        .int-dot { width: 22px; height: 5px; border-radius: 3px; }
+        .int-cell-label { font-size: 9px; color: var(--text3); }
+        /* Day cards */
+        .day-cards { display: flex; flex-direction: column; gap: 6px; }
+        .day-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; text-align: left; width: 100%; transition: border-color 0.15s; }
+        .day-card:active { border-color: var(--accent); }
+        .day-card-top { display: flex; align-items: center; gap: 10px; }
+        .day-card-icon { font-size: 20px; flex-shrink: 0; }
+        .day-card-info { flex: 1; }
+        .day-card-day { font-size: 10px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.06em; }
+        .day-card-title { font-size: 14px; font-weight: 600; color: var(--text); }
+        .day-card-right { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
+        .badge { padding: 2px 7px; border-radius: 4px; font-size: 9px; font-weight: 700; color: #1a1a1a; letter-spacing: 0.03em; }
+        .day-card-dur { font-size: 10px; color: var(--text3); }
+        .day-prog { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+        .day-prog-track { flex: 1; height: 3px; border-radius: 2px; background: var(--bg3); }
+        .day-prog-fill { height: 100%; border-radius: 2px; background: var(--green2); transition: width 0.3s; }
+        .day-prog-pct { font-size: 10px; color: var(--text3); font-variant-numeric: tabular-nums; }
+        /* Day detail */
+        .detail-header { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+        .back-btn { background: var(--bg3); border: 1px solid var(--border); color: var(--text); padding: 6px 12px; border-radius: 6px; font-size: 13px; flex-shrink: 0; margin-top: 2px; }
+        .detail-title { font-size: 19px; font-weight: 700; letter-spacing: -0.02em; }
+        .detail-meta { font-size: 12px; color: var(--text2); margin-top: 3px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .equip-note { font-size: 11px; color: var(--accent); margin-top: 3px; }
+        .block-name { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text2); margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px solid var(--border); }
+        .block { margin-bottom: 14px; }
+        .item { display: flex; gap: 10px; padding: 7px 0; border-bottom: 1px solid #1a1a1a; align-items: flex-start; }
+        .chk { font-size: 18px; padding: 0; margin-top: 1px; flex-shrink: 0; width: 22px; text-align: center; }
+        .item-text { font-size: 13px; line-height: 1.5; color: var(--text); }
+        .item-done .item-text { text-decoration: line-through; color: var(--text3); }
+        .item-acts { display: flex; gap: 5px; margin-top: 3px; flex-wrap: wrap; }
+        .act-btn { background: var(--bg3); border: 1px solid var(--border); color: var(--text2); padding: 2px 7px; border-radius: 4px; font-size: 10px; }
+        .act-btn-filled { color: var(--blue); border-color: rgba(96,165,250,0.3); }
+        .inline-edit { display: flex; gap: 3px; align-items: center; }
+        .edit-input { background: var(--bg3); border: 1px solid var(--accent); color: var(--text); padding: 2px 6px; border-radius: 4px; font-size: 11px; width: 80px; outline: none; }
+        .save-btn { background: var(--green2); border: none; color: #000; border-radius: 4px; padding: 2px 6px; font-size: 10px; font-weight: 700; }
+        .cancel-btn { background: var(--bg3); border: 1px solid var(--border); color: var(--text3); border-radius: 4px; padding: 2px 6px; font-size: 10px; }
+        .arrow-note { font-size: 11px; color: var(--text3); font-style: italic; padding-left: 32px; padding-bottom: 3px; }
+        /* Export */
+        .export-hint { font-size: 12px; color: var(--text2); margin-bottom: 12px; }
+        .export-box { width: 100%; min-height: 300px; background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 11px; font-family: 'SF Mono','Fira Code',monospace; padding: 12px; resize: vertical; outline: none; }
+        .export-copy { margin-top: 10px; background: linear-gradient(135deg, var(--accent), var(--orange)); border: none; color: #000; padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 700; width: 100%; }
+        /* Deload banner */
+        .deload { margin-top: 14px; padding: 10px 12px; background: rgba(212,164,58,0.08); border: 1px solid rgba(212,164,58,0.2); border-radius: 8px; font-size: 12px; color: var(--accent); }
+        /* Utility */
+        .hidden { display: none; }
     </style>
 </head>
-<body class="bg-gradient-to-br from-slate-900 to-slate-800 text-white min-h-screen">
-    <div id="app"></div>
+<body>
+<div id="app"></div>
+<script>
+// ─── Constants ──────────────────────────────────────────────────────────────
+const PROGRAM_START = new Date(2026, 2, 30); // Mon Mar 30
+const DAY_ORDER = ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"];
+const DAY_LABELS = {monday:"Mon",tuesday:"Tue",wednesday:"Wed",thursday:"Thu",friday:"Fri",saturday:"Sat",sunday:"Sun"};
+const INTENSITY_COLORS = {REST:"#444",EASY:"#4ade80","EASY-MOD":"#86efac",MODERATE:"#d4a43a","MOD-HARD":"#fb923c",HARD:"#f87171"};
 
-    <script>
-        function getCurrentWeek() {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            
-            const week0Start = new Date(2025, 9, 11);
-            const week1Start = new Date(2025, 9, 13);
-            
-            week0Start.setHours(0, 0, 0, 0);
-            week1Start.setHours(0, 0, 0, 0);
-            
-            if (today < week0Start) return 0;
-            if (today >= week0Start && today < week1Start) return 0;
-            
-            const diffTime = today - week1Start;
-            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-            const weekNum = Math.floor(diffDays / 7) + 1;
-            
-            return Math.max(1, Math.min(18, weekNum));
-        }
+// ─── State ──────────────────────────────────────────────────────────────────
+const state = {
+    currentWeek: 1,
+    selectedDay: null,
+    view: 'overview',
+    checked: JSON.parse(localStorage.getItem('rba_checked') || '{}'),
+    weights: JSON.parse(localStorage.getItem('rba_weights') || '{}'),
+    notes: JSON.parse(localStorage.getItem('rba_notes') || '{}'),
+    editingWeight: null,
+    editingNote: null,
+};
 
-       const state = {
-            currentWeek: parseInt(localStorage.getItem('lastWeek')) || getCurrentWeek(),
-            selectedDay: null,
-            view: 'overview',
-            completedExercises: JSON.parse(localStorage.getItem('workoutProgress') || '{}'),
-            exerciseWeights: JSON.parse(localStorage.getItem('exerciseWeights') || '{}'),
-            supplementLog: JSON.parse(localStorage.getItem('supplementLog') || '{}'),
-            editingSet: null,
-            tempWeight: '',
-            expandedItems: {}  // <-- NEW PROPERTY
-        };
-
-        function cleanOldSupplementLogs() {
-            const today = new Date().toISOString().split('T')[0];
-            const logDates = Object.keys(state.supplementLog);
-            
-            logDates.forEach(date => {
-                if (date !== today) {
-                    const logDate = new Date(date);
-                    const daysDiff = Math.floor((new Date(today) - logDate) / (1000 * 60 * 60 * 24));
-                    if (daysDiff > 7) {
-                        delete state.supplementLog[date];
-                    }
-                }
-            });
-            
-            saveState();
-        }
-        
-        cleanOldSupplementLogs();
-        
-        function toggleExpand(itemId) {
-            const content = document.getElementById(`expand-${itemId}`);
-            const icon = document.getElementById(`icon-${itemId}`);
-            
-            if (content && icon) {
-                content.classList.toggle('expanded');
-                icon.classList.toggle('rotated');
-                state.expandedItems[itemId] = content.classList.contains('expanded');
-            }
-        }
-        
-        function saveState() {
-            localStorage.setItem('workoutProgress', JSON.stringify(state.completedExercises));
-            localStorage.setItem('exerciseWeights', JSON.stringify(state.exerciseWeights));
-            localStorage.setItem('supplementLog', JSON.stringify(state.supplementLog));
-            localStorage.setItem('lastWeek', state.currentWeek.toString());
-        }
-
-        function cleanOldSupplementLogs() {
-            const today = new Date().toISOString().split('T')[0];
-            const logDates = Object.keys(state.supplementLog);
-            
-            logDates.forEach(date => {
-                if (date !== today) {
-                    const logDate = new Date(date);
-                    const daysDiff = Math.floor((new Date(today) - logDate) / (1000 * 60 * 60 * 24));
-                    if (daysDiff > 7) {
-                        delete state.supplementLog[date];
-                    }
-                }
-            });
-            
-            saveState();
-        }
-        
-        function getWeekDates(week) {
-            if (week === 0) {
-                return {
-                    saturday: new Date(2025, 9, 11),
-                    sunday: new Date(2025, 9, 12)
-                };
-            }
-            
-            const week1Monday = new Date(2025, 9, 13);
-            const daysFromWeek1 = (week - 1) * 7;
-            
-            const monday = new Date(week1Monday);
-            monday.setDate(week1Monday.getDate() + daysFromWeek1);
-            
-            return {
-                monday: new Date(monday),
-                tuesday: new Date(monday.getTime() + 86400000),
-                wednesday: new Date(monday.getTime() + 172800000),
-                thursday: new Date(monday.getTime() + 259200000),
-                friday: new Date(monday.getTime() + 345600000),
-                saturday: new Date(monday.getTime() + 432000000),
-                sunday: new Date(monday.getTime() + 518400000)
-            };
-        }
-
-        function formatDate(date) {
-            return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-        }
-
-        function getWeekDateRange(week) {
-            const dates = getWeekDates(week);
-            if (week === 0) {
-                return `${formatDate(dates.saturday)} - ${formatDate(dates.sunday)}`;
-            }
-            return `${formatDate(dates.monday)} - ${formatDate(dates.sunday)}`;
-        }
-
-        function getDayDate(week, day) {
-            const dates = getWeekDates(week);
-            return dates[day] ? formatDate(dates[day]) : '';
-        }
-
-        function shouldTakeCollagenToday() {
-            const today = new Date();
-            const startDate = new Date(2025, 9, 11);
-            const daysSinceStart = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
-            return daysSinceStart % 2 === 0;
-        }
-
-        const supplementSchedule = {
-            preworkout: {
-                time: '6:00 AM',
-                note: 'Before training',
-                supplements: [
-                    { name: 'Beta-Alanine', dose: '3.2g (4 caps)', icon: '⚡', conditional: true }
-                ]
-            },
-            morning: {
-                time: '8:30 AM',
-                note: 'Post-workout',
-                supplements: [
-                    { name: 'Whey Protein', dose: '2 scoops (50g)', icon: '🥤' },
-                    { name: 'Creatine', dose: '5g', icon: '💪' },
-                    { name: 'Omega-3', dose: '1 cap', icon: '🐟' },
-                    { name: 'Vitamin D3+K2', dose: '4000IU+100mcg', icon: '☀️' },
-                    { name: 'B-Complex', dose: '1 cap', icon: '🔋' },
-                    { name: 'Vitamin C', dose: '500mg', icon: '🍊' }
-                ]
-            },
-            afternoon: {
-                time: '3:00 PM',
-                note: 'Mid-day (every other day)',
-                supplements: [
-                    { name: 'Collagen', dose: '1 scoop (10g)', icon: '🦴', conditional: true, checkFunction: shouldTakeCollagenToday }
-                ]
-            },
-            evening: {
-                time: '9:30 PM',
-                note: 'Before bed',
-                supplements: [
-                    { name: 'Magnesium', dose: '240mg', icon: '😴' },
-                    { name: 'Zinc', dose: '30mg', icon: '🛡️' },
-                    { name: 'Ashwagandha', dose: '500mg', icon: '🧘' }
-                ]
-            }
-        };
-
-        const warmupGuides = {
-            monday: {
-                additions: [
-                    'Bodyweight Squats × 10',
-                    'Leg Swings (front/back) × 10 each',
-                    'Leg Swings (side/side) × 10 each',
-                    'Walking Lunges × 10 total'
-                ],
-                why: 'Lower body needs hip mobility and glute activation before heavy squats/lunges',
-                totalTime: '10 min'
-            },
-            tuesday: {
-                additions: [
-                    'Arm Circles (forward/backward) × 10 each',
-                    'Band Pull-Aparts × 15',
-                    'Wall Slides × 10',
-                    'Light DB Shoulder Press × 10 (10-15 lbs)'
-                ],
-                why: 'Upper body needs shoulder mobility and scapular activation before pressing/pulling',
-                totalTime: '8-10 min'
-            },
-            wednesday: {
-                additions: [
-                    'Box Step-ups × 10 each leg',
-                    'Lateral Leg Swings × 10 each',
-                    'Broad Jump × 3 (submaximal)',
-                    'Fast Feet in Place × 20s'
-                ],
-                why: 'Explosive work needs CNS priming and fast-twitch muscle activation',
-                totalTime: '10 min'
-            },
-            thursday: {
-                additions: [
-                    'Bodyweight Squats × 10',
-                    'Push-ups × 10',
-                    'Light KB Swings × 10 (20-25 lbs)',
-                    'Broad Jump × 3'
-                ],
-                why: 'Full body needs general activation, power work needs CNS priming',
-                totalTime: '10 min'
-            },
-            friday: {
-                additions: [
-                    'Arm Circles (forward/backward) × 10 each',
-                    'Band Pull-Aparts × 15',
-                    'Wall Slides × 10'
-                ],
-                why: 'Upper body needs shoulder mobility and scapular activation',
-                totalTime: '8-10 min'
-            },
-            saturday: {
-                additions: [
-                    'A-Skips × 20 yards',
-                    'High Knees (exaggerated) × 20 yards',
-                    'Butt Kicks (fast) × 20 yards',
-                    'Light Sprint × 50 yards @ 60%'
-                ],
-                why: 'Power/sprint work needs progressive speed buildup',
-                totalTime: '12 min'
-            },
-            sunday: {
-                additions: [],
-                why: 'Recovery day - minimal warm-up needed',
-                totalTime: '5 min'
-            }
-        };
-        
-        const finisherGuides = {
-            'Finisher: Ladder Sprint + Burpees': {
-                duration: '8 min EMOM',
-                protocol: [
-                    'Every minute: Agility ladder (fast feet down and back) + 3 burpees',
-                    'Rest = whatever time is left in that minute',
-                    'Repeat for 8 rounds'
-                ],
-                tips: [
-                    'Focus on SPEED through ladder, not perfection',
-                    'Burpees can be modified (step back vs jump)',
-                    'If you finish in 30s, you get 30s rest'
-                ],
-                why: 'Total body conditioning without taxing chest/back/shoulders. Perfect after upper volume day.'
-            },
-            'Finisher: Ball Slams Circuit': {
-                duration: '10 min (2 rounds × 5 min)',
-                protocol: [
-                    'Med Ball Slams × 10',
-                    'Exercise Ball Mountain Climbers × 20',
-                    'Med Ball Overhead Squats × 10',
-                    'Exercise Ball Plank Hold × 30s',
-                    'Med Ball Russian Twists × 20',
-                    'Rest 1 min, then repeat'
-                ],
-                tips: [
-                    'Move FAST between exercises',
-                    'Quality over speed on ball work',
-                    'Medicine ball: 15-20 lbs',
-                    'Don\'t worry if you can\'t finish in 5 min - keep moving'
-                ],
-                why: 'Core + conditioning focus. Upper body is already smoked from the week - this gives you a metabolic finish without overtaxing.'
-            }
-        };
-
-        const exerciseGuides = {
-            'Band Sprint Drives': {
-                setup: [
-                    'Option 1: Band around ANKLES (harder, recommended)',
-                    'Option 2: Band around KNEES (easier, start here)',
-                    'Stand with feet hip-width apart, slight tension in band'
-                ],
-                execution: [
-                    'Slight forward lean (like starting a sprint)',
-                    'Drive knee EXPLOSIVELY to hip height',
-                    'Alternate rapidly - "DRIVE! DRIVE! DRIVE!"',
-                    'Pump arms in sprint motion (opposite arm/leg)',
-                    'Stay on balls of feet throughout',
-                    'Duration: 20 seconds per set'
-                ],
-                cues: [
-                    'Knee to HIP HEIGHT (thigh parallel)',
-                    'EXPLODE up, control down',
-                    'Quick ground contact',
-                    'Arms pump fast - elbows back'
-                ],
-                progression: 'Week 8: Knees (6×20s) → Weeks 10-13: Ankles (8×20s) → Weeks 15-18: Ankles (10×25s)'
-            },
-            'Fast Feet Drills': {
-                variations: [
-                    '1. Fast Feet in Place: Rapid alternating taps (30s)',
-                    '2. Fast Feet Forward/Back: Small rapid steps forward 3, back 3 (30s)',
-                    '3. Fast Feet Lateral: Side-to-side rapid steps (30s)'
-                ],
-                execution: [
-                    'Stay on balls of feet (NOT flat-footed)',
-                    'Rapid cadence - minimal ground contact',
-                    'Maintain tall posture throughout',
-                    'Athletic stance, slight knee bend'
-                ],
-                cues: [
-                    'Light on your feet!',
-                    'Maximum cadence!',
-                    'Quick! Quick! Quick!',
-                    'If heels touch, too slow'
-                ],
-                format: '4 sets × 30s, cycling through all 3 variations'
-            },
-            'Ladder Drills': {
-                patterns: [
-                    '1. IN-IN-OUT-OUT: Both feet in square, both out to sides, repeat',
-                    '2. ICKEY SHUFFLE: Right in, left out (left), right out (right), left in, repeat',
-                    '3. SINGLE-LEG HOPS (Phase 3+): Hop on one leg per square',
-                    '4. 180° TURNS (Phase 4): Run through, jump 180° every 3 squares'
-                ],
-                cues: [
-                    'SPEED over perfection',
-                    'Eyes UP, not down at ladder',
-                    'Quick ground contact',
-                    'No ladder? Use tape (18" squares)'
-                ],
-                progression: 'Week 8: Patterns 1-2 → Weeks 10-13: Add Pattern 3 → Weeks 15-18: All 4 patterns'
-            },
-            'Copenhagen Plank': {
-                setup: [
-                    'Side plank position on elbow',
-                    'Top leg on bench/box (knee or ankle)',
-                    'Bottom leg hovering off ground',
-                    'Body in straight line'
-                ],
-                execution: [
-                    'Lift bottom leg up toward top leg (adductor squeeze)',
-                    'Hold at top for 20-45 seconds',
-                    'Keep hips elevated - no sagging',
-                    'Switch sides'
-                ],
-                cues: [
-                    'Squeeze inner thighs together',
-                    'Drive top hip toward ceiling',
-                    'Core tight throughout',
-                    'Breathe - don\'t hold breath'
-                ],
-                modification: 'Too hard? Keep bottom knee on ground'
-            },
-            'KB Windmill': {
-                setup: [
-                    'Hold KB overhead in right hand',
-                    'Left foot forward, right foot back 45°',
-                    'Eyes on the kettlebell throughout'
-                ],
-                execution: [
-                    'Push hips to the RIGHT (opposite of KB)',
-                    'Slide left hand down left leg',
-                    'Keep KB vertical and arm locked',
-                    'Return to start, repeat'
-                ],
-                cues: [
-                    'Hips push OPPOSITE direction',
-                    'Never take eyes off KB',
-                    'Arm stays locked overhead',
-                    'This is a HIP hinge, not a side bend'
-                ],
-                safety: 'Start with light weight (10-15 lbs) to learn pattern'
-            }
-        };
-        
-
-
-        
-        const muscleMappings = {
-            'Box Jumps': { primary: ['Quads'], secondary: ['Glutes', 'Calves'] },
-            'Goblet Squats': { primary: ['Quads', 'Glutes'], secondary: ['Core'] },
-            'Single-Leg Step-ups': { primary: ['Quads', 'Glutes'], secondary: ['Balance'] },
-            'KB Swings': { primary: ['Glutes', 'Hamstrings'], secondary: ['Core', 'Shoulders'] },
-            'KB Swings (heavy)': { primary: ['Glutes', 'Hamstrings'], secondary: ['Core', 'Shoulders'] },
-            'Walking Lunges': { primary: ['Quads', 'Glutes'], secondary: ['Balance'] },
-            'Slider Leg Curls': { primary: ['Hamstrings'], secondary: ['Glutes'] },
-            'Bulgarian Split Squats': { primary: ['Quads', 'Glutes'], secondary: ['Balance'] },
-            'Single-Leg RDL': { primary: ['Hamstrings', 'Glutes'], secondary: ['Core'] },
-            'DB Front Squats': { primary: ['Quads', 'Glutes'], secondary: ['Core'] },
-            'Heavy Goblet Squats': { primary: ['Quads', 'Glutes'], secondary: ['Core'] },
-            'Goblet Squat Pulses': { primary: ['Quads', 'Glutes'], secondary: ['Core'] },
-            'Depth Jumps': { primary: ['Power', 'Quads'], secondary: [] },
-            
-            'DB Floor Press': { primary: ['Chest'], secondary: ['Triceps', 'Shoulders'] },
-            'DB Bench Press (tempo 3-0-1)': { primary: ['Chest'], secondary: ['Triceps', 'Shoulders'] },
-            'Heavy DB Bench Press': { primary: ['Chest'], secondary: ['Triceps', 'Shoulders'] },
-            'DB Floor Press (wide grip)': { primary: ['Chest'], secondary: ['Triceps'] },
-            'Heavy DB Floor Press': { primary: ['Chest'], secondary: ['Triceps'] },
-            'Incline DB Press': { primary: ['Upper Chest', 'Shoulders'], secondary: ['Triceps'] },
-            'Chest Flyes': { primary: ['Chest'], secondary: [] },
-            'DB Chest Flyes': { primary: ['Chest'], secondary: [] },
-            
-            'KB Rows': { primary: ['Back'], secondary: ['Biceps'] },
-            'DB Rows': { primary: ['Back'], secondary: ['Biceps'] },
-            'DB Rows (tempo 3-0-1)': { primary: ['Back'], secondary: ['Biceps'] },
-            'Heavy DB Rows': { primary: ['Back'], secondary: ['Biceps'] },
-            'DB Rows (heavy)': { primary: ['Back'], secondary: ['Biceps'] },
-            'Single-Arm KB Rows': { primary: ['Back'], secondary: ['Biceps', 'Core'] },
-            'Bent-Over Rows': { primary: ['Back'], secondary: ['Biceps'] },
-            
-            'KB Shoulder Press': { primary: ['Shoulders'], secondary: ['Triceps'] },
-            'DB Shoulder Press': { primary: ['Shoulders'], secondary: ['Triceps'] },
-            'Arnold Press': { primary: ['Shoulders'], secondary: ['Triceps'] },
-            'Push-ups': { primary: ['Chest'], secondary: ['Triceps', 'Core'] },
-            'Push-ups (feet elevated)': { primary: ['Upper Chest'], secondary: ['Triceps', 'Core'] },
-            'Explosive Push-ups (clap)': { primary: ['Chest', 'Power'], secondary: ['Triceps'] },
-            'Weighted Push-ups': { primary: ['Chest'], secondary: ['Triceps', 'Core'] },
-            'Weighted Deficit Push-ups': { primary: ['Chest'], secondary: ['Triceps'] },
-            
-            'Lateral Raises': { primary: ['Shoulders'], secondary: [] },
-            'Lateral Raises (drop set)': { primary: ['Shoulders'], secondary: [] },
-            'Lateral Raise Giant Set': { primary: ['Shoulders'], secondary: [] },
-            'Rear Delt Flyes': { primary: ['Rear Delts'], secondary: ['Upper Back'] },
-            'Face Pulls': { primary: ['Rear Delts'], secondary: ['Traps'] },
-            'Pike Push-ups': { primary: ['Shoulders'], secondary: ['Triceps'] },
-            'KB Upright Rows': { primary: ['Shoulders'], secondary: ['Traps'] },
-            
-            'Hammer Curls': { primary: ['Biceps'], secondary: ['Forearms'] },
-            'DB Bicep Curls': { primary: ['Biceps'], secondary: [] },
-            'Bicep Curls': { primary: ['Biceps'], secondary: [] },
-            'Bicep Curl Superset': { primary: ['Biceps'], secondary: [] },
-            'Concentration Curls': { primary: ['Biceps'], secondary: [] },
-            'KB Curls': { primary: ['Biceps'], secondary: [] },
-            
-            'Tricep Extensions': { primary: ['Triceps'], secondary: [] },
-            'Overhead Tricep Extension': { primary: ['Triceps'], secondary: [] },
-            'Tricep Extension Superset': { primary: ['Triceps'], secondary: [] },
-            'Tricep Kickbacks': { primary: ['Triceps'], secondary: [] },
-            'Tricep Dips': { primary: ['Triceps'], secondary: ['Chest'] },
-            'Skull Crushers': { primary: ['Triceps'], secondary: [] },
-            
-            'KB Clean & Press': { primary: ['Full Body'], secondary: ['Power'] },
-            'DB Clean & Press': { primary: ['Full Body'], secondary: ['Power'] },
-            'Heavy DB Clean & Press': { primary: ['Full Body'], secondary: ['Power'] },
-            'Broad Jumps': { primary: ['Power', 'Legs'], secondary: [] },
-            'Broad Jumps (max distance)': { primary: ['Power', 'Legs'], secondary: [] },
-            'Weighted Carries': { primary: ['Core', 'Grip'], secondary: ['Traps'] },
-            'Heavy Carries': { primary: ['Core', 'Grip'], secondary: ['Traps'] },
-            'KB Snatches': { primary: ['Full Body'], secondary: ['Power'] },
-            'Single-Arm Floor Press': { primary: ['Chest'], secondary: ['Triceps', 'Core'] },
-            'DB Floor Press (tempo)': { primary: ['Chest'], secondary: ['Triceps'] },
-            
-            'Sprint Intervals': { primary: ['Cardio', 'Legs'], secondary: [] },
-            'Stadium Stairs': { primary: ['Cardio', 'Quads'], secondary: ['Glutes'] },
-            'Jump Rope HIIT': { primary: ['Cardio'], secondary: ['Calves'] },
-            'Slider Mt Climbers': { primary: ['Core'], secondary: ['Shoulders'] },
-            'Power Sprints': { primary: ['Speed', 'Legs'], secondary: [] },
-            'Agility T-Drill': { primary: ['Agility'], secondary: ['Legs'] },
-            'Lateral Bounds': { primary: ['Lateral Power'], secondary: ['Legs'] },
-            'Jump Rope': { primary: ['Cardio'], secondary: ['Calves'] },
-            'Weighted Stairs': { primary: ['Cardio', 'Quads'], secondary: ['Glutes'] },
-            
-            'Med Ball Slams': { primary: ['Core', 'Power'], secondary: ['Shoulders'] },
-            'Plank Hold': { primary: ['Core'], secondary: [] },
-            'Weighted Plank': { primary: ['Core'], secondary: [] },
-            'Med Ball Twists': { primary: ['Obliques'], secondary: ['Core'] },
-            'Dead Bugs': { primary: ['Core'], secondary: [] },
-            'Burpees': { primary: ['Full Body'], secondary: ['Cardio'] },
-            'High Plank Hold': { primary: ['Core'], secondary: ['Shoulders'] },
-            'Ball Pikes': { primary: ['Core'], secondary: ['Shoulders'] },
-            'Side Throws': { primary: ['Obliques'], secondary: ['Core'] },
-            'Ball Rollouts': { primary: ['Core'], secondary: [] },
-            'High Knees': { primary: ['Cardio'], secondary: ['Hip Flexors'] },
-            'V-ups': { primary: ['Core'], secondary: [] },
-            'Bicycle Crunches': { primary: ['Abs', 'Obliques'], secondary: [] },
-            'Band Sprint Drives': { primary: ['Hip Flexors', 'Quads'], secondary: ['Cardio'] },
-            'Fast Feet Drills': { primary: ['Speed', 'Coordination'], secondary: ['Calves'] },
-            'Banded Hip Rotations': { primary: ['Hip Mobility', 'Glutes'], secondary: [] },
-            'Finisher: Ladder Sprint + Burpees': { primary: ['Cardio', 'Full Body'], secondary: [] },
-            'Finisher: Ball Slams Circuit': { primary: ['Cardio', 'Core'], secondary: ['Shoulders'] },
-            'Copenhagen Plank': { primary: ['Adductors', 'Core'], secondary: ['Obliques'] },
-            'KB Plank Pull-Through': { primary: ['Core', 'Obliques'], secondary: ['Shoulders'] },
-            'KB Windmill': { primary: ['Core', 'Obliques'], secondary: ['Shoulders'] },
-            'Slider Body Saw': { primary: ['Core'], secondary: ['Shoulders'] },
-            'Band Pallof Press': { primary: ['Core', 'Anti-Rotation'], secondary: [] },
-            'Hollow Body Hold': { primary: ['Core'], secondary: [] },
-            'L-Sit Hold': { primary: ['Core', 'Hip Flexors'], secondary: [] },
-            '180° Box Jumps': { primary: ['Power', 'Rotation'], secondary: ['Core'] },
-            'Ladder Drills': { primary: ['Agility', 'Footwork'], secondary: ['Cardio'] },
-            'Depth Jumps': { primary: ['Power', 'Reactive'], secondary: ['Legs'] },
-            'Lateral Box Shuffles': { primary: ['Agility', 'Lateral Power'], secondary: ['Legs'] },
-            'Band Resisted Sprints': { primary: ['Speed', 'Power'], secondary: ['Legs'] },
-            'Burpee Box Jumps': { primary: ['Full Body', 'Power'], secondary: ['Cardio'] },
-            'Banded Hip Rotations': { primary: ['Hip Mobility'], secondary: ['Glutes'] },
-            'Slider Lateral Lunges': { primary: ['Hip Mobility', 'Glutes'], secondary: ['Adductors'] },
-            'Reactive Box Jumps': { primary: ['Power', 'Reactive'], secondary: ['Legs'] },
-            'Sprint Mechanics Drills': { primary: ['Speed', 'Technique'], secondary: [] },
-            'Depth Jump to Box Jump': { primary: ['Power', 'Legs'], secondary: [] },
-            '50-Yard Sprints': { primary: ['Speed', 'Power'], secondary: ['Legs'] },
-            '100-Yard Sprints': { primary: ['Speed Endurance'], secondary: ['Cardio'] },
-            'Relay Sprints': { primary: ['Speed Endurance'], secondary: ['Cardio'] },
-            'Broad Jump for Distance': { primary: ['Power', 'Legs'], secondary: [] },
-            'Stadium Stairs (explosive)': { primary: ['Power', 'Quads'], secondary: ['Glutes'] },
-            'T-Drill': { primary: ['Agility'], secondary: ['Speed'] },
-            'Cone Weave': { primary: ['Agility'], secondary: ['Coordination'] },
-            'Gassers': { primary: ['Cardio', 'Speed Endurance'], secondary: ['Mental Toughness'] },
-            'Hollow Body Rock': { primary: ['Core'], secondary: [] },
-            'Hip Mobility & Stretching': { primary: ['Mobility'], secondary: [] },
-            'Shoulder Mobility': { primary: ['Mobility'], secondary: [] },
-            'Animal Flow Warm-up': { primary: ['Mobility', 'Coordination'], secondary: [] },
-            'YTW Raises': { primary: ['Shoulders', 'Upper Back'], secondary: [] },
-            'Cossack Squats': { primary: ['Hip Mobility', 'Glutes'], secondary: ['Adductors'] },
-            'Single-Leg Balance': { primary: ['Balance'], secondary: ['Stabilizers'] },
-            'Med Ball Chest Pass': { primary: ['Chest', 'Power'], secondary: ['Triceps'] },
-            'Bird Dogs': { primary: ['Core'], secondary: ['Back'] },
-            'Side Plank': { primary: ['Obliques'], secondary: ['Core'] },
-            'Easy Walk or Light Activity': { primary: ['Recovery'], secondary: [] },
-            'Foam Rolling': { primary: ['Recovery'], secondary: [] },
-            'Easy Jog Warm-up': { primary: ['Warm-up'], secondary: [] },
-            'Build-up Sprints': { primary: ['Speed'], secondary: ['Warm-up'] },
-            'Backpedaling': { primary: ['Speed', 'Agility'], secondary: ['Legs'] },
-            'Lateral Shuffles': { primary: ['Agility'], secondary: ['Hip Abductors'] },
-            'Easy Stairs': { primary: ['Cardio'], secondary: ['Legs'] },
-            'Cool-down Jog': { primary: ['Cool-down'], secondary: [] },
-            'Easy Walk': { primary: ['Recovery'], secondary: [] },
-            'Stretching': { primary: ['Recovery', 'Mobility'], secondary: [] },
-            'Deep Stretching': { primary: ['Recovery', 'Mobility'], secondary: [] },
-            '40-Yard Dashes': { primary: ['Speed', 'Power'], secondary: ['Legs'] },
-            '60-Yard Sprints': { primary: ['Speed', 'Power'], secondary: ['Legs'] },
-            'Flying 20s': { primary: ['Max Speed'], secondary: ['Power'] },
-            'Stadium Stairs (2-step)': { primary: ['Power', 'Legs'], secondary: ['Cardio'] },
-            'Pro Agility Shuttle': { primary: ['Agility'], secondary: ['Speed'] },
-            'Backpedal + Sprint': { primary: ['Speed', 'Agility'], secondary: ['Legs'] },
-            'Russian Twists': { primary: ['Obliques'], secondary: ['Core'] },
-            'Extended Dynamic Warm-up': { primary: ['Warm-up'], secondary: [] },
-        };
-
-        function getMuscleGroups(exerciseName) {
-            return muscleMappings[exerciseName] || { primary: [], secondary: [] };
-        }
-
-        function getPhase(week) {
-            if (week === 0) return 0;
-            if (week <= 4) return 1;
-            if (week <= 8) return 2;
-            if (week <= 12) return 3;
-            return 4;
-        }
-        function isDeloadWeek(week) {
-            return week === 9 || week === 14;
-        }
-
-
-        function getPhaseInfo(phase) {
-            const phases = {
-                0: { name: 'Prep Week', focus: 'Movement prep' },
-                1: { name: 'Foundation', focus: 'Work capacity' },
-                2: { name: 'Strength Building', focus: 'Progressive overload' },
-                3: { name: 'Hypertrophy Peak', focus: 'Maximum muscle growth' },
-                4: { name: 'Peak Performance', focus: 'Elite strength & power' }
-            };
-            return phases[phase];
-        }
-
-        const baseWorkouts = {
-            monday: { 
-                name: 'Lower Body', 
-                duration: '65 min',
-                location: 'home',
-                exercises: [
-                    { name: 'Dynamic Warm-up', sets: 1, reps: '8 min' },
-                    { name: 'Box Jumps', sets: 3, reps: 8, rest: '90s', hasWeight: true, defaultWeight: 20 },
-                    { name: 'Goblet Squats', sets: 4, reps: 15, rest: '90s', hasWeight: true, defaultWeight: 35 },
-                    { name: 'Single-Leg Step-ups', sets: 3, reps: '12 each leg', rest: '75s', hasWeight: true, defaultWeight: 20 },
-                    { name: 'KB Swings', sets: 4, reps: 20, rest: '75s', hasWeight: true, defaultWeight: 35 },
-                    { name: 'Walking Lunges', sets: 3, reps: '20 steps', rest: '75s', hasWeight: true, defaultWeight: 20 },
-                    { name: 'Slider Leg Curls', sets: 3, reps: 12, rest: '60s' },
-                    { name: 'Med Ball Slams', sets: 3, reps: 15, rest: '45s', hasWeight: true, defaultWeight: 15 },
-                    { name: 'Copenhagen Plank', sets: 3, reps: '20s each side', rest: '30s' },
-                    { name: 'Mobility Cool-down', sets: 1, reps: '5 min' }
-                ]
-            },
-            tuesday: { 
-                name: 'Upper Body', 
-                duration: '70 min',
-                location: 'home',
-                exercises: [
-                    { name: 'Dynamic Warm-up', sets: 1, reps: '8 min' },
-                    { name: 'DB Floor Press', sets: 4, reps: 12, rest: '90s', hasWeight: true, defaultWeight: 35 },
-                    { name: 'KB Rows', sets: 4, reps: '15 each arm', rest: '90s', hasWeight: true, defaultWeight: 35 },
-                    { name: 'KB Shoulder Press', sets: 4, reps: 12, rest: '75s', hasWeight: true, defaultWeight: 25 },
-                    { name: 'Push-ups', sets: 3, reps: 15, rest: '75s' },
-                    { name: 'KB Upright Rows', sets: 3, reps: 15, rest: '60s', hasWeight: true, defaultWeight: 25 },
-                    { name: 'Hammer Curls', sets: 3, reps: 15, rest: '60s', hasWeight: true, defaultWeight: 20 },
-                    { name: 'Tricep Extensions', sets: 3, reps: 15, rest: '60s', hasWeight: true, defaultWeight: 25 },
-                    { name: 'KB Plank Pull-Through', sets: 3, reps: '10 each side', rest: '45s', hasWeight: true, defaultWeight: 15 },
-                    { name: 'Dead Bugs', sets: 3, reps: '12 each side', rest: '30s' },
-                    { name: 'Stretch', sets: 1, reps: '5 min' }
-                ]
-            },
-            wednesday: { 
-                name: 'Explosive Training', 
-                duration: '55 min',
-                location: 'home',
-                equipmentNeeded: [],
-                exercises: [
-                    { name: 'Dynamic Warm-up', sets: 1, reps: '8 min' },
-                    { name: 'Box Jumps', sets: 3, reps: 6, rest: '2m', hasWeight: true, defaultWeight: 18 },
-                    { name: 'Broad Jumps', sets: 3, reps: 5, rest: '90s' },
-                    { name: 'Ladder Drills', sets: 5, reps: '2 patterns', rest: '60s' },
-                    { name: 'Band Sprint Drives', sets: 6, reps: '20s', rest: '90s' },
-                    { name: 'Burpee Box Jumps', sets: 3, reps: 6, rest: '75s', hasWeight: true, defaultWeight: 18 },
-                    { name: 'Slider Lateral Lunges', sets: 3, reps: '8 each side', rest: '60s' },
-                    { name: 'Hollow Body Hold', sets: 3, reps: '30s', rest: '45s' },
-                    { name: 'Mobility Cool-down', sets: 1, reps: '5 min' }
-                ]
-            },
-            thursday: { 
-                name: 'Full Body Power', 
-                duration: '65 min',
-                location: 'home',
-                exercises: [
-                    { name: 'Dynamic Warm-up', sets: 1, reps: '8 min' },
-                    { name: 'Broad Jumps', sets: 4, reps: 5, rest: '2m' },
-                    { name: 'KB Clean & Press', sets: 4, reps: '8 each arm', rest: '2m', hasWeight: true, defaultWeight: 35 },
-                    { name: 'Single-Leg RDL', sets: 3, reps: '12 each leg', rest: '75s', hasWeight: true, defaultWeight: 25 },
-                    { name: 'Box Jumps', sets: 4, reps: 8, rest: '90s', hasWeight: true, defaultWeight: 20 },
-                    { name: 'KB Swings', sets: 4, reps: 25, rest: '90s', hasWeight: true, defaultWeight: 35 },
-                    { name: 'Lateral Bounds', sets: 3, reps: '10 each side', rest: '60s' },
-                    { name: 'Weighted Carries', sets: 3, reps: '75 steps', rest: '75s', hasWeight: true, defaultWeight: 35 },
-                    { name: 'Med Ball Slams', sets: 3, reps: 15, rest: '45s', hasWeight: true, defaultWeight: 15 },
-                    { name: 'KB Windmill', sets: 3, reps: '8 each side', rest: '45s', hasWeight: true, defaultWeight: 15 },
-                    { name: 'Mobility', sets: 1, reps: '5 min' }
-                ]
-            },
-            friday: { 
-                name: 'Upper Volume', 
-                duration: '65 min',
-                location: 'home',
-                exercises: [
-                    { name: 'Dynamic Warm-up', sets: 1, reps: '8 min' },
-                    { name: 'DB Floor Press', sets: 4, reps: 12, rest: '90s', hasWeight: true, defaultWeight: 35 },
-                    { name: 'Bent-Over Rows', sets: 4, reps: 15, rest: '75s', hasWeight: true, defaultWeight: 35 },
-                    { name: 'Lateral Raises', sets: 3, reps: 15, rest: '60s', hasWeight: true, defaultWeight: 15 },
-                    { name: 'Pike Push-ups', sets: 3, reps: 12, rest: '75s' },
-                    { name: 'KB Curls', sets: 3, reps: 15, rest: '60s', hasWeight: true, defaultWeight: 20 },
-                    { name: 'Skull Crushers', sets: 3, reps: 15, rest: '60s', hasWeight: true, defaultWeight: 20 },
-                    { name: 'Face Pulls', sets: 3, reps: 20, rest: '60s', hasWeight: true, defaultWeight: 15 },
-                    { name: 'Slider Body Saw', sets: 3, reps: 12, rest: '45s' },
-                    { name: 'Band Pallof Press', sets: 3, reps: '15 each side', rest: '45s' },
-                    { name: 'Stretch', sets: 1, reps: '5 min' }
-                ]
-            },
-            saturday: { 
-                name: 'Athletic Power', 
-                duration: '70 min',
-                location: 'stadium',
-                equipmentNeeded: ['Jump rope', 'Weighted vest', 'Water'],
-                exercises: [
-                    { name: 'Dynamic Warm-up', sets: 1, reps: '12 min' },
-                    { name: 'Power Sprints', sets: 8, reps: '50 yds @ 90%', rest: '2m' },
-                    { name: 'Broad Jumps', sets: 4, reps: 5, rest: '90s' },
-                    { name: 'Agility T-Drill', sets: 6, reps: 1, rest: '90s' },
-                    { name: 'Lateral Bounds', sets: 3, reps: '10 each side', rest: '60s' },
-                    { name: 'Jump Rope', sets: 5, reps: '1 min', rest: '60s' },
-                    { name: 'Weighted Stairs', sets: 5, reps: 'full climb', rest: '90s', hasWeight: true, defaultWeight: 15 },
-                    { name: 'High Knees', sets: 3, reps: '30s', rest: '30s' },
-                    { name: 'V-ups', sets: 3, reps: 15, rest: '45s' },
-                    { name: 'Bicycle Crunches', sets: 3, reps: 20, rest: '30s' },
-                    { name: 'Cool-down', sets: 1, reps: '8 min' }
-                ]
-            },
-            sunday: { 
-                name: 'Active Recovery', 
-                duration: '30 min',
-                location: 'neighborhood',
-                exercises: [
-                    { name: 'Easy Walk', sets: 1, reps: '20 min' },
-                    { name: 'Mobility Flow', sets: 1, reps: '5 min' },
-                    { name: 'Foam Rolling', sets: 1, reps: '5 min' }
-                ]
-            }
-        };
-
-        const prepWorkouts = {
-            saturday: { 
-                name: 'Prep Power', 
-                duration: '55 min',
-                location: 'stadium',
-                equipmentNeeded: ['Jump rope', 'Sliders', 'Water'],
-                exercises: [
-                    { name: 'Dynamic Warm-up', sets: 1, reps: '12 min' },
-                    { name: 'Build-up Sprints', sets: 6, reps: '40 yds @ 75%', rest: '2m' },
-                    { name: 'Broad Jumps', sets: 3, reps: 5, rest: '90s' },
-                    { name: 'Agility Drills', sets: 1, reps: '8 min' },
-                    { name: 'Jump Rope', sets: 5, reps: '1 min on/off' },
-                    { name: 'Easy Stairs', sets: 4, reps: 'walk up/jog down', rest: '90s' },
-                    { name: 'Plank', sets: 3, reps: '30s', rest: '30s' },
-                    { name: 'Mobility', sets: 1, reps: '8 min' }
-                ]
-            },
-            sunday: { 
-                name: 'Prep Recovery', 
-                duration: '30 min',
-                location: 'neighborhood',
-                exercises: [
-                    { name: 'Easy Walk', sets: 1, reps: '20 min' },
-                    { name: 'Stretching', sets: 1, reps: '5 min' },
-                    { name: 'Foam Rolling', sets: 1, reps: '5 min' }
-                ]
-            }
-        };
-
-        function getWorkoutSchedule(week) {
-            // DELOAD WEEKS: Special recovery programming
-            if (isDeloadWeek(week)) {
-                return {
-                    monday: {
-                        name: 'Mobility & Light Lower',
-                        duration: '45 min',
-                        location: 'home',
-                        exercises: [
-                            { name: 'Hip Mobility & Stretching', sets: 1, reps: '15 min' },
-                            { name: 'Goblet Squats', sets: 3, reps: 8, rest: '2m', hasWeight: true, defaultWeight: 17.5 },
-                            { name: 'Slider Lateral Lunges', sets: 3, reps: '10 each side', rest: '90s' },
-                            { name: 'Single-Leg Balance', sets: 3, reps: '30s each', rest: '60s' },
-                            { name: 'Cossack Squats', sets: 3, reps: '8 each side', rest: '60s' },
-                            { name: 'Deep Stretching', sets: 1, reps: '10 min' }
-                        ]
-                    },
-                    tuesday: {
-                        name: 'Upper Movement Quality',
-                        duration: '45 min',
-                        location: 'home',
-                        exercises: [
-                            { name: 'Shoulder Mobility', sets: 1, reps: '15 min' },
-                            { name: 'DB Floor Press', sets: 3, reps: 8, rest: '2m', hasWeight: true, defaultWeight: 17.5 },
-                            { name: 'KB Rows', sets: 3, reps: '8 each arm', rest: '90s', hasWeight: true, defaultWeight: 17.5 },
-                            { name: 'YTW Raises', sets: 3, reps: 10, rest: '60s', hasWeight: true, defaultWeight: 7.5 },
-                            { name: 'Push-ups', sets: 2, reps: 8, rest: '75s' },
-                            { name: 'Stretching', sets: 1, reps: '10 min' }
-                        ]
-                    },
-                    wednesday: {
-                        name: 'Agility & Athletic Movement',
-                        duration: '50 min',
-                        location: 'home',
-                        equipmentNeeded: ['Agility ladder', 'Cones', 'Sliders'],
-                        exercises: [
-                            { name: 'Dynamic Warm-up', sets: 1, reps: '12 min' },
-                            { name: 'Ladder Drills', sets: 8, reps: 'various @ 70%', rest: '60s' },
-                            { name: 'Cone Weave', sets: 6, reps: '1 @ 75%', rest: '60s' },
-                            { name: 'Box Step-ups', sets: 3, reps: '12 each leg', rest: '60s', hasWeight: true, defaultWeight: 18 },
-                            { name: 'Lateral Bounds', sets: 3, reps: '8 each side @ 75%', rest: '60s' },
-                            { name: 'Dead Bugs', sets: 3, reps: '10 each side', rest: '30s' },
-                            { name: 'Bird Dogs', sets: 3, reps: '10 each side', rest: '30s' },
-                            { name: 'Side Plank', sets: 2, reps: '30s each', rest: '30s' },
-                            { name: 'Cool-down', sets: 1, reps: '5 min' }
-                        ]
-                    },
-                    thursday: {
-                        name: 'Full Rest / Gentle Activity',
-                        duration: '30 min',
-                        location: 'home or outdoors',
-                        exercises: [
-                            { name: 'Easy Walk or Light Activity', sets: 1, reps: '20-30 min' },
-                            { name: 'Foam Rolling', sets: 1, reps: '10 min' }
-                        ]
-                    },
-                    friday: {
-                        name: 'Movement Exploration',
-                        duration: '45 min',
-                        location: 'home',
-                        exercises: [
-                            { name: 'Animal Flow Warm-up', sets: 1, reps: '12 min' },
-                            { name: 'Box Jumps', sets: 4, reps: '4 (soft landing)', rest: '90s', hasWeight: true, defaultWeight: 18 },
-                            { name: 'Broad Jumps', sets: 4, reps: '3 @ 70%', rest: '90s' },
-                            { name: 'Med Ball Chest Pass', sets: 3, reps: 8, rest: '60s', hasWeight: true, defaultWeight: 15 },
-                            { name: 'Copenhagen Plank', sets: 3, reps: '15s each side', rest: '45s' },
-                            { name: 'Band Pallof Press', sets: 3, reps: '10 each side', rest: '45s' },
-                            { name: 'KB Windmill', sets: 3, reps: '6 each side', rest: '45s', hasWeight: true, defaultWeight: 10 },
-                            { name: 'Hollow Body Hold', sets: 3, reps: '20s', rest: '45s' },
-                            { name: 'Stretching', sets: 1, reps: '6 min' }
-                        ]
-                    },
-                    saturday: {
-                        name: 'Light Field Conditioning',
-                        duration: '45 min',
-                        location: 'stadium',
-                        equipmentNeeded: ['Jump rope', 'Water'],
-                        exercises: [
-                            { name: 'Easy Jog Warm-up', sets: 1, reps: '2 laps' },
-                            { name: 'Build-up Sprints', sets: 4, reps: '40 yds @ 70-75%', rest: '90s' },
-                            { name: 'Backpedaling', sets: 4, reps: '30 yards', rest: '60s' },
-                            { name: 'Lateral Shuffles', sets: 4, reps: '30 yds each', rest: '60s' },
-                            { name: 'Easy Stairs', sets: 4, reps: 'walk up/down', rest: '90s' },
-                            { name: 'Jump Rope', sets: 3, reps: '45s easy', rest: '60s' },
-                            { name: 'Cool-down Jog', sets: 1, reps: '1 lap' },
-                            { name: 'Stretching', sets: 1, reps: '10 min' }
-                        ]
-                    },
-                    sunday: {
-                        name: 'Active Recovery',
-                        duration: '30 min',
-                        location: 'neighborhood',
-                        exercises: [
-                            { name: 'Easy Walk', sets: 1, reps: '20-30 min' },
-                            { name: 'Foam Rolling', sets: 1, reps: '15 min' },
-                            { name: 'Stretching', sets: 1, reps: '15 min' }
-                        ]
-                    }
-                };
-            }
-            
-            
-            if (week === 0) return prepWorkouts;
-            
-            const phase = getPhase(week);
-            if (phase === 1) return JSON.parse(JSON.stringify(baseWorkouts));
-            
-            const schedule = JSON.parse(JSON.stringify(baseWorkouts));
-            const weightMultiplier = 1 + (phase - 1) * 0.15;
-            
-            Object.keys(schedule).forEach(day => {
-                schedule[day].exercises.forEach(ex => {
-                    if (ex.hasWeight && ex.defaultWeight) {
-                        ex.defaultWeight = Math.round(ex.defaultWeight * weightMultiplier);
-                    }
-                });
-            });
-            
-            if (phase === 2) {
-                // PHASE 2: STRENGTH BUILDING (Weeks 5-8)
-                // Goal: Build strength foundation for hypertrophy phase
-                // Rep range: 8-12, Rest: 75-90s
-                
-                // MONDAY - Lower stays similar but add intensity
-                schedule.monday.exercises[2].sets = 4;
-                schedule.monday.exercises[2].reps = 12;
-                schedule.monday.exercises[3] = { name: 'Bulgarian Split Squats', sets: 4, reps: '10 each leg', rest: '90s', hasWeight: true, defaultWeight: 25 };
-                schedule.monday.exercises[4].sets = 4;
-                schedule.monday.exercises[4].reps = 22;
-                
-                // TUESDAY - More upper volume, add rear delts & arms
-                schedule.tuesday.exercises = [
-                    { name: 'Dynamic Warm-up', sets: 1, reps: '8 min' },
-                    { name: 'DB Floor Press', sets: 4, reps: 10, rest: '90s', hasWeight: true, defaultWeight: 40 },
-                    { name: 'KB Rows', sets: 4, reps: '12 each arm', rest: '90s', hasWeight: true, defaultWeight: 40 },
-                    { name: 'DB Shoulder Press', sets: 4, reps: 10, rest: '75s', hasWeight: true, defaultWeight: 25 },
-                    { name: 'Push-ups', sets: 3, reps: 18, rest: '60s' },
-                    { name: 'Rear Delt Flyes', sets: 3, reps: 12, rest: '60s', hasWeight: true, defaultWeight: 15 },
-                    { name: 'DB Bicep Curls', sets: 3, reps: 12, rest: '60s', hasWeight: true, defaultWeight: 20 },
-                    { name: 'Overhead Tricep Extension', sets: 3, reps: 12, rest: '60s', hasWeight: true, defaultWeight: 25 },
-                    { name: 'Med Ball Twists', sets: 3, reps: 25, rest: '45s', hasWeight: true, defaultWeight: 15 },
-                    { name: 'Plank Hold', sets: 3, reps: '60s', rest: '30s' },
-                    { name: 'Stretch', sets: 1, reps: '5 min' }
-                ];
-                
-                // PHASE 2 WEDNESDAY - Intro to explosive work
-                schedule.wednesday.name = 'Explosive Training';
-                schedule.wednesday.duration = '60 min';
-                schedule.wednesday.location = 'home';
-                schedule.wednesday.equipmentNeeded = [];
-                schedule.wednesday.exercises = [
-                    { name: 'Dynamic Warm-up', sets: 1, reps: '10 min' },
-                    { name: 'Box Jumps', sets: 4, reps: 6, rest: '2m', hasWeight: true, defaultWeight: 20 },
-                    { name: 'Ladder Drills', sets: 6, reps: '2 patterns', rest: '60s' },
-                    { name: 'Broad Jumps', sets: 4, reps: 5, rest: '90s' },
-                    { name: 'Band Sprint Drives', sets: 6, reps: '20s', rest: '90s' },
-                    { name: 'Fast Feet Drills', sets: 4, reps: '30s', rest: '60s' },
-                    { name: 'Burpee Box Jumps', sets: 3, reps: 8, rest: '75s', hasWeight: true, defaultWeight: 18 },
-                    { name: 'Slider Lateral Lunges', sets: 3, reps: '10 each side', rest: '60s' },
-                    { name: 'Hollow Body Hold', sets: 3, reps: '30s', rest: '45s' },
-                    { name: 'Mobility Cool-down', sets: 1, reps: '5 min' }
-                ];
-                
-                
-                // THURSDAY - Full body with upper emphasis
-                schedule.thursday.exercises[2] = { name: 'KB Snatches', sets: 4, reps: '8 each arm', rest: '2m', hasWeight: true, defaultWeight: 35 };
-                schedule.thursday.exercises[7] = { name: 'Weighted Carries', sets: 3, reps: '75 steps', rest: '75s', hasWeight: true, defaultWeight: 40 };
-                
-                // FRIDAY - Volume upper day
-                schedule.friday.exercises = [
-                    { name: 'Dynamic Warm-up', sets: 1, reps: '8 min' },
-                    { name: 'Incline DB Press', sets: 4, reps: '10 each arm', rest: '90s', hasWeight: true, defaultWeight: 35 },
-                    { name: 'Single-Arm KB Rows', sets: 4, reps: '12 each arm', rest: '75s', hasWeight: true, defaultWeight: 40 },
-                    { name: 'Lateral Raises', sets: 4, reps: 12, rest: '60s', hasWeight: true, defaultWeight: 15 },
-                    { name: 'DB Chest Flyes', sets: 3, reps: 12, rest: '75s', hasWeight: true, defaultWeight: 20 },
-                    { name: 'Face Pulls', sets: 3, reps: 15, rest: '60s', hasWeight: true, defaultWeight: 15 },
-                    { name: 'Hammer Curls', sets: 3, reps: 12, rest: '60s', hasWeight: true, defaultWeight: 22.5 },
-                    { name: 'Tricep Dips', sets: 3, reps: 12, rest: '60s' },
-                    { name: 'Side Throws', sets: 3, reps: '15 each side', rest: '45s', hasWeight: true, defaultWeight: 15 },
-                    { name: 'Dead Bugs', sets: 3, reps: '15 each side', rest: '30s' },
-                    { name: 'Stretch', sets: 1, reps: '5 min' }
-                ];
-            }
-            
-            if (phase === 3) {
-                // PHASE 3: TRUE HYPERTROPHY (Weeks 9-12)
-                // Goal: MAXIMUM MUSCLE GROWTH - visible size gains
-                // Rep range: 10-15, Rest: 60-75s, Volume HIGH
-                // This is where you'll see the most dramatic changes
-                
-                // MONDAY - Lower with more volume
-                schedule.monday.exercises = [
-                    { name: 'Dynamic Warm-up', sets: 1, reps: '10 min' },
-                    { name: 'Box Jumps', sets: 3, reps: 8, rest: '2m', hasWeight: true, defaultWeight: 24 },
-                    { name: 'DB Front Squats', sets: 5, reps: 12, rest: '90s', hasWeight: true, defaultWeight: 40 },
-                    { name: 'Walking Lunges', sets: 4, reps: '24 steps', rest: '75s', hasWeight: true, defaultWeight: 25 },
-                    { name: 'Bulgarian Split Squats', sets: 4, reps: '12 each leg', rest: '75s', hasWeight: true, defaultWeight: 30 },
-                    { name: 'KB Swings', sets: 4, reps: 25, rest: '60s', hasWeight: true, defaultWeight: 44 },
-                    { name: 'Slider Leg Curls', sets: 4, reps: 15, rest: '60s' },
-                    { name: 'Goblet Squat Pulses', sets: 3, reps: 20, rest: '60s', hasWeight: true, defaultWeight: 40 },
-                    { name: 'Med Ball Slams', sets: 3, reps: 20, rest: '45s', hasWeight: true, defaultWeight: 20 },
-                    { name: 'Copenhagen Plank', sets: 3, reps: '40s each side', rest: '30s' },
-                    { name: 'Mobility Cool-down', sets: 1, reps: '5 min' }
-                ];
-                
-                // TUESDAY - HYPERTROPHY UPPER (High Volume!)
-                schedule.tuesday.exercises = [
-                    { name: 'Dynamic Warm-up', sets: 1, reps: '8 min' },
-                    { name: 'DB Bench Press (tempo 3-0-1)', sets: 5, reps: 12, rest: '75s', hasWeight: true, defaultWeight: 40 },
-                    { name: 'Incline DB Press', sets: 4, reps: 12, rest: '75s', hasWeight: true, defaultWeight: 35 },
-                    { name: 'DB Rows', sets: 5, reps: 12, rest: '75s', hasWeight: true, defaultWeight: 45 },
-                    { name: 'DB Shoulder Press', sets: 4, reps: 12, rest: '75s', hasWeight: true, defaultWeight: 30 },
-                    { name: 'Chest Flyes', sets: 3, reps: 15, rest: '60s', hasWeight: true, defaultWeight: 20 },
-                    { name: 'Rear Delt Flyes', sets: 3, reps: 15, rest: '60s', hasWeight: true, defaultWeight: 17.5 },
-                    { name: 'Lateral Raises (drop set)', sets: 3, reps: '12+8', rest: '60s', hasWeight: true, defaultWeight: 17.5 },
-                    { name: 'Bicep Curl Superset', sets: 4, reps: '12+12', rest: '60s', hasWeight: true, defaultWeight: 22.5 },
-                    { name: 'Tricep Extension Superset', sets: 4, reps: '12+12', rest: '60s', hasWeight: true, defaultWeight: 25 },
-                    { name: 'Med Ball Twists', sets: 3, reps: 30, rest: '30s', hasWeight: true, defaultWeight: 15 },
-                    { name: 'Finisher: Ladder Sprint + Burpees', sets: 1, reps: '8 min EMOM' }
-                ];
-                
-                // PHASE 3 WEDNESDAY - Full plyometric program
-                schedule.wednesday.name = 'Explosive Plyometrics';
-                schedule.wednesday.duration = '65 min';
-                schedule.wednesday.location = 'home';
-                schedule.wednesday.equipmentNeeded = [];
-                schedule.wednesday.exercises = [
-                    { name: 'Dynamic Warm-up', sets: 1, reps: '12 min' },
-                    { name: '180° Box Jumps', sets: 5, reps: 6, rest: '2m', hasWeight: true, defaultWeight: 24 },
-                    { name: 'Ladder Drills', sets: 10, reps: '3 patterns', rest: '45s' },
-                    { name: 'Depth Jumps', sets: 4, reps: 5, rest: '2m', hasWeight: true, defaultWeight: 24 },
-                    { name: 'Lateral Box Shuffles', sets: 4, reps: '12 each side', rest: '75s', hasWeight: true, defaultWeight: 20 },
-                    { name: 'Band Sprint Drives', sets: 8, reps: '20s', rest: '90s' },
-                    { name: 'Burpee Box Jumps', sets: 4, reps: 10, rest: '60s', hasWeight: true, defaultWeight: 20 },
-                    { name: 'Banded Hip Rotations', sets: 3, reps: '15 each side', rest: '45s' },
-                    { name: 'Slider Lateral Lunges', sets: 3, reps: '12 each side', rest: '60s' },
-                    { name: 'Hollow Body Hold', sets: 4, reps: '45s', rest: '30s' },
-                    { name: 'Mobility Cool-down', sets: 1, reps: '5 min' }
-                ];
-                
-                // THURSDAY - Upper emphasis full body
-                schedule.thursday.exercises = [
-                    { name: 'Dynamic Warm-up', sets: 1, reps: '8 min' },
-                    { name: 'Broad Jumps', sets: 3, reps: 6, rest: '2m' },
-                    { name: 'DB Clean & Press', sets: 5, reps: 10, rest: '90s', hasWeight: true, defaultWeight: 35 },
-                    { name: 'Single-Arm KB Rows', sets: 4, reps: '15 each arm', rest: '75s', hasWeight: true, defaultWeight: 44 },
-                    { name: 'DB Floor Press', sets: 4, reps: 12, rest: '75s', hasWeight: true, defaultWeight: 42.5 },
-                    { name: 'Box Jumps', sets: 3, reps: 10, rest: '90s', hasWeight: true, defaultWeight: 24 },
-                    { name: 'Face Pulls', sets: 4, reps: 20, rest: '60s', hasWeight: true, defaultWeight: 15 },
-                    { name: 'Weighted Carries', sets: 3, reps: '75 steps', rest: '75s', hasWeight: true, defaultWeight: 44 },
-                    { name: 'Med Ball Slams', sets: 3, reps: 20, rest: '45s', hasWeight: true, defaultWeight: 20 },
-                    { name: 'KB Windmill', sets: 3, reps: '12 each side', rest: '45s', hasWeight: true, defaultWeight: 20 },
-                    { name: 'Mobility', sets: 1, reps: '5 min' }
-                ];
-                
-                // FRIDAY - VOLUME UPPER DAY (Arms & Shoulders Focus)
-                schedule.friday.exercises = [
-                    { name: 'Dynamic Warm-up', sets: 1, reps: '8 min' },
-                    { name: 'DB Floor Press (wide grip)', sets: 5, reps: 12, rest: '75s', hasWeight: true, defaultWeight: 42.5 },
-                    { name: 'DB Rows (tempo 3-0-1)', sets: 5, reps: 12, rest: '75s', hasWeight: true, defaultWeight: 45 },
-                    { name: 'Arnold Press', sets: 4, reps: 12, rest: '75s', hasWeight: true, defaultWeight: 25 },
-                    { name: 'Push-ups (feet elevated)', sets: 3, reps: 15, rest: '60s' },
-                    { name: 'Lateral Raise Giant Set', sets: 3, reps: '10+10+10', rest: '90s', hasWeight: true, defaultWeight: 15 },
-                    { name: 'Concentration Curls', sets: 4, reps: '15 each arm', rest: '60s', hasWeight: true, defaultWeight: 20 },
-                    { name: 'Overhead Tricep Extension', sets: 4, reps: 15, rest: '60s', hasWeight: true, defaultWeight: 30 },
-                    { name: 'Hammer Curls', sets: 3, reps: 15, rest: '60s', hasWeight: true, defaultWeight: 22.5 },
-                    { name: 'Tricep Kickbacks', sets: 3, reps: '15 each arm', rest: '60s', hasWeight: true, defaultWeight: 15 },
-                    { name: 'Band Pallof Press', sets: 3, reps: '20 each side', rest: '30s' },
-                    { name: 'Finisher: Ball Slams Circuit', sets: 1, reps: '10 min' }
-                ];
-            }
-            
-            if (phase === 4) {
-                // PHASE 4: PEAK PERFORMANCE (Weeks 15-18)
-                // Goal: Peak strength while maintaining muscle size
-                // Rep range: 6-10, Rest: 2-3m for compounds, still volume for accessories
-                // Keep muscle while showcasing strength gains
-                
-                // MONDAY - Heavy lower with power
-                schedule.monday.exercises = [
-                    { name: 'Dynamic Warm-up', sets: 1, reps: '10 min' },
-                    { name: 'Depth Jumps', sets: 5, reps: 5, rest: '2m', hasWeight: true, defaultWeight: 24 },
-                    { name: 'Heavy Goblet Squats', sets: 5, reps: 8, rest: '2.5m', hasWeight: true, defaultWeight: 53 },
-                    { name: 'Bulgarian Split Squats', sets: 4, reps: '10 each leg', rest: '90s', hasWeight: true, defaultWeight: 35 },
-                    { name: 'KB Swings (heavy)', sets: 5, reps: 20, rest: '90s', hasWeight: true, defaultWeight: 53 },
-                    { name: 'Single-Leg RDL', sets: 4, reps: '10 each leg', rest: '75s', hasWeight: true, defaultWeight: 30 },
-                    { name: 'Slider Leg Curls', sets: 4, reps: 12, rest: '60s' },
-                    { name: 'Med Ball Slams', sets: 3, reps: 20, rest: '45s', hasWeight: true, defaultWeight: 20 },
-                    { name: 'Weighted Plank', sets: 3, reps: '60s', rest: '30s', hasWeight: true, defaultWeight: 20 },
-                    { name: 'Mobility Cool-down', sets: 1, reps: '5 min' }
-                ];
-                
-                // PHASE 4 WEDNESDAY - Elite explosive training
-                schedule.wednesday.name = 'Elite Explosiveness';
-                schedule.wednesday.duration = '70 min';
-                schedule.wednesday.location = 'home';
-                schedule.wednesday.equipmentNeeded = [];
-                schedule.wednesday.exercises = [
-                    { name: 'Dynamic Warm-up', sets: 1, reps: '12 min' },
-                    { name: 'Reactive Box Jumps', sets: 6, reps: 5, rest: '2.5m', hasWeight: true, defaultWeight: 24 },
-                    { name: 'Sprint Mechanics Drills', sets: 1, reps: '12 min' },
-                    { name: 'Depth Jump to Box Jump', sets: 5, reps: 5, rest: '2.5m', hasWeight: true, defaultWeight: 24 },
-                    { name: 'Ladder Drills', sets: 12, reps: '4 patterns', rest: '45s' },
-                    { name: 'Band Sprint Drives', sets: 10, reps: '25s', rest: '90s' },
-                    { name: '180° Box Jumps', sets: 4, reps: 6, rest: '2m', hasWeight: true, defaultWeight: 24 },
-                    { name: 'L-Sit Hold', sets: 4, reps: '30s', rest: '60s' },
-                    { name: 'Hollow Body Hold', sets: 3, reps: '60s', rest: '45s' },
-                    { name: 'Mobility Cool-down', sets: 1, reps: '8 min' }
-                ];
-                
-                
-                
-                // TUESDAY - Heavy upper with volume accessories
-                schedule.tuesday.exercises = [
-                    { name: 'Dynamic Warm-up', sets: 1, reps: '8 min' },
-                    { name: 'Heavy DB Bench Press', sets: 5, reps: 8, rest: '2.5m', hasWeight: true, defaultWeight: 50 },
-                    { name: 'Explosive Push-ups (clap)', sets: 5, reps: 8, rest: '2m' },
-                    { name: 'Heavy DB Rows', sets: 5, reps: 8, rest: '2m', hasWeight: true, defaultWeight: 50 },
-                    { name: 'DB Shoulder Press', sets: 4, reps: 8, rest: '90s', hasWeight: true, defaultWeight: 35 },
-                    { name: 'Incline DB Press', sets: 3, reps: 10, rest: '75s', hasWeight: true, defaultWeight: 40 },
-                    { name: 'Rear Delt Flyes', sets: 3, reps: 12, rest: '60s', hasWeight: true, defaultWeight: 20 },
-                    { name: 'Lateral Raises', sets: 3, reps: 12, rest: '60s', hasWeight: true, defaultWeight: 17.5 },
-                    { name: 'Bicep Curls', sets: 3, reps: 12, rest: '60s', hasWeight: true, defaultWeight: 25 },
-                    { name: 'Tricep Extensions', sets: 3, reps: 12, rest: '60s', hasWeight: true, defaultWeight: 30 },
-                    { name: 'Med Ball Twists', sets: 3, reps: 30, rest: '30s', hasWeight: true, defaultWeight: 20 }
-                ];
-                
-                // THURSDAY - Power emphasis
-                schedule.thursday.exercises = [
-                    { name: 'Dynamic Warm-up', sets: 1, reps: '10 min' },
-                    { name: 'Broad Jumps (max distance)', sets: 6, reps: 4, rest: '2.5m' },
-                    { name: 'Heavy DB Clean & Press', sets: 5, reps: 6, rest: '2.5m', hasWeight: true, defaultWeight: 40 },
-                    { name: 'Single-Arm KB Rows', sets: 4, reps: '10 each arm', rest: '90s', hasWeight: true, defaultWeight: 53 },
-                    { name: 'DB Floor Press', sets: 4, reps: 8, rest: '90s', hasWeight: true, defaultWeight: 45 },
-                    { name: 'Box Jumps (max height)', sets: 4, reps: 6, rest: '2m', hasWeight: true, defaultWeight: 30 },
-                    { name: 'Face Pulls', sets: 3, reps: 15, rest: '60s', hasWeight: true, defaultWeight: 15 },
-                    { name: 'Heavy Carries', sets: 3, reps: '75 steps', rest: '90s', hasWeight: true, defaultWeight: 53 },
-                    { name: 'Med Ball Slams', sets: 3, reps: 15, rest: '45s', hasWeight: true, defaultWeight: 20 },
-                    { name: 'KB Windmill', sets: 3, reps: '15 each side', rest: '45s', hasWeight: true, defaultWeight: 25 },
-                    { name: 'Mobility', sets: 1, reps: '5 min' }
-                ];
-                
-                // FRIDAY - Strength with pump work
-                schedule.friday.exercises = [
-                    { name: 'Dynamic Warm-up', sets: 1, reps: '8 min' },
-                    { name: 'Heavy DB Floor Press', sets: 5, reps: 8, rest: '2m', hasWeight: true, defaultWeight: 50 },
-                    { name: 'DB Rows (heavy)', sets: 5, reps: 8, rest: '2m', hasWeight: true, defaultWeight: 50 },
-                    { name: 'Arnold Press', sets: 4, reps: 10, rest: '90s', hasWeight: true, defaultWeight: 30 },
-                    { name: 'Chest Flyes', sets: 3, reps: 12, rest: '75s', hasWeight: true, defaultWeight: 25 },
-                    { name: 'Lateral Raises (drop set)', sets: 3, reps: '10+8', rest: '60s', hasWeight: true, defaultWeight: 20 },
-                    { name: 'Hammer Curls', sets: 4, reps: 10, rest: '60s', hasWeight: true, defaultWeight: 25 },
-                    { name: 'Overhead Tricep Extension', sets: 4, reps: 10, rest: '60s', hasWeight: true, defaultWeight: 35 },
-                    { name: 'Concentration Curls', sets: 3, reps: '12 each arm', rest: '60s', hasWeight: true, defaultWeight: 22.5 },
-                    { name: 'Tricep Kickbacks', sets: 3, reps: '12 each arm', rest: '60s', hasWeight: true, defaultWeight: 17.5 },
-                    { name: 'Slider Body Saw', sets: 3, reps: '15', rest: '30s' }
-                ];
-            }
-            
-            return schedule;
-        }
-
-        function getEquipmentType(exerciseName) {
-            const name = exerciseName.toLowerCase();
-            
-            if (name.includes('weighted stairs') || name.includes('weighted vest')) {
-                return { type: 'vest', options: [0, 10, 15, 20, 25, 30, 35, 40] };
-            }
-            
-            if (name.includes('med ball') || name.includes('medicine ball') || name.includes('ball slam') || name.includes('ball twist') || name.includes('side throw')) {
-                return { type: 'medball', options: [5, 10, 15, 20, 30, 40] };
-            }
-            
-            if (name.includes('box jump')) {
-                return { type: 'box', options: [6, 20, 24, 30] };
-            }
-            
-            if (name.includes('kb ') || name.includes('kettlebell') || name.includes('goblet') || name.includes('swing')) {
-                return { type: 'kettlebell', options: [5, 10, 15, 20, 25, 35, 40, 44, 53, 62, 72, 81, 90] };
-            }
-            
-            if (name.includes('db ') || name.includes('dumbbell') || name.includes('curl') || name.includes('raise') || name.includes('skull crusher')) {
-                return { type: 'dumbbell', options: [2.5, 5, 7.5, 10, 12.5, 15, 17.5, 20, 22.5, 25, 30, 35, 40, 45, 50, 52.5, 55, 60, 65, 70, 75, 80] };
-            }
-            
-            return { type: 'weight', increment: 5, min: 5 };
-        }
-
-        function getClosestWeight(target, equipment) {
-            if (!equipment.options) return target;
-            return equipment.options.reduce((prev, curr) => 
-                Math.abs(curr - target) < Math.abs(prev - target) ? curr : prev
-            );
-        }
-
-        function getSmartRecommendation(exerciseName, setIndex, week) {
-            const key = `${week}-${exerciseName}-${setIndex}`;
-            const stored = state.exerciseWeights[key];
-            
-            if (stored) return stored;
-            
-            // BUG FIX: Check if any set for this exercise in this week has been logged
-            let hasAnyWeight = false;
-            let maxWeightLogged = 0;
-            for (let i = 0; i < 10; i++) {
-                const checkKey = `${week}-${exerciseName}-${i}`;
-                if (state.exerciseWeights[checkKey]) {
-                    hasAnyWeight = true;
-                    maxWeightLogged = Math.max(maxWeightLogged, state.exerciseWeights[checkKey]);
-                }
-            }
-            
-            if (hasAnyWeight) {
-                return maxWeightLogged;
-            }
-            
-            if (setIndex > 0) {
-                const prevKey = `${week}-${exerciseName}-${setIndex - 1}`;
-                const prevWeight = state.exerciseWeights[prevKey];
-                if (prevWeight) return prevWeight;
-            }
-            
-            if (week > 0) {
-                const lastWeekKey = `${week - 1}-${exerciseName}-${setIndex}`;
-                const lastWeek = state.exerciseWeights[lastWeekKey];
-                if (lastWeek) return lastWeek;
-            }
-            
-            const schedule = getWorkoutSchedule(week);
-            for (const day in schedule) {
-                const exercise = schedule[day].exercises.find(ex => ex.name === exerciseName);
-                if (exercise && exercise.hasWeight) {
-                    const equipment = getEquipmentType(exerciseName);
-                    return getClosestWeight(exercise.defaultWeight, equipment);
-                }
-            }
-            
-            return 0;
-        }
-
-        function updateFutureSets(exerciseName, currentSetIndex, newWeight, week, totalSets) {
-            for (let i = currentSetIndex; i < totalSets; i++) {
-                const futureKey = `${week}-${exerciseName}-${i}`;
-                state.exerciseWeights[futureKey] = newWeight;
-            }
-            saveState();
-        }
-
-       function getTotalSupplementProgress() {
-    // Force fresh date calculation every time
-            const today = new Date();
-            const dateString = today.getFullYear() + '-' + 
-                              String(today.getMonth() + 1).padStart(2, '0') + '-' + 
-                              String(today.getDate()).padStart(2, '0');
-            
-            const dayLog = state.supplementLog[dateString] || {};
-            
-            let total = 0;
-            let completed = 0;
-            
-            const dayOfWeek = today.getDay();
-            const includePreworkout = dayOfWeek !== 0;
-            
-            Object.entries(supplementSchedule).forEach(([timeKey, timeData]) => {
-                if (timeKey === 'preworkout' && !includePreworkout) return;
-                
-                let supplements = timeData.supplements.filter(supp => {
-                    if (supp.conditional && supp.checkFunction) {
-                        return supp.checkFunction();
-                    }
-                    return true;
-                });
-                
-                supplements.forEach(supp => {
-                    total++;
-                    const suppKey = `${timeKey}-${supp.name}`;
-                    if (dayLog[suppKey]) completed++;
-                });
-            });
-            
-            return { completed, total, percentage: total > 0 ? Math.round((completed / total) * 100) : 0 };
-        }
-        
-        function getWeekProgress() {
-            const schedule = getWorkoutSchedule(state.currentWeek);
-            const days = state.currentWeek === 0 ? ['saturday', 'sunday'] : 
-                ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-            
-            let totalExercises = 0;
-            let completedExercises = 0;
-            
-            days.forEach(day => {
-                const workout = schedule[day];
-                if (workout) {
-                    const dayKey = `${state.currentWeek}-${day}`;
-                    const completed = state.completedExercises[dayKey] || [];
-                    
-                    // Validate: only count exercises that actually exist in this workout
-                    const validExercises = workout.exercises.map(ex => ex.name);
-                    const validCompleted = completed.filter(name => validExercises.includes(name));
-                    
-                    totalExercises += workout.exercises.length;
-                    completedExercises += validCompleted.length;
-                    
-                    // Clean up invalid completions
-                    if (validCompleted.length !== completed.length) {
-                        state.completedExercises[dayKey] = validCompleted;
-                        saveState();
-                    }
-                }
-            });
-            
-            return {
-                completed: completedExercises,
-                total: totalExercises,
-                percentage: totalExercises > 0 ? Math.round((completedExercises / totalExercises) * 100) : 0
-            };
-        }
-
-        function getProgramProgress() {
-            let totalExercises = 0;
-            let completedExercises = 0;
-            
-            for (let week = 0; week <= 18; week++) {
-                const schedule = getWorkoutSchedule(week);
-                const days = week === 0 ? ['saturday', 'sunday'] : 
-                    ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-                
-                days.forEach(day => {
-                    const workout = schedule[day];
-                    if (workout) {
-                        const dayKey = `${week}-${day}`;
-                        const completed = state.completedExercises[dayKey] || [];
-                        totalExercises += workout.exercises.length;
-                        completedExercises += completed.length;
-                    }
-                });
-            }
-            
-            return {
-                completed: completedExercises,
-                total: totalExercises,
-                percentage: totalExercises > 0 ? Math.round((completedExercises / totalExercises) * 100) : 0
-            };
-        }
-
-        function renderProgressRing(percentage, label, colorClass, isClickable) {
-            const radius = 45;
-            const stroke = 7;
-            const normalizedRadius = radius - stroke / 2;
-            const circumference = normalizedRadius * 2 * Math.PI;
-            const strokeDashoffset = circumference - (percentage / 100) * circumference;
-            
-            return `
-                <div class="progress-ring ${isClickable ? 'hover:opacity-80 transition-opacity' : ''}">
-                    <svg height="110" width="110" class="progress-ring-circle">
-                        <defs>
-                            <linearGradient id="gradient-program" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#a855f7;stop-opacity:1" />
-                                <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:1" />
-                            </linearGradient>
-                            <linearGradient id="gradient-week" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
-                                <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:1" />
-                            </linearGradient>
-                            <linearGradient id="gradient-supplement" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:1" />
-                                <stop offset="100%" style="stop-color:#ec4899;stop-opacity:1" />
-                            </linearGradient>
-                        </defs>
-                        <circle
-                            class="progress-ring-bg"
-                            stroke-width="${stroke}"
-                            r="${normalizedRadius}"
-                            cx="55"
-                            cy="55"
-                        />
-                        <circle
-                            class="progress-ring-fill ${colorClass}"
-                            stroke-width="${stroke}"
-                            stroke-dasharray="${circumference} ${circumference}"
-                            style="stroke-dashoffset: ${strokeDashoffset}"
-                            r="${normalizedRadius}"
-                            cx="55"
-                            cy="55"
-                        />
-                    </svg>
-                    <div class="progress-ring-text">
-                        <div class="text-xl font-bold text-white">${percentage}%</div>
-                        <div class="text-xs text-slate-400">${label}</div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function updateRingProgress(ringClass, percentage, labelText) {
-            const ring = document.querySelector(`.${ringClass}`);
-            if (ring) {
-                const radius = 45;
-                const stroke = 7;
-                const normalizedRadius = radius - stroke / 2;
-                const circumference = normalizedRadius * 2 * Math.PI;
-                const strokeDashoffset = circumference - (percentage / 100) * circumference;
-                ring.style.strokeDashoffset = strokeDashoffset;
-                
-                const ringContainer = ring.closest('.progress-ring');
-                if (ringContainer) {
-                    const percentText = ringContainer.querySelector('.text-xl');
-                    const label = ringContainer.querySelector('.text-xs');
-                    if (percentText) percentText.textContent = `${percentage}%`;
-                    if (label && labelText) label.textContent = labelText;
-                }
-            }
-        }
-
-        
-        function renderExerciseGuide(exerciseName) {
-            const guide = exerciseGuides[exerciseName];
-            if (!guide) return '';
-            
-            let html = '<div class="bg-slate-900 rounded-lg p-4 mt-3 space-y-3">';
-            
-            if (guide.setup) {
-                html += '<div><p class="text-xs text-blue-400 font-semibold mb-2">SETUP:</p>';
-                html += '<ul class="text-xs text-slate-300 space-y-1 ml-4">';
-                guide.setup.forEach(item => html += `<li>• ${item}</li>`);
-                html += '</ul></div>';
-            }
-            
-            if (guide.variations) {
-                html += '<div><p class="text-xs text-green-400 font-semibold mb-2">VARIATIONS:</p>';
-                html += '<ul class="text-xs text-slate-300 space-y-1 ml-4">';
-                guide.variations.forEach(item => html += `<li>${item}</li>`);
-                html += '</ul></div>';
-            }
-            
-            if (guide.patterns) {
-                html += '<div><p class="text-xs text-purple-400 font-semibold mb-2">PATTERNS:</p>';
-                html += '<ul class="text-xs text-slate-300 space-y-1 ml-4">';
-                guide.patterns.forEach(item => html += `<li>${item}</li>`);
-                html += '</ul></div>';
-            }
-            
-            if (guide.execution) {
-                html += '<div><p class="text-xs text-green-400 font-semibold mb-2">EXECUTION:</p>';
-                html += '<ul class="text-xs text-slate-300 space-y-1 ml-4">';
-                guide.execution.forEach(item => html += `<li>• ${item}</li>`);
-                html += '</ul></div>';
-            }
-            
-            if (guide.cues) {
-                html += '<div><p class="text-xs text-yellow-400 font-semibold mb-2">COACHING CUES:</p>';
-                html += '<ul class="text-xs text-slate-300 space-y-1 ml-4">';
-                guide.cues.forEach(item => html += `<li>💡 ${item}</li>`);
-                html += '</ul></div>';
-            }
-            
-            if (guide.progression) {
-                html += '<div class="pt-2 border-t border-slate-700">';
-                html += `<p class="text-xs text-slate-400 italic">📈 ${guide.progression}</p>`;
-                html += '</div>';
-            }
-            
-            if (guide.format) {
-                html += '<div class="pt-2 border-t border-slate-700">';
-                html += `<p class="text-xs text-blue-300">📋 ${guide.format}</p>`;
-                html += '</div>';
-            }
-            
-            if (guide.modification) {
-                html += '<div class="pt-2 border-t border-slate-700">';
-                html += `<p class="text-xs text-orange-400">⚡ ${guide.modification}</p>`;
-                html += '</div>';
-            }
-            
-            if (guide.safety) {
-                html += '<div class="pt-2 border-t border-slate-700">';
-                html += `<p class="text-xs text-red-400">⚠️ ${guide.safety}</p>`;
-                html += '</div>';
-            }
-            
-            html += '</div>';
-            return html;
-        }
-        
-        function render() {
-            const app = document.getElementById('app');
-            
-            if (state.view === 'overview') {
-                renderOverview(app);
-            } else if (state.view === 'workout') {
-                renderWorkout(app);
-            } else if (state.view === 'supplements') {
-                renderSupplements(app);
-            }
-        }
-
-        function renderOverview(app) {
-            const schedule = getWorkoutSchedule(state.currentWeek);
-            const phase = getPhase(state.currentWeek);
-            const phaseInfo = isDeloadWeek(state.currentWeek) 
-                ? { name: 'DELOAD WEEK', focus: 'Recovery & mobility' }
-                : getPhaseInfo(phase);
-            const dateRange = getWeekDateRange(state.currentWeek);
-            const currentWeek = getCurrentWeek();
-            const weekProgress = getWeekProgress();
-            const programProgress = getProgramProgress();
-            const suppProgress = getTotalSupplementProgress();
-            
-            const days = state.currentWeek === 0 ? ['saturday', 'sunday'] : 
-                ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-            
-            app.innerHTML = `
-                <div class="sticky-header shadow-xl">
-                    <div class="p-5">
-                        <h1 class="text-3xl font-bold text-center mb-2 gradient-text">« rba | fit »</h1>
-                        
-                        <div class="flex items-center justify-between mb-4 gap-2">
-                            <button onclick="changeWeek(-1)" class="w-24 py-2 text-slate-300 hover:text-white hover:bg-slate-700/30 rounded-lg text-sm" ${state.currentWeek === 0 ? 'disabled style="opacity: 0.3"' : ''}>
-                                ← Previous
-                            </button>
-                            <div class="text-center flex-1">
-                                <div class="text-2xl font-bold">Week ${state.currentWeek}</div>
-                                <div class="text-xs text-slate-400">${dateRange}</div>
-                                <div class="text-xs text-blue-400">${phaseInfo.name}</div>
-                            </div>
-                            <button onclick="changeWeek(1)" class="w-24 py-2 text-slate-300 hover:text-white hover:bg-slate-700/30 rounded-lg text-sm" ${state.currentWeek === 18 ? 'disabled style="opacity: 0.3"' : ''}>
-                                Next →
-                            </button>
-                        </div>
-
-                        ${state.currentWeek !== currentWeek ? `
-                            <button onclick="jumpToCurrentWeek()" class="w-full mb-3 px-4 py-2 text-green-400 hover:text-green-300 hover:bg-green-900/20 rounded-lg text-sm font-medium">
-                                Jump to Current Week (${currentWeek})
-                            </button>
-                        ` : ''}
-
-                        <div class="flex justify-around items-center mb-2">
-                            ${renderProgressRing(programProgress.percentage, 'Program', 'ring-program', false)}
-                            ${renderProgressRing(weekProgress.percentage, 'Week', 'ring-week', false)}
-                            <div onclick="showSupplements()" class="cursor-pointer">
-                                ${renderProgressRing(suppProgress.percentage, '💊 Daily', 'ring-supplement', true)}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="p-5 space-y-4">
-                    ${days.map(day => {
-                        const workout = schedule[day];
-                        if (!workout) return '';
-                        
-                        const dayKey = `${state.currentWeek}-${day}`;
-                        const completedCount = (state.completedExercises[dayKey] || []).length;
-                        const totalExercises = workout.exercises.length;
-                        const progress = (completedCount / totalExercises) * 100;
-                        const dayDate = getDayDate(state.currentWeek, day);
-                        
-                        return `
-                            <div onclick="selectDay('${day}')" class="workout-card bg-slate-800 rounded-lg p-5 cursor-pointer border border-slate-700 hover:border-blue-500 shadow-lg hover:shadow-xl">
-                                <div class="flex justify-between items-start mb-3">
-                                    <div>
-                                        <h3 class="text-xl font-bold capitalize text-blue-400">${day} <span class="text-sm text-slate-400 font-normal">${dayDate}</span></h3>
-                                        <p class="text-lg text-white mt-1">${workout.name}</p>
-                                        <p class="text-sm text-slate-400">${workout.duration} • ${workout.location}</p>
-                                        ${workout.equipmentNeeded ? `
-                                            <p class="text-xs text-yellow-400 mt-1">📦 Bring: ${workout.equipmentNeeded.join(', ')}</p>
-                                        ` : ''}
-                                    </div>
-                                    <div class="text-right">
-                                        <div class="text-xl mb-1">${completedCount === totalExercises ? '✔️' : '⭕'}</div>
-                                        <div class="text-sm text-slate-400">${completedCount}/${totalExercises}</div>
-                                    </div>
-                                </div>
-                                
-                                <div class="w-full bg-slate-700 rounded-full h-2">
-                                    <div class="progress-bar bg-blue-500 h-2 rounded-full" style="width: ${progress}%"></div>
-                                </div>
-                            </div>
-                        `;
-                    }).join('')}
-                </div>
-            `;
-        }
-
-        function renderWorkout(app) {
-            const schedule = getWorkoutSchedule(state.currentWeek);
-            const workout = schedule[state.selectedDay];
-            const dayKey = `${state.currentWeek}-${state.selectedDay}`;
-            let completed = state.completedExercises[dayKey] || [];
-            
-            // Validate: only show exercises that actually exist in this workout
-            const validExercises = workout.exercises.map(ex => ex.name);
-            completed = completed.filter(name => validExercises.includes(name));
-            
-            // Update storage if we cleaned up any phantom completions
-            if (completed.length !== (state.completedExercises[dayKey] || []).length) {
-                state.completedExercises[dayKey] = completed;
-                saveState();
-            }
-            
-            const completedCount = completed.length;
-            const totalExercises = workout.exercises.length;
-            const progress = (completedCount / totalExercises) * 100;
-            const dayDate = getDayDate(state.currentWeek, state.selectedDay);
-            
-            setTimeout(() => window.scrollTo(0, 0), 0);
-            
-            app.innerHTML = `
-                <div class="sticky-header shadow-xl">
-                    <div class="p-4">
-                        <button onclick="backToOverview()" class="mb-3 px-4 py-2 text-slate-300 hover:text-white hover:bg-slate-700/30 rounded-lg text-sm">
-                            ← Back
-                        </button>
-                        <div class="flex justify-between items-center gap-3">
-                            <div class="flex-1 min-w-0">
-                                <div class="flex items-baseline gap-2 mb-1">
-                                    <h2 class="text-xl font-bold capitalize">${state.selectedDay}</h2>
-                                    <span class="text-sm text-slate-400">${dayDate}</span>
-                                </div>
-                                <p class="text-base text-blue-400 font-medium">${workout.name}</p>
-                                <p class="text-xs text-slate-400 mt-1">${workout.duration} • ${workout.location}</p>
-                                ${workout.note ? `<p class="text-xs text-yellow-400 mt-1">⚠️ ${workout.note}</p>` : ''}
-                                ${workout.equipmentNeeded ? `
-                                    <p class="text-xs text-yellow-400 mt-1">📦 ${workout.equipmentNeeded.join(', ')}</p>
-                                ` : ''}
-                            </div>
-                            <div class="flex-shrink-0">
-                                ${renderProgressRing(Math.round(progress), `${completedCount}/${totalExercises}`, 'ring-week', false)}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="p-5 space-y-4">
-                    ${workout.exercises.map((exercise, exIndex) => {
-                        const isCompleted = completed.includes(exercise.name);
-                        const muscles = getMuscleGroups(exercise.name);
-                        
-                        return `
-                            <div class="bg-slate-800 rounded-lg p-5 border border-slate-700 shadow-md">
-                                <div class="flex justify-between items-start mb-3">
-                                    <div class="flex-1 pr-3">
-                                        <div class="flex items-start flex-wrap gap-1">
-                                            <h3 class="text-lg font-bold ${isCompleted ? 'text-green-400' : 'text-white'} inline">
-                                                ${exercise.name}
-                                            </h3>
-                                            ${muscles.primary.length > 0 ? `<div class="inline-flex gap-1 items-center">${muscles.primary.map(m => 
-                                                `<span class="muscle-tag primary-muscle">${m}</span>`
-                                            ).join('')}</div>` : ''}
-                                            ${muscles.secondary.length > 0 ? `<div class="inline-flex gap-1 items-center">${muscles.secondary.slice(0, 2).map(m => 
-                                                `<span class="muscle-tag secondary-muscle">${m}</span>`
-                                            ).join('')}</div>` : ''}
-                                        </div>
-                                        <p class="text-sm text-slate-400 mt-1">
-                                            ${exercise.sets} sets × ${exercise.reps}
-                                            ${exercise.rest ? ` • ${exercise.rest} rest` : ''}
-                                        </p>
-                                        ${(() => {
-                                            const isDynamicWarmup = exercise.name === 'Dynamic Warm-up';
-                                            const isFinisher = exercise.name.startsWith('Finisher:');
-                                            const hasExerciseGuide = exerciseGuides[exercise.name];
-                                            const warmupGuide = isDynamicWarmup ? warmupGuides[state.selectedDay] : null;
-                                            const finisherGuide = isFinisher ? finisherGuides[exercise.name] : null;
-                                            const expandId = `${state.currentWeek}-${state.selectedDay}-${exIndex}`;
-                                            const isExpanded = state.expandedItems[expandId] || false;
-                                            
-                                            if (!isDynamicWarmup && !isFinisher && !hasExerciseGuide) return '';
-                                            
-                                            return `
-                                                <button 
-                                                    onclick="event.stopPropagation(); toggleExpand('${expandId}')"
-                                                    class="mt-2 text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1"
-                                                >
-                                                    <span id="icon-${expandId}" class="expand-icon ${isExpanded ? 'rotated' : ''}">▼</span>
-                                                    ${isDynamicWarmup ? 'View Warm-up Guide' : isFinisher ? 'View Finisher Details' : 'How to Perform'}
-                                                </button>
-                                                ${isDynamicWarmup && warmupGuide ? `
-                                                    <div id="expand-${expandId}" class="expandable-content ${isExpanded ? 'expanded' : ''} mt-3 pt-3 border-t border-slate-700">
-                                                        <div class="bg-slate-900 rounded-lg p-4 space-y-3">
-                                                            <div>
-                                                                <p class="text-xs text-blue-400 font-semibold mb-2">BASE ROUTINE (All Days):</p>
-                                                                <ul class="text-xs text-slate-300 space-y-1 ml-4">
-                                                                    <li>• World's Greatest Stretch × 5 each side</li>
-                                                                    <li>• Downward Dog → Cobra × 5</li>
-                                                                    <li>• Cat-Cow × 10</li>
-                                                                    <li>• Child's Pose × 30s</li>
-                                                                    <li>• High Knees × 20s</li>
-                                                                    <li>• Butt Kicks × 20s</li>
-                                                                    <li>• Jumping Jacks × 20s</li>
-                                                                </ul>
-                                                            </div>
-                                                            ${warmupGuide.additions.length > 0 ? `
-                                                                <div>
-                                                                    <p class="text-xs text-green-400 font-semibold mb-2">TODAY'S ADDITIONS:</p>
-                                                                    <ul class="text-xs text-slate-300 space-y-1 ml-4">
-                                                                        ${warmupGuide.additions.map(add => `<li>• ${add}</li>`).join('')}
-                                                                    </ul>
-                                                                </div>
-                                                            ` : ''}
-                                                            <div class="pt-2 border-t border-slate-700">
-                                                                <p class="text-xs text-slate-400 italic">${warmupGuide.why}</p>
-                                                                <p class="text-xs text-yellow-400 mt-1">⏱️ Total time: ${warmupGuide.totalTime}</p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                ` : ''}
-                                                ${hasExerciseGuide && !isDynamicWarmup && !isFinisher ? `
-                                                    <div id="expand-${expandId}" class="expandable-content ${isExpanded ? 'expanded' : ''} mt-3 pt-3 border-t border-slate-700">
-                                                        ${renderExerciseGuide(exercise.name)}
-                                                    </div>
-                                                ` : ''}
-                                                ${isFinisher && finisherGuide ? `
-                                                    <div id="expand-${expandId}" class="expandable-content ${isExpanded ? 'expanded' : ''} mt-3 pt-3 border-t border-slate-700">
-                                                        <div class="bg-slate-900 rounded-lg p-4 space-y-3">
-                                                            <div>
-                                                                <p class="text-xs text-purple-400 font-semibold mb-1">Duration: ${finisherGuide.duration}</p>
-                                                            </div>
-                                                            <div>
-                                                                <p class="text-xs text-blue-400 font-semibold mb-2">PROTOCOL:</p>
-                                                                <ul class="text-xs text-slate-300 space-y-1 ml-4">
-                                                                    ${finisherGuide.protocol.map(step => `<li>• ${step}</li>`).join('')}
-                                                                </ul>
-                                                            </div>
-                                                            <div>
-                                                                <p class="text-xs text-green-400 font-semibold mb-2">TIPS:</p>
-                                                                <ul class="text-xs text-slate-300 space-y-1 ml-4">
-                                                                    ${finisherGuide.tips.map(tip => `<li>• ${tip}</li>`).join('')}
-                                                                </ul>
-                                                            </div>
-                                                            <div class="pt-2 border-t border-slate-700">
-                                                                <p class="text-xs text-slate-400 italic">${finisherGuide.why}</p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                ` : ''}
-                                            `;
-                                        })()}
-
-                                        
-                                    </div>
-                                    <button onclick="toggleExercise('${exercise.name}')" class="ml-2 text-2xl flex-shrink-0">
-                                        ${isCompleted ? '✔️' : '⭕'}
-                                    </button>
-                                </div>
-                                
-                                ${exercise.hasWeight ? `
-                                    <div class="mt-3 pt-3 border-t border-slate-700">
-                                        <div class="grid grid-cols-${exercise.sets === 5 ? '5' : Math.min(exercise.sets, 4)} gap-2">
-                                            ${Array.from({ length: exercise.sets }, (_, i) => {
-                                                const weight = getSmartRecommendation(exercise.name, i, state.currentWeek);
-                                                const equipment = getEquipmentType(exercise.name);
-                                                
-                                                return `
-                                                    <div class="text-center">
-                                                        <div class="text-xs text-slate-500 mb-1">Set ${i + 1}</div>
-                                                        ${state.editingSet === `${exercise.name}-${i}` ? `
-                                                            <input 
-                                                                type="number" 
-                                                                inputmode="decimal"
-                                                                value="${state.tempWeight}"
-                                                                onchange="saveWeight('${exercise.name}', ${i}, this.value, ${exercise.sets})"
-                                                                onblur="cancelEdit()"
-                                                                class="w-full px-2 py-1 bg-slate-700 border border-blue-500 rounded text-center text-white"
-                                                                autofocus
-                                                                id="weight-input-${exercise.name}-${i}"
-                                                            />
-                                                        ` : `
-                                                            <div class="flex items-center justify-center gap-1">
-                                                                <span class="text-lg font-bold text-blue-400">${weight}</span>
-                                                                <button 
-                                                                    onclick="event.stopPropagation(); startEdit('${exercise.name}', ${i}, ${weight})"
-                                                                    class="text-slate-500 hover:text-blue-400 text-sm"
-                                                                >✏️</button>
-                                                            </div>
-                                                        `}
-                                                        <div class="text-xs text-slate-600">${equipment.type === 'box' ? 'in' : 'lbs'}</div>
-                                                    </div>
-                                                `;
-                                            }).join('')}
-                                        </div>
-                                    </div>
-                                ` : ''}
-                            </div>
-                        `;
-                    }).join('')}
-                </div>
-            `;
-        }
-
-        function renderSupplements(app) {
-            const today = new Date();
-            const dateString = today.getFullYear() + '-' + 
-                          String(today.getMonth() + 1).padStart(2, '0') + '-' + 
-                          String(today.getDate()).padStart(2, '0');
-            const dayLog = state.supplementLog[dateString] || {};
-            const suppProgress = getTotalSupplementProgress();
-            
-            setTimeout(() => window.scrollTo(0, 0), 0);
-            
-            app.innerHTML = `
-                <div class="sticky-header shadow-xl">
-                    <div class="p-4">
-                        <button onclick="backToOverview()" class="mb-3 px-4 py-2 text-slate-300 hover:text-white hover:bg-slate-700/30 rounded-lg text-sm">
-                            ← Back
-                        </button>
-                        <div class="flex justify-between items-center gap-3">
-                            <div class="flex-1 min-w-0">
-                                <h2 class="text-xl font-bold">💊 Daily Supplements</h2>
-                                <p class="text-xs text-slate-400 mt-1">${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
-                            </div>
-                            <div class="flex-shrink-0">
-                                ${renderProgressRing(suppProgress.percentage, `${suppProgress.completed}/${suppProgress.total}`, 'ring-supplement', false)}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="p-5 space-y-6">
-                    ${Object.entries(supplementSchedule).map(([timeKey, timeData]) => {
-                        let supplements = timeData.supplements;
-                        
-                        if (timeKey === 'preworkout') {
-                            const dayOfWeek = new Date().getDay();
-                            if (dayOfWeek === 0) supplements = [];
-                        }
-                        
-                        supplements = supplements.filter(supp => {
-                            if (supp.conditional && supp.checkFunction) {
-                                return supp.checkFunction();
-                            }
-                            return true;
-                        });
-                        
-                        if (supplements.length === 0) return '';
-                        
-                        return `
-                            <div class="bg-slate-800 rounded-lg p-4 border border-slate-700 shadow-md">
-                                <div class="mb-3">
-                                    <h3 class="text-lg font-bold text-purple-400">${timeData.time}</h3>
-                                    <p class="text-xs text-slate-400">${timeData.note}</p>
-                                </div>
-                                
-                                <div class="space-y-2">
-                                    ${supplements.map(supp => {
-                                        const suppKey = `${timeKey}-${supp.name}`;
-                                        const taken = dayLog[suppKey] || false;
-                                        
-                                        return `
-                                            <div class="flex items-center justify-between p-3 bg-slate-900 rounded-lg">
-                                                <div class="flex items-center gap-3">
-                                                    <span class="text-xl">${supp.icon}</span>
-                                                    <div>
-                                                        <p class="font-semibold ${taken ? 'text-green-400' : 'text-white'}">${supp.name}</p>
-                                                        <p class="text-xs text-slate-400">${supp.dose}</p>
-                                                    </div>
-                                                </div>
-                                                <button 
-                                                    onclick="toggleSupplement('${timeKey}', '${supp.name}')"
-                                                    class="text-2xl"
-                                                >
-                                                    ${taken ? '✔️' : '⭕'}
-                                                </button>
-                                            </div>
-                                        `;
-                                    }).join('')}
-                                </div>
-                            </div>
-                        `;
-                    }).join('')}
-                    
-                    <div class="bg-blue-900 bg-opacity-30 rounded-lg p-4 border border-blue-700">
-                        <p class="text-sm text-blue-300">
-                            <strong>💡 Tip:</strong> Beta-Alanine is only on workout days (Mon-Sat). Collagen alternates every other day at 3 PM.
-                        </p>
-                    </div>
-                </div>
-            `;
-        }
-
-        function changeWeek(delta) {
-            const newWeek = state.currentWeek + delta;
-            if (newWeek >= 0 && newWeek <= 18) {
-                state.currentWeek = newWeek;
-                saveState();
-                render();
-                window.scrollTo(0, 0);
-            }
-        }
-
-        function jumpToCurrentWeek() {
-            state.currentWeek = getCurrentWeek();
-            saveState();
-            render();
-        }
-
-        function selectDay(day) {
-            state.selectedDay = day;
-            state.view = 'workout';
-            history.pushState({ view: 'workout', day: day }, '', '');
-            render();
-        }
-
-        function backToOverview() {
-            state.view = 'overview';
-            state.editingSet = null;
-            history.pushState({ view: 'overview' }, '', '');
-            render();
-        }
-
-        function showSupplements() {
-            state.view = 'supplements';
-            history.pushState({ view: 'supplements' }, '', '');
-            render();
-        }
-
-        function toggleExercise(exerciseName) {
-            const dayKey = `${state.currentWeek}-${state.selectedDay}`;
-            if (!state.completedExercises[dayKey]) {
-                state.completedExercises[dayKey] = [];
-            }
-            
-            const index = state.completedExercises[dayKey].indexOf(exerciseName);
-            const isNowCompleted = index === -1;
-            
-            if (index > -1) {
-                state.completedExercises[dayKey].splice(index, 1);
-            } else {
-                state.completedExercises[dayKey].push(exerciseName);
-            }
-            
-            saveState();
-            
-            // Update UI without full re-render
-            const completed = state.completedExercises[dayKey].length;
-            const schedule = getWorkoutSchedule(state.currentWeek);
-            const workout = schedule[state.selectedDay];
-            const total = workout.exercises.length;
-            const progress = Math.round((completed / total) * 100);
-            
-            // Update ring
-            updateRingProgress('ring-week', progress, `${completed}/${total}`);
-            
-            // Update exercise styling
-            const exercises = document.querySelectorAll('.bg-slate-800.rounded-lg.p-5');
-            exercises.forEach(exerciseEl => {
-                const titleEl = exerciseEl.querySelector('h3');
-                if (titleEl && titleEl.textContent.includes(exerciseName)) {
-                    const button = exerciseEl.querySelector('button[onclick*="toggleExercise"]');
-                    if (button) {
-                        button.textContent = isNowCompleted ? '✔️' : '⭕';
-                    }
-                    if (isNowCompleted) {
-                        titleEl.classList.add('text-green-400');
-                        titleEl.classList.remove('text-white');
-                    } else {
-                        titleEl.classList.remove('text-green-400');
-                        titleEl.classList.add('text-white');
-                    }
-                }
-            });
-        }
-
-        function toggleSupplement(timeKey, suppName) {
-            // Force fresh date calculation
-            const today = new Date();
-            const dateString = today.getFullYear() + '-' + 
-                              String(today.getMonth() + 1).padStart(2, '0') + '-' + 
-                              String(today.getDate()).padStart(2, '0');
-            
-            if (!state.supplementLog[dateString]) {
-                state.supplementLog[dateString] = {};
-            }
-            
-            const suppKey = `${timeKey}-${suppName}`;
-            const newState = !state.supplementLog[dateString][suppKey];
-            state.supplementLog[dateString][suppKey] = newState;
-            
-            saveState();
-            
-            // Update ring in real-time
-            const suppProgress = getTotalSupplementProgress();
-            updateRingProgress('ring-supplement', suppProgress.percentage, `${suppProgress.completed}/${suppProgress.total}`);
-            
-            // Update supplement styling
-            const suppElements = document.querySelectorAll('.bg-slate-900.rounded-lg');
-            suppElements.forEach(el => {
-                const nameEl = el.querySelector('.font-semibold');
-                if (nameEl && nameEl.textContent === suppName) {
-                    const button = el.querySelector('button');
-                    if (button) {
-                        button.textContent = newState ? '✔️' : '⭕';
-                    }
-                    if (newState) {
-                        nameEl.classList.add('text-green-400');
-                        nameEl.classList.remove('text-white');
-                    } else {
-                        nameEl.classList.remove('text-green-400');
-                        nameEl.classList.add('text-white');
-                    }
-                }
-            });
-        }
-
-       function startEdit(exerciseName, setIndex, currentWeight) {
-            const currentScrollPos = window.pageYOffset;
-            state.editingSet = `${exerciseName}-${setIndex}`;
-            state.tempWeight = currentWeight.toString();
-            
-            // Re-render only the exercise card
-            const schedule = getWorkoutSchedule(state.currentWeek);
-            const workout = schedule[state.selectedDay];
-            const exercise = workout.exercises.find(ex => ex.name === exerciseName);
-            
-            if (exercise) {
-                const exercises = document.querySelectorAll('.bg-slate-800.rounded-lg.p-5');
-                exercises.forEach(exerciseEl => {
-                    const titleEl = exerciseEl.querySelector('h3');
-                    if (titleEl && titleEl.textContent.includes(exerciseName)) {
-                        const weightGrid = exerciseEl.querySelector('.grid');
-                        if (weightGrid) {
-                            const setDivs = weightGrid.querySelectorAll('.text-center');
-                            if (setDivs[setIndex]) {
-                                const equipment = getEquipmentType(exerciseName);
-                                setDivs[setIndex].innerHTML = `
-                                    <div class="text-xs text-slate-500 mb-1">Set ${setIndex + 1}</div>
-                                    <input 
-                                        type="number" 
-                                        inputmode="decimal"
-                                        value="${currentWeight}"
-                                        onchange="saveWeight('${exerciseName}', ${setIndex}, this.value, ${exercise.sets})"
-                                        onblur="cancelEdit()"
-                                        onkeydown="handleWeightInputKeydown(event, '${exerciseName}', ${setIndex}, ${exercise.sets})"
-                                        class="w-full px-2 py-1 bg-slate-700 border border-blue-500 rounded text-center text-white"
-                                        autofocus
-                                        id="weight-input-${exerciseName}-${setIndex}"
-                                    />
-                                    <div class="text-xs text-slate-600">${equipment.type === 'box' ? 'in' : 'lbs'}</div>
-                                `;
-                                
-                                setTimeout(() => {
-                                    const input = document.getElementById(`weight-input-${exerciseName}-${setIndex}`);
-                                    if (input) {
-                                        input.focus();
-                                        // FIX #1: Move cursor to the end of the text
-                                        const length = input.value.length;
-                                        input.setSelectionRange(length, length);
-                                        // Also scroll input to show the end
-                                        if (input.scrollLeft !== undefined) {
-                                            input.scrollLeft = input.scrollWidth;
-                                        }
-                                    }
-                                    window.scrollTo(0, currentScrollPos);
-                                }, 50);
-                            }
-                        }
-                    }
-                });
-            }
-        }
-
-        
-        function handleWeightInputKeydown(event, exerciseName, setIndex, totalSets) {
-            if (event.key === 'Enter') {
-                event.preventDefault();
-                const input = event.target;
-                saveWeight(exerciseName, setIndex, input.value, totalSets);
-            } else if (event.key === 'Escape') {
-                event.preventDefault();
-                state.editingSet = null;
-                state.tempWeight = '';
-                render();
-            }
-        }
-        
-        function saveWeight(exerciseName, setIndex, value, totalSets) {
-            const currentScrollPos = window.pageYOffset;
-            const newWeight = parseFloat(value);
-            
-            // Allow exit even if no change or invalid value
-            if (!isNaN(newWeight) && newWeight > 0) {
-                const key = `${state.currentWeek}-${exerciseName}-${setIndex}`;
-                const oldWeight = state.exerciseWeights[key];
-                
-                // Only update if value actually changed
-                if (oldWeight !== newWeight) {
-                    state.exerciseWeights[key] = newWeight;
-                    updateFutureSets(exerciseName, setIndex, newWeight, state.currentWeek, totalSets);
-                    saveState();
-                }
-            }
-            
-            // Always exit edit mode, regardless of whether value changed
-            state.editingSet = null;
-            state.tempWeight = '';
-            
-            // Update the display without full re-render
-            const exercises = document.querySelectorAll('.bg-slate-800.rounded-lg.p-5');
-            exercises.forEach(exerciseEl => {
-                const titleEl = exerciseEl.querySelector('h3');
-                if (titleEl && titleEl.textContent.includes(exerciseName)) {
-                    const weightGrid = exerciseEl.querySelector('.grid');
-                    if (weightGrid) {
-                        const setDivs = weightGrid.querySelectorAll('.text-center');
-                        // FIX #2 PART B: Update ALL sets from current forward
-                        for (let i = setIndex; i < totalSets; i++) {
-                            if (setDivs[i]) {
-                                const weight = getSmartRecommendation(exerciseName, i, state.currentWeek);
-                                const equipment = getEquipmentType(exerciseName);
-                                setDivs[i].innerHTML = `
-                                    <div class="text-xs text-slate-500 mb-1">Set ${i + 1}</div>
-                                    <div class="flex items-center justify-center gap-1">
-                                        <span class="text-lg font-bold text-blue-400">${weight}</span>
-                                        <button 
-                                            onclick="event.stopPropagation(); startEdit('${exerciseName}', ${i}, ${weight})"
-                                            class="text-slate-500 hover:text-blue-400 text-sm"
-                                        >✏️</button>
-                                    </div>
-                                    <div class="text-xs text-slate-600">${equipment.type === 'box' ? 'in' : 'lbs'}</div>
-                                `;
-                            }
-                        }
-                    }
-                }
-            });
-    
-    window.scrollTo(0, currentScrollPos);
+function save() {
+    localStorage.setItem('rba_checked', JSON.stringify(state.checked));
+    localStorage.setItem('rba_weights', JSON.stringify(state.weights));
+    localStorage.setItem('rba_notes', JSON.stringify(state.notes));
 }
 
-        function cancelEdit() {
-            setTimeout(() => {
-                if (state.editingSet) {
-                    const currentScrollPos = window.pageYOffset;
-                    state.editingSet = null;
-                    state.tempWeight = '';
-                    window.scrollTo(0, currentScrollPos);
-                }
-            }, 200);
-        }
+// ─── Date helpers ───────────────────────────────────────────────────────────
+function getWeekStart(w) { const d = new Date(PROGRAM_START); d.setDate(d.getDate() + (w-1)*7); return d; }
+function getDayDate(w, day) { const i = DAY_ORDER.indexOf(day); const d = new Date(getWeekStart(w)); d.setDate(d.getDate()+i); return d; }
+function fmt(d) { return ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][d.getMonth()] + " " + d.getDate(); }
+function fmtRange(w) { const s=getWeekStart(w); const e=new Date(s); e.setDate(e.getDate()+6); return fmt(s)+" – "+fmt(e); }
+function fmtDay(w,day) { return getDayDate(w,day).getDate().toString(); }
 
-        window.addEventListener('popstate', function(event) {
-            if (state.view !== 'overview') {
-                backToOverview();
+// ─── Phase 0: Reactivation (Weeks 1-2) ─────────────────────────────────────
+const P0 = {
+    monday: { title:"Full Body Strength A", intensity:"MODERATE", duration:"45 min", icon:"🏋️", blocks:[
+        {name:"Warm-Up — 10 min",items:["Hip Openers","Thoracic Rotations","World's Greatest Stretch","Leg Swings","Band Pull-Aparts"]},
+        {name:"Main Work — 25 min",items:["Goblet Squat — 3×12","DB Floor Press — 3×12","Single-Arm DB Row — 3×10 each","KB Romanian Deadlift — 3×12","Half-Kneeling DB Shoulder Press — 3×10 each"]},
+        {name:"Core — 5 min",items:["Dead Bug — 3×10 each side","Front Plank — 2×30s"]},
+        {name:"Cool-Down — 5 min",items:["Hip Flexor Stretch","Hamstring Stretch","Chest Opener","Lat Stretch"]},
+    ]},
+    tuesday: { title:"Dog Walk + Mobility", intensity:"EASY", duration:"35 min", icon:"🐕", blocks:[
+        {name:"Dog Walk — 15-20 min",items:["Brisk walk with the dog"]},
+        {name:"Mobility — 15 min",items:["Pigeon — 60s each","Couch Stretch — 60s each","Thoracic Spine Rotation — 60s each","Seated Hamstring Stretch — 60s each","Doorway Chest Stretch — 60s each","Cat-Cow — 10 reps","Child's Pose — 60s"]},
+    ]},
+    wednesday: { title:"Full Body Strength B", intensity:"MODERATE", duration:"45 min", icon:"🏋️", blocks:[
+        {name:"Warm-Up — 10 min",items:["Same dynamic warm-up as Monday"]},
+        {name:"Main Work — 25 min",items:["DB Reverse Lunge — 3×10 each","Push-Up (3s negative) — 3×10","KB Swing — 3×15","DB Bent-Over Row — 3×12","Slider Body Saw — 3×8"]},
+        {name:"Core — 5 min",items:["Bird Dog — 3×8 each","Side Plank — 2×20s each"]},
+        {name:"Cool-Down — 5 min",items:["Hip Flexors","Hamstrings","Chest","Thoracic Spine"]},
+    ]},
+    thursday: { title:"Footwork + Mobility", intensity:"EASY", duration:"30 min", icon:"👟", blocks:[
+        {name:"Ladder Drills — learning pace",items:["Icky Shuffle — 2 rounds","In-Out — 2 rounds","Lateral Shuffle — 2 rounds","Carioca — 2 rounds"]},
+        {name:"Movement",items:["Lateral Bounds (low intensity) — 2×8 each","A-Skip — 2×30 yds","B-Skip — 2×30 yds","High Knees — 2×30 yds","Butt Kicks — 2×30 yds"]},
+        {name:"Deep Stretch — 10 min",items:["90/90 Hips — 90s each","Pigeon — 90s each","Thoracic Rotation — 60s each","Hamstring Stretch — 60s each"]},
+    ]},
+    friday: { title:"Full Body Strength C", intensity:"MODERATE", duration:"45 min", icon:"🏋️", blocks:[
+        {name:"Warm-Up — 10 min",items:["Same dynamic warm-up"]},
+        {name:"Main Work — 25 min",items:["DB Sumo Squat — 3×12","Incline Push-Up to DB Row — 3×8 each","Single-Leg RDL (light DB) — 3×8 each","DB Lateral Raise — 3×12","Exercise Ball Hamstring Curl — 3×10"]},
+        {name:"Core — 5 min",items:["Pallof Press (band) — 3×8 each","Plank Shoulder Tap — 2×10 each"]},
+        {name:"Cool-Down — 5 min",items:["Hip Flexors","Hamstrings","Chest","Lats"]},
+    ]},
+    saturday: { title:"Track: Easy Run + Strides", intensity:"EASY-MOD", duration:"35 min", icon:"🏟️", equip:"Jump rope, water", blocks:[
+        {name:"Run",items:["Easy jog — 10 min"]},
+        {name:"Strides + Movement",items:["80m Strides at 60-70% — 4 reps (walk back)","Lateral Shuffle — 20 yds each direction × 4"]},
+        {name:"Stretch — 10 min",items:["Hip Flexors — 90s each","Hamstrings — 90s each","Quads — 60s each","Thoracic Bridge — 60s each","Calf Stretch — 60s each"]},
+    ]},
+    sunday: { title:"Dog Walk + Rest", intensity:"REST", duration:"20 min", icon:"😴", blocks:[
+        {name:"",items:["15-20 min easy dog walk. Full rest otherwise."]},
+    ]},
+};
+
+// ─── Phase 1A: Rebuild (Weeks 3, 5) ────────────────────────────────────────
+const P1A = {
+    monday: { title:"Lower Strength A", intensity:"HARD", duration:"60 min", icon:"🦵", blocks:[
+        {name:"Warm-Up — 8 min",items:["Dynamic warm-up + hip activation"]},
+        {name:"Main Work",items:["DB Bulgarian Split Squat — 4×10 each","KB Sumo Deadlift — 4×10","Superset: Slider Reverse Lunge / Ex. Ball Ham Curl — 3×10 each","Single-Leg Calf Raise (weighted) — 3×15 each","KB Goblet Lateral Lunge — 3×8 each"]},
+        {name:"Core — 5 min",items:["Hollow Body Hold — 30s","Bicycle Crunch — 20 reps","Slider Plank to Pike — 8 reps","→ 2 rounds"]},
+    ]},
+    tuesday: { title:"Upper Push/Pull A", intensity:"HARD", duration:"60 min", icon:"💪", blocks:[
+        {name:"Warm-Up — 8 min",items:["Dynamic warm-up + band pull-aparts"]},
+        {name:"Main Work",items:["DB Floor Press — 4×10","DB Bent-Over Row — 4×10","Superset: DB Incline Push-Up Press / Face Pull (band) — 3×12","Superset: DB Shoulder Press / Single-Arm Row — 3×10","Superset: DB Curl / Overhead Tricep Extension — 3×12","Rear Delt Flye — 3×15"]},
+        {name:"Core",items:["Exercise Ball Rollout — 3×10","Pallof Press — 3×8 each"]},
+    ]},
+    wednesday: { title:"Conditioning A + Core", intensity:"MODERATE", duration:"55 min", icon:"🔥", blocks:[
+        {name:"Warm-Up — 8 min",items:["Dynamic warm-up with ladder footwork"]},
+        {name:"Circuit — 45s/25s, 75% effort",items:["Round 1 (×3): Jump Rope → KB Swing → Push-Up → Slider Mt. Climber → Squat","Round 2 (×3): Lateral Shuffle → Plank-to-Push-Up → DB Thruster → Skater Bounds → Ex. Ball Pass"]},
+        {name:"Core — 10 min",items:["V-Ups — 12","Side Plank Dips — 10 each","Ex. Ball Knee Tuck — 12","Dead Bug w/ Weight — 10 each","→ 2 rounds"]},
+    ]},
+    thursday: { title:"Footwork + Agility A", intensity:"EASY-MOD", duration:"35 min", icon:"👟", blocks:[
+        {name:"Ladder Drills",items:["Ali Shuffle — 3 rounds","Crossover — 3 rounds","5-Hop-and-Stick — 3 rounds"]},
+        {name:"Agility",items:["5-10-5 Shuttle at 70% — 4 reps","Lateral Bound to Stick — 3×6 each","Carioca w/ Hip Turn — 3×30 yds","Backpedal to Sprint at 70% — 4×20 yds"]},
+        {name:"Mobility — 10 min",items:["90/90 Hips","Couch Stretch","Thoracic Foam Roll","Banded Hip Distraction"]},
+    ]},
+    friday: { title:"Full Body Power A", intensity:"HARD", duration:"60 min", icon:"⚡", blocks:[
+        {name:"Warm-Up — 8 min",items:["Dynamic warm-up"]},
+        {name:"Main Work",items:["KB Clean and Press — 4×6 each","DB Jump Squat (light) — 4×8","Superset: Push-Up w/ Rotation / DB Row — 3×10 each","Med Ball Slam — 3×10","Farmer's Carry — 3×40 yds","Superset: DB Lateral Raise / Band Pull-Apart — 3×12"]},
+        {name:"Core",items:["Plank Pull-Through (DB) — 3×8 each","Exercise Ball Pike — 3×8"]},
+    ]},
+    saturday: { title:"Track Day A", intensity:"MOD-HARD", duration:"55 min", icon:"🏟️", equip:"Jump rope, sliders, water", blocks:[
+        {name:"Warm-Up — 10 min",items:["Jog, dynamic stretches, A-skips, B-skips, high knees"]},
+        {name:"Agility — 10 min",items:["Ladder Drills at 80%","T-Drill — 3 reps","5-10-5 Shuttle — 4 reps"]},
+        {name:"Conditioning — 15 min",items:["200m Repeats at 75% — 3 reps (walk back)","100m at 80% — 2 reps"]},
+        {name:"Core — 10 min",items:["Sprinter Sit-Ups — 12 each","Plank Walkout — 8","Mountain Climber — 20","V-Up — 12","Superman Hold — 30s","→ 2 rounds"]},
+        {name:"Cool-Down — 5 min",items:["Jog + stretch"]},
+    ]},
+    sunday: { title:"Dog Walk + Rest", intensity:"REST", duration:"20 min", icon:"😴", blocks:[{name:"",items:["15-20 min easy dog walk. Full rest."]}]},
+};
+
+// ─── Phase 1B: Rebuild (Weeks 4, 6) ────────────────────────────────────────
+const P1B = {
+    monday: { title:"Lower Strength B", intensity:"HARD", duration:"60 min", icon:"🦵", blocks:[
+        {name:"Warm-Up — 8 min",items:["Dynamic warm-up + hip activation"]},
+        {name:"Main Work",items:["DB Front Squat — 4×10","Single-Leg RDL (DB) — 4×8 each","Superset: DB Step-Up / Slider Hamstring Curl — 3×10 each","KB Swing — 4×12","DB Goblet Curtsy Lunge — 3×8 each"]},
+        {name:"Core — 5 min",items:["Dead Bug w/ Weight — 10 each","Side Plank — 30s each","Ex. Ball Pass — 12 reps","→ 2 rounds"]},
+    ]},
+    tuesday: { title:"Upper Push/Pull B", intensity:"HARD", duration:"60 min", icon:"💪", blocks:[
+        {name:"Warm-Up — 8 min",items:["Dynamic warm-up + band pull-aparts"]},
+        {name:"Main Work",items:["DB Incline Press (floor, elevated hips) — 4×10","Single-Arm DB Row (knee on bench) — 4×10 each","Superset: Diamond Push-Up / Band Face Pull — 3×12","Superset: Arnold Press / Chest-Supported Row — 3×10","Superset: Hammer Curl / Tricep Dip (bench) — 3×12","Band Pull-Apart — 3×20"]},
+        {name:"Core",items:["Plank Shoulder Tap — 3×10 each","Russian Twist — 3×20"]},
+    ]},
+    wednesday: { title:"Conditioning B + Core", intensity:"MODERATE", duration:"55 min", icon:"🔥", blocks:[
+        {name:"Warm-Up — 8 min",items:["Dynamic warm-up with ladder footwork"]},
+        {name:"Circuit — 45s/25s, 75% effort",items:["Round 1 (×3): High Knees → DB Snatch → Slider Push-Up → Squat Jump → Band Pull-Apart","Round 2 (×3): Carioca → Burpee (controlled) → KB Swing → Slider Mt. Climber → Plank Hold"]},
+        {name:"Core — 10 min",items:["Hollow Body Hold — 30s","Bicycle Crunch — 20","Plank Drag (DB) — 8 each","Ex. Ball Rollout — 10","→ 2 rounds"]},
+    ]},
+    thursday: { title:"Footwork + Agility B", intensity:"EASY-MOD", duration:"35 min", icon:"👟", blocks:[
+        {name:"Ladder Drills",items:["Lateral Icky — 3 rounds","In-Out-In — 3 rounds","Single-Leg Hop — 3 rounds each"]},
+        {name:"Agility",items:["T-Drill at 70% — 4 reps","Reactive Lateral Shuffle — 3×10 yds each","A-Skip to Sprint at 70% — 4×20 yds","Broad Jump to Backpedal — 3×4"]},
+        {name:"Mobility — 10 min",items:["Pigeon — 90s each","Thoracic Rotation — 60s each","Banded Shoulder Distraction — 60s each","Calf Stretch — 60s each"]},
+    ]},
+    friday: { title:"Full Body Power B", intensity:"HARD", duration:"60 min", icon:"⚡", blocks:[
+        {name:"Warm-Up — 8 min",items:["Dynamic warm-up"]},
+        {name:"Main Work",items:["DB Thruster — 4×8","Broad Jump — 4×5","Superset: Renegade Row / Explosive Push-Up — 3×8 each","KB Goblet Squat to Press — 3×10","Suitcase Carry (single arm) — 3×40 yds each","Superset: DB Reverse Flye / DB Curl — 3×12"]},
+        {name:"Core",items:["Ex. Ball Knee Tuck — 3×10","Pallof Press — 3×8 each"]},
+    ]},
+    saturday: { title:"Track Day B", intensity:"MOD-HARD", duration:"55 min", icon:"🏟️", equip:"Jump rope, sliders, water", blocks:[
+        {name:"Warm-Up — 10 min",items:["Jog, dynamic stretches, leg swings, high knees"]},
+        {name:"Agility — 10 min",items:["Ladder Drills at 80% (different patterns)","Pro Agility (5-10-5) — 4 reps","L-Drill — 3 reps"]},
+        {name:"Conditioning — 15 min",items:["150m at 80% — 4 reps (walk back)","50m Sprint at 85% — 3 reps","400m at 70% — 1 rep"]},
+        {name:"Core — 10 min",items:["Bicycle Crunch — 20","Plank to Push-Up — 10","Flutter Kicks — 20 each","Burpee — 6","V-Up — 12","→ 2 rounds"]},
+        {name:"Cool-Down — 5 min",items:["Jog + stretch on the grass"]},
+    ]},
+    sunday: { title:"Dog Walk + Rest", intensity:"REST", duration:"20 min", icon:"😴", blocks:[{name:"",items:["15-20 min easy dog walk. Full rest."]}]},
+};
+
+// ─── Phase 2A: Accelerate (Weeks 7, 9, 11) ─────────────────────────────────
+const P2A = {
+    monday: { title:"Lower Strength + Power A", intensity:"HARD", duration:"65 min", icon:"🦵", blocks:[
+        {name:"Warm-Up — 8 min",items:["Dynamic warm-up + hip activation"]},
+        {name:"Main Work",items:["DB Front Squat — 4×8","KB Swing (heavy) — 4×12","DB Walking Lunge — 3×10 each","Superset: Single-Leg RDL / Slider Ham Curl — 3×10 each","Box Jump or Broad Jump — 4×5","Lateral Bound to Stick — 3×6 each"]},
+        {name:"Core",items:["Weighted Plank — 3×30s","Ex. Ball Knee Tuck — 3×12"]},
+    ]},
+    tuesday: { title:"Upper Hypertrophy A", intensity:"HARD", duration:"70 min", icon:"💪", blocks:[
+        {name:"Warm-Up — 8 min",items:["Dynamic warm-up + band work"]},
+        {name:"Main Work",items:["DB Bench Press — 5×10 (3s negative last 2 sets)","DB Bent-Over Row — 5×10","Superset: Incline DB Press / Chest-Supported Row — 4×12","Giant Set: DB Shoulder Press / Lat Raise / Rear Delt Flye — 3×10-12","Superset: DB Curl / Tricep Dip — 4×12","Band Pull-Apart — 3×20"]},
+        {name:"Metabolic Finisher — 8 min",items:["30s Jump Rope / 30s Slider Push-Up / 30s KB Swing / 30s Rest — 4 rounds"]},
+        {name:"Core — 5 min",items:["Ex. Ball Rollout — 10","Lying Leg Raise — 12","Side Plank — 30s each","→ 2 rounds"]},
+    ]},
+    wednesday: { title:"Skill Conditioning A + Core", intensity:"MODERATE", duration:"55 min", icon:"🔥", blocks:[
+        {name:"Warm-Up — 8 min",items:["Ladder footwork (skill practice)"]},
+        {name:"Circuit — 45s/25s, 70-75% effort",items:["Block 1 (×3): Lateral Shuffle w/ Band → Carioca → Slider Push-Up → BW Squat Jump","Block 2 (×3): KB Swing → Push-Up Variation → DB Thruster → Slider Mt. Climber"]},
+        {name:"Core — 12 min",items:["V-Ups — 12","Russian Twist — 20","Plank Drag (DB) — 8 each","Bicycle Crunch — 20","Hollow Body — 30s","Side Plank Dips — 10 each","→ 2 rounds"]},
+    ]},
+    thursday: { title:"Footwork + Agility A", intensity:"EASY-MOD", duration:"35 min", icon:"👟", blocks:[
+        {name:"Ladder — game speed",items:["Ali Shuffle — 3 rounds","Crossover — 3 rounds","In-Out-In — 3 rounds","Lateral Icky — 3 rounds"]},
+        {name:"Reactive Agility",items:["T-Drill — 3 reps","5-10-5 Shuttle at 80% — 4 reps","Lateral Bound to Sprint — 3×4 each","Backpedal to Cut and Sprint — 4×20 yds"]},
+        {name:"Mobility — 10 min",items:["90/90 Hips","Pigeon","Couch Stretch","Thoracic Rotation","Banded Shoulder Distraction"]},
+    ]},
+    friday: { title:"Upper Volume A · Shoulders + Arms", intensity:"HARD", duration:"70 min", icon:"💪", blocks:[
+        {name:"Warm-Up — 8 min",items:["Dynamic warm-up + band pull-aparts"]},
+        {name:"Main Work",items:["DB Incline Press — 4×10 (3s negative)","Single-Arm DB Row — 4×10 each","Superset: Arnold Press / Face Pull — 4×12","Superset: Chest Flye / Reverse Flye — 3×12","Superset: Hammer Curl / Diamond Push-Up — 4×12","Lateral Raise Drop Set — 3 sets (12 heavy + 8 lighter)"]},
+        {name:"Metabolic Finisher — 8 min",items:["30s Burpee / 30s DB Snatch / 30s Jump Rope / 30s Rest — 4 rounds"]},
+        {name:"Core — 5 min",items:["Pallof Press — 3×8 each","Dead Bug w/ Weight — 3×10 each","Plank Shoulder Tap — 2×12 each"]},
+    ]},
+    saturday: { title:"Track: Power + Speed A", intensity:"HARD", duration:"60 min", icon:"🏟️", equip:"Jump rope, sliders, weighted vest (wks 9+)", blocks:[
+        {name:"Warm-Up — 10 min",items:["Jog, dynamic stretches, A-skips, B-skips, high knees, leg swings"]},
+        {name:"Agility — 15 min",items:["Ladder Drills (full speed)","5-10-5 Shuttle — 6 reps","T-Drill — 4 reps","Reactive Direction Changes"]},
+        {name:"Power + Speed — 20 min",items:["Broad Jump — 5 reps","100m Sprint at 85-90% — 3 reps (full walk-back)","200m Repeat at 80% — 3 reps (walk back)","Weighted Vest Sprint 30 yds — 4 reps (wks 9+)"]},
+        {name:"Core — 10 min",items:["Sprinter Sit-Ups — 12 each","Plank Walkout — 8","Mountain Climber — 20","V-Up — 12","Superman Hold — 30s","→ 2 rounds"]},
+        {name:"Cool-Down — 5 min",items:["Easy jog + stretch on the grass"]},
+    ]},
+    sunday: { title:"Light Jog + Deep Stretch", intensity:"EASY", duration:"30 min", icon:"🌿", blocks:[
+        {name:"Dog Walk + Jog",items:["15 min easy jog (bring the dog if trail-friendly)"]},
+        {name:"Deep Stretch — 15 min",items:["90/90 Hip — 2 min each","Pigeon — 90s each","Seated Forward Fold — 90s","Thoracic Bridge — 60s each","Wall Pec Stretch — 60s each","Figure-4 Stretch — 90s each"]},
+    ]},
+};
+
+// ─── Phase 2B: Accelerate (Weeks 8, 10, 12) ────────────────────────────────
+const P2B = {
+    monday: { title:"Lower Strength + Power B", intensity:"HARD", duration:"65 min", icon:"🦵", blocks:[
+        {name:"Warm-Up — 8 min",items:["Dynamic warm-up + hip activation"]},
+        {name:"Main Work",items:["DB Bulgarian Split Squat — 4×8 each (heavy)","KB Deadlift (heavy) — 4×8","Superset: DB Step-Up / Nordic Ham Curl Negative — 3×8 each","DB Cossack Squat — 3×8 each","Depth Jump to Sprint — 4×3","Single-Leg Bound — 3×5 each"]},
+        {name:"Core",items:["Dragon Flag Negative — 3×5","Weighted Side Plank — 3×20s each"]},
+    ]},
+    tuesday: { title:"Upper Hypertrophy B", intensity:"HARD", duration:"70 min", icon:"💪", blocks:[
+        {name:"Warm-Up — 8 min",items:["Dynamic warm-up + band work"]},
+        {name:"Main Work",items:["DB Squeeze Press — 5×10 (3s negative last 2 sets)","Meadows Row (DB) — 5×10 each","Superset: Decline Push-Up / Inverted Row — 4×12","Giant Set: DB Z-Press / Lateral Raise / Band Pull-Apart — 3×10-12","Superset: Incline Curl / Overhead Tricep Extension — 4×12","Rear Delt Flye (slow tempo) — 3×15"]},
+        {name:"Metabolic Finisher — 8 min",items:["30s Slider Burpee / 30s KB Swing / 30s Push-Up / 30s Rest — 4 rounds"]},
+        {name:"Core — 5 min",items:["Hanging Knee Raise (or Lying) — 12","Plank Drag (DB) — 8 each","Hollow Body — 30s","→ 2 rounds"]},
+    ]},
+    wednesday: { title:"Skill Conditioning B + Core", intensity:"MODERATE", duration:"55 min", icon:"🔥", blocks:[
+        {name:"Warm-Up — 8 min",items:["Ladder footwork (new patterns)"]},
+        {name:"Circuit — 45s/25s, 70-75% effort",items:["Block 1 (×3): Jump Rope → Bear Crawl 10 yds → DB Snatch → Lateral Shuffle","Block 2 (×3): Burpee → Slider Pike → KB Swing → Skater Bounds"]},
+        {name:"Core — 12 min",items:["Ex. Ball Rollout — 10","Pallof Press — 8 each","Dead Bug — 10 each","Side Plank Dips — 10 each","V-Up — 12","Plank to Push-Up — 8","→ 2 rounds"]},
+    ]},
+    thursday: { title:"Footwork + Agility B", intensity:"EASY-MOD", duration:"35 min", icon:"👟", blocks:[
+        {name:"Ladder — game speed",items:["Single-Leg Hops — 3 rounds each","Lateral Zig-Zag — 3 rounds","Quick Feet Sprint-Out — 3 rounds","Backwards Through — 3 rounds"]},
+        {name:"Reactive Agility",items:["L-Drill — 4 reps","Pro Agility at 85% — 4 reps","Lateral Bound → Cut → Sprint — 3×4 each","Mirror Drill (shadow cuts) — 3×15s"]},
+        {name:"Mobility — 10 min",items:["90/90 Hips","Thoracic Foam Roll","Pigeon","Banded Hip Distraction","Calf/Achilles Stretch"]},
+    ]},
+    friday: { title:"Upper Volume B · Chest + Back", intensity:"HARD", duration:"70 min", icon:"💪", blocks:[
+        {name:"Warm-Up — 8 min",items:["Dynamic warm-up + band pull-aparts"]},
+        {name:"Main Work",items:["DB Floor Press — 4×10 (3s negative)","DB Bent-Over Row (wide grip) — 4×10","Superset: DB Shoulder Press / Single-Arm Row — 4×10","Superset: Push-Up (feet elevated) / Band Face Pull — 3×15","Superset: Concentration Curl / Tricep Kickback — 4×12","DB Chest Flye Drop Set — 3 sets (10 heavy + 8 lighter)"]},
+        {name:"Metabolic Finisher — 8 min",items:["30s Thruster / 30s Mt. Climber / 30s KB Snatch / 30s Rest — 4 rounds"]},
+        {name:"Core — 5 min",items:["Russian Twist — 20","Ex. Ball Pike — 8","Side Plank — 30s each","→ 2 rounds"]},
+    ]},
+    saturday: { title:"Track: Power + Speed B", intensity:"HARD", duration:"60 min", icon:"🏟️", equip:"Jump rope, sliders, weighted vest (wks 9+)", blocks:[
+        {name:"Warm-Up — 10 min",items:["Jog, dynamic stretches, A-skips, B-skips, leg swings"]},
+        {name:"Agility — 15 min",items:["Ladder Drills (full speed, B patterns)","L-Drill — 5 reps","Pro Agility — 5 reps","Reactive Cut Drill — 4×15s"]},
+        {name:"Power + Speed — 20 min",items:["Standing Triple Jump — 4 reps","60m Sprint at 90% — 4 reps (full recovery)","300m at 75% — 2 reps (3 min rest)","Hill Sprint or Weighted Vest 40 yds — 4 reps (wks 9+)"]},
+        {name:"Core — 10 min",items:["Bicycle Crunch — 20","Plank to Push-Up — 10","Sprinter Sit-Up — 12 each","Flutter Kicks — 20 each","Superman — 30s","→ 2 rounds"]},
+        {name:"Cool-Down — 5 min",items:["Easy jog + stretch on the grass"]},
+    ]},
+    sunday: { title:"Dog Walk + Deep Stretch", intensity:"EASY", duration:"30 min", icon:"🐕", blocks:[
+        {name:"Dog Walk + Jog",items:["15 min walk/jog with the dog"]},
+        {name:"Deep Stretch — 15 min",items:["90/90 Hip — 2 min each","Pigeon — 90s each","Couch Stretch — 60s each","Thoracic Bridge — 60s each","Lat Stretch — 60s each","Child's Pose — 90s"]},
+    ]},
+};
+
+// ─── Week → Data mapping ────────────────────────────────────────────────────
+function getDays(w) {
+    if (w <= 2) return P0;
+    if (w <= 6) return (w % 2 === 1) ? P1A : P1B;
+    return (w % 2 === 1) ? P2A : P2B;
+}
+function getPhaseLabel(w) {
+    if (w <= 2) return "Phase 0 · Reactivation";
+    if (w <= 6) return "Phase 1 · Rebuild (" + (w%2===1?"A":"B") + ")";
+    return "Phase 2 · Accelerate (" + (w%2===1?"A":"B") + ")";
+}
+function getDayData(w, day) { return getDays(w)[day] || null; }
+
+// ─── Counting ───────────────────────────────────────────────────────────────
+function countDay(w, day) {
+    const d = getDayData(w, day); if (!d) return {t:0,d:0};
+    let t=0, dn=0;
+    d.blocks.forEach((b,bi) => b.items.forEach((item,ii) => {
+        if (!item.startsWith("→")) { t++; if (state.checked[`${w}-${day}-${bi}-${ii}`]) dn++; }
+    }));
+    return {t,d:dn};
+}
+function countWeek(w) {
+    let t=0,d=0; DAY_ORDER.forEach(day => { const c=countDay(w,day); t+=c.t; d+=c.d; }); return {t,d,pct:t?Math.round(d/t*100):0};
+}
+function countProgram() {
+    let t=0,d=0; for(let w=1;w<=12;w++){const c=countWeek(w);t+=c.t;d+=c.d;} return {t,d,pct:t?Math.round(d/t*100):0};
+}
+
+// ─── Export with exercise groupings ─────────────────────────────────────────
+function generateExport() {
+    const prog = countProgram();
+    let out = "# rba | fit — Progress Export\n";
+    out += "Generated: " + new Date().toLocaleDateString() + "\n";
+    out += "Program: " + prog.d + "/" + prog.t + " (" + prog.pct + "%)\n\n";
+
+    // Collect weight data by exercise group
+    const groupWeights = {};
+    for (let w=1; w<=12; w++) {
+        DAY_ORDER.forEach(day => {
+            const d = getDayData(w, day); if (!d) return;
+            d.blocks.forEach((b,bi) => b.items.forEach((item,ii) => {
+                const k = `${w}-${day}-${bi}-${ii}`;
+                const wt = state.weights[k];
+                if (wt) {
+                    const grp = getExerciseGroup(item) || item.split("—")[0].trim();
+                    if (!groupWeights[grp]) groupWeights[grp] = [];
+                    groupWeights[grp].push({ week: w, day: DAY_LABELS[day], date: fmt(getDayDate(w,day)), exercise: item.split("—")[0].trim(), weight: wt });
+                }
+            }));
+        });
+    }
+
+    // Weight progression by group
+    if (Object.keys(groupWeights).length > 0) {
+        out += "## Weight Progression by Exercise Group\n";
+        Object.entries(groupWeights).forEach(([grp, entries]) => {
+            out += "\n### " + grp + "\n";
+            entries.forEach(e => { out += "  Wk" + e.week + " " + e.date + " " + e.day + " — " + e.exercise + ": " + e.weight + "\n"; });
+        });
+        out += "\n";
+    }
+
+    // Weekly completion
+    out += "## Weekly Completion\n";
+    for (let w=1; w<=12; w++) {
+        const wk = countWeek(w);
+        if (wk.d === 0) continue;
+        out += "\n### Week " + w + " — " + getPhaseLabel(w) + " — " + fmtRange(w) + " — " + wk.d + "/" + wk.t + " (" + wk.pct + "%)\n";
+        DAY_ORDER.forEach(day => {
+            const d = getDayData(w, day); if (!d) return;
+            const c = countDay(w, day);
+            if (c.d > 0) {
+                out += "  " + DAY_LABELS[day] + " " + fmt(getDayDate(w,day)) + " — " + d.title + ": " + c.d + "/" + c.t + "\n";
+                d.blocks.forEach((b,bi) => b.items.forEach((item,ii) => {
+                    const k = `${w}-${day}-${bi}-${ii}`;
+                    if (state.checked[k]) {
+                        out += "    ✓ " + item;
+                        if (state.weights[k]) out += " [" + state.weights[k] + "]";
+                        if (state.notes[k]) out += " — " + state.notes[k];
+                        out += "\n";
+                    }
+                }));
             }
         });
+    }
+    return out;
+}
 
-        history.replaceState({ view: 'overview' }, '', '');
-        render();
-    </script>
+// ─── Current week calculation ───────────────────────────────────────────────
+function getCurrentWeek() {
+    const today = new Date(); today.setHours(0,0,0,0);
+    const start = new Date(PROGRAM_START); start.setHours(0,0,0,0);
+    if (today < start) return 1;
+    const diff = Math.floor((today - start) / (1000*60*60*24));
+    const w = Math.floor(diff / 7) + 1;
+    return Math.max(1, Math.min(12, w));
+}
+
+// ─── Render ─────────────────────────────────────────────────────────────────
+function render() {
+    const app = document.getElementById('app');
+    if (state.view === 'overview') renderOverview(app);
+    else if (state.view === 'workout') renderWorkout(app);
+    else if (state.view === 'export') renderExport(app);
+}
+
+function renderOverview(app) {
+    const w = state.currentWeek;
+    const wk = countWeek(w);
+    const prog = countProgram();
+
+    app.innerHTML = `
+        <div class="header">
+            <div class="logo-row">
+                <div class="logo">rba</div>
+                <div>
+                    <div class="header-title">rba | fit</div>
+                    <div class="header-sub">Rise · Build · Adapt</div>
+                </div>
+            </div>
+            <button class="top-btn" onclick="showExport()">Export</button>
+        </div>
+
+        <div style="margin-bottom:14px">
+            <div class="prog-row">
+                <span class="prog-label">Program</span>
+                <div class="prog-track"><div class="prog-fill" style="width:${prog.pct}%;background:var(--green)"></div></div>
+                <span class="prog-pct">${prog.pct}%</span>
+            </div>
+            <div class="prog-row">
+                <span class="prog-label">Week ${w}</span>
+                <div class="prog-track"><div class="prog-fill" style="width:${wk.pct}%;background:var(--accent)"></div></div>
+                <span class="prog-pct">${wk.pct}%</span>
+            </div>
+        </div>
+
+        <div class="week-nav">
+            <button class="nav-btn" onclick="changeWeek(-1)" ${w===1?'disabled':''}>‹</button>
+            <div class="week-center">
+                <div class="week-label">Week ${w}</div>
+                <div class="phase-label">${getPhaseLabel(w)}</div>
+                <div class="date-range">${fmtRange(w)}</div>
+            </div>
+            <button class="nav-btn" onclick="changeWeek(1)" ${w===12?'disabled':''}>›</button>
+        </div>
+
+        ${w !== getCurrentWeek() ? `<button style="width:100%;padding:8px;margin-bottom:10px;border-radius:6px;background:var(--bg2);border:1px solid var(--border);color:var(--green);font-size:12px;font-weight:600" onclick="jumpToToday()">↓ Jump to Current Week (${getCurrentWeek()}) ↓</button>` : ''}
+
+        <div class="pills">
+            ${Array.from({length:12},(_,i)=>`<button class="pill ${i+1===w?'pill-active':'pill-inactive'}" onclick="goWeek(${i+1})">${i+1}</button>`).join('')}
+        </div>
+
+        <div class="int-map">
+            <div class="int-title">Intensity</div>
+            <div class="int-row">
+                ${DAY_ORDER.map(day => {
+                    const d = getDayData(w, day);
+                    return `<div class="int-cell"><div class="int-dot" style="background:${INTENSITY_COLORS[d?.intensity]||'#333'}"></div><div class="int-cell-label">${DAY_LABELS[day]}</div></div>`;
+                }).join('')}
+            </div>
+        </div>
+
+        <div class="day-cards">
+            ${DAY_ORDER.map(day => {
+                const d = getDayData(w, day);
+                if (!d) return '';
+                const c = countDay(w, day);
+                const pct = c.t ? Math.round(c.d/c.t*100) : 0;
+                const dateStr = fmtDay(w, day);
+                return `
+                    <button class="day-card" onclick="selectDay('${day}')">
+                        <div class="day-card-top">
+                            <span class="day-card-icon">${d.icon}</span>
+                            <div class="day-card-info">
+                                <div class="day-card-day">${DAY_LABELS[day]} ${dateStr}</div>
+                                <div class="day-card-title">${d.title}</div>
+                            </div>
+                            <div class="day-card-right">
+                                <span class="badge" style="background:${INTENSITY_COLORS[d.intensity]||'#444'}">${d.intensity}</span>
+                                <span class="day-card-dur">${d.duration}</span>
+                            </div>
+                        </div>
+                        ${c.t > 0 ? `<div class="day-prog"><div class="day-prog-track"><div class="day-prog-fill" style="width:${pct}%"></div></div><span class="day-prog-pct">${c.d}/${c.t}</span></div>` : ''}
+                    </button>
+                `;
+            }).join('')}
+        </div>
+
+        ${w===10?'<div class="deload">⚠️ <strong>Deload Week.</strong> Drop volume 40%, keep weights same.</div>':''}
+    `;
+}
+
+function renderWorkout(app) {
+    const w = state.currentWeek;
+    const day = state.selectedDay;
+    const d = getDayData(w, day);
+    if (!d) { state.view='overview'; render(); return; }
+    const dateStr = fmt(getDayDate(w, day));
+
+    app.innerHTML = `
+        <div class="detail-header">
+            <button class="back-btn" onclick="backToOverview()">← Back</button>
+            <div>
+                <div class="detail-title">${d.icon} ${d.title}</div>
+                <div class="detail-meta">
+                    Week ${w} · ${DAY_LABELS[day]} ${dateStr}
+                    <span class="badge" style="background:${INTENSITY_COLORS[d.intensity]}">${d.intensity}</span>
+                    <span style="color:var(--text3)">${d.duration}</span>
+                </div>
+                ${d.equip ? `<div class="equip-note">Bring: ${d.equip}</div>` : ''}
+            </div>
+        </div>
+        <div>
+            ${d.blocks.map((block, bi) => `
+                <div class="block">
+                    ${block.name ? `<div class="block-name">${block.name}</div>` : ''}
+                    ${block.items.map((item, ii) => {
+                        if (item.startsWith("→")) return `<div class="arrow-note">${item}</div>`;
+                        const k = `${w}-${day}-${bi}-${ii}`;
+                        const done = !!state.checked[k];
+                        const wt = state.weights[k];
+                        const nt = state.notes[k];
+                        return `
+                            <div class="item ${done?'item-done':''}">
+                                <button class="chk" style="color:${done?'var(--green)':'var(--text3)'}" onclick="toggleCheck('${k}')">${done?'✓':'○'}</button>
+                                <div style="flex:1;min-width:0">
+                                    <div class="item-text">${item}</div>
+                                    <div class="item-acts">
+                                        <button class="${wt?'act-btn act-btn-filled':'act-btn'}" onclick="editWeight('${k}','${(wt||'').replace(/'/g,"\\'")}')">${wt?'⚖ '+wt:'+weight'}</button>
+                                        <button class="${nt?'act-btn act-btn-filled':'act-btn'}" onclick="editNote('${k}','${(nt||'').replace(/'/g,"\\'")}')">${nt?'📝 '+(nt.length>18?nt.substring(0,18)+'…':nt):'+note'}</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
+function renderExport(app) {
+    const txt = generateExport();
+    app.innerHTML = `
+        <div class="detail-header">
+            <button class="back-btn" onclick="backToOverview()">← Back</button>
+            <div class="detail-title">Export Progress</div>
+        </div>
+        <p class="export-hint">Copy and paste into a chat with Claude to review progress and adjust the program.</p>
+        <textarea class="export-box" readonly onclick="this.select()">${txt}</textarea>
+        <button class="export-copy" onclick="navigator.clipboard?.writeText(document.querySelector('.export-box').value)">Copy to Clipboard</button>
+    `;
+}
+
+// ─── Actions ────────────────────────────────────────────────────────────────
+function changeWeek(d) { const nw=state.currentWeek+d; if(nw>=1&&nw<=12){state.currentWeek=nw;render();window.scrollTo(0,0);} }
+function goWeek(w) { state.currentWeek=w; render(); window.scrollTo(0,0); }
+function jumpToToday() { state.currentWeek=getCurrentWeek(); render(); window.scrollTo(0,0); }
+function selectDay(day) { state.selectedDay=day; state.view='workout'; render(); window.scrollTo(0,0); }
+function backToOverview() { state.view='overview'; render(); window.scrollTo(0,0); }
+function showExport() { state.view='export'; render(); window.scrollTo(0,0); }
+
+function toggleCheck(k) {
+    state.checked[k] = !state.checked[k];
+    if (!state.checked[k]) delete state.checked[k];
+    save(); render();
+}
+
+function editWeight(k, current) {
+    const val = prompt('Weight (e.g. 35lb, 2x25lb):', current || '');
+    if (val !== null && val.trim()) { state.weights[k] = val.trim(); save(); render(); }
+    else if (val === '') { delete state.weights[k]; save(); render(); }
+}
+
+function editNote(k, current) {
+    const val = prompt('Note:', current || '');
+    if (val !== null && val.trim()) { state.notes[k] = val.trim(); save(); render(); }
+    else if (val === '') { delete state.notes[k]; save(); render(); }
+}
+
+// ─── Init ───────────────────────────────────────────────────────────────────
+state.currentWeek = getCurrentWeek();
+render();
+</script>
 </body>
 </html>
