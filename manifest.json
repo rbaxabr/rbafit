@@ -1,14 +1,14 @@
 {
-  "name": "rba Fit",
+  "name": "rba | fit",
   "short_name": "rba | fit",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#0f172a",
-  "theme_color": "#1e293b",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect fill='%231e293b' width='512' height='512'/%3E%3Ctext x='256' y='340' font-size='280' text-anchor='middle' fill='%233b82f6'%3E💪%3C/text%3E%3C/svg%3E",
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect fill='%230a0a0a' width='512' height='512' rx='80'/%3E%3Ctext x='256' y='320' font-size='200' text-anchor='middle' font-weight='800' font-family='system-ui' fill='%23d4a43a'%3Erba%3C/text%3E%3C/svg%3E",
       "sizes": "512x512",
       "type": "image/svg+xml",
       "purpose": "any maskable"
