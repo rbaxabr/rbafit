@@ -101,7 +101,7 @@ function getHeaderHTML() {
             </div>
         </div>
         <div>
-           <button class="tb" onclick="triggerEODAgent()" style="margin-right: 5px;">Day Complete ✓</button>
+           <button class="tb" onclick="triggerEODAgent()" style="margin-right: 5px;">🔄 Update AI Summary</button>
         </div>
     </div>`;
 }
@@ -313,9 +313,9 @@ function triggerEODAgent() {
         method: "POST",
         mode: "no-cors",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: 'run_eod_agent', date: dateStr })
+        body: JSON.stringify({ type: 'run_manual_agent', date: dateStr })
     }).catch(err => console.error(err));
-    alert("Day complete! End-of-Day Agent triggered. Summary and suggestions will populate shortly.");
+    alert("Manual AI update triggered! Depending on the hour, your midday or End-of-Day summary will synthesize and populate shortly.");
 }
 
 // Global actions
