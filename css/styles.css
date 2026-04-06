@@ -194,10 +194,10 @@ button {
 }
 
 .pill {
-    width: 28px;
-    height: 26px;
-    border-radius: 6px;
-    font-size: 11px;
+    width: 36px;
+    height: 34px;
+    border-radius: 8px;
+    font-size: 15px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -459,13 +459,13 @@ button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 18px;
-    height: 18px;
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
     background: var(--bg3);
     border: 1px solid var(--border);
     color: var(--text2);
-    font-size: 10px;
+    font-size: 14px;
     font-weight: bold;
     cursor: pointer;
 }
@@ -501,10 +501,10 @@ button {
     background: var(--bg);
     border: 1px solid var(--border);
     color: var(--text);
-    padding: 4px;
-    border-radius: 4px;
-    width: 40px;
-    font-size: 12px;
+    padding: 6px;
+    border-radius: 6px;
+    width: 50px;
+    font-size: 16px;
     text-align: center;
 }
 
@@ -513,9 +513,9 @@ button {
     border-color: var(--accent);
 }
 
-.set-input.reps { width: 36px; }
-.set-input.weight { width: 44px; }
-.set-select.rpe { width: 50px; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 4px; padding: 3px; font-size: 11px; }
+.set-input.reps { width: 44px; }
+.set-input.weight { width: 56px; }
+.set-select.rpe { width: 62px; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 4px; font-size: 16px; }
 
 .set-recom {
     font-size: 10px;
@@ -528,9 +528,9 @@ button {
     background: var(--bg3);
     color: var(--green);
     border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 3px 6px;
-    font-size: 10px;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 14px;
     font-weight: bold;
 }
 .save-set-btn.saved {
@@ -633,7 +633,7 @@ button {
     margin-bottom: 12px;
 }
 .input-label {
-    font-size: 11px;
+    font-size: 14px;
     color: var(--text3);
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -642,9 +642,9 @@ button {
     background: var(--bg);
     border: 1px solid var(--border);
     color: var(--text);
-    padding: 10px;
-    border-radius: 6px;
-    font-size: 14px;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 16px;
     font-family: inherit;
     width: 100%;
 }
