@@ -114,7 +114,7 @@ function rO(a) {
     const dLog = S.daily[dateStr] || { weight: '', food: '' };
 
     // AI Summary defaults
-    const activeType = S.aiSummaryType || "Pending";
+    const activeType = S.aiSummaryType || "Beta";
     const activeSummary = S.aiSummaryText || "Loading highlights from Agent...";
     const activeScore = S.aiScore || "N/A";
 
